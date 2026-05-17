@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Tech Stack Summary | PhiNova Bulk SMS Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --navy:#1a2a4a; --navy-mid:#1e3a6e; --blue:#4a7fb5; --blue-light:#7ab3d8;
+    --paper:#f4f7fb; --white:#fff; --muted:#6b7a94; --rule:#d8e3ef;
+    --green:#1a7a4a; --green-bg:#edf7f2;
+    --sec-bg:#f0eafa; --sec-border:#c4a8e8; --sec-color:#6b3fa0;
+    --orange:#b84a10; --orange-bg:#fff4ed; --orange-border:#f5c09a;
+    --amber:#92600a; --amber-bg:#fdf4e3; --amber-border:#f0d090;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--navy);min-height:100vh;padding:2rem 1rem 4rem;}
+
+  .doc{max-width:860px;margin:0 auto;background:var(--white);border:1px solid var(--rule);box-shadow:0 8px 56px rgba(26,42,74,.11);overflow:hidden;}
+
+  /* ── HEADER ── */
+  .header{background:linear-gradient(135deg,#0d1b30 0%,#1e3a6e 100%);color:#fff;padding:2.6rem 3.5rem 2.2rem;position:relative;overflow:hidden;}
+  .header::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(-55deg,transparent,transparent 28px,rgba(255,255,255,.016) 28px,rgba(255,255,255,.016) 29px);}
+  .header::after{content:'';position:absolute;right:-90px;top:-90px;width:300px;height:300px;border-radius:50%;border:48px solid rgba(74,144,196,.09);pointer-events:none;}
+  .header-inner{position:relative;z-index:1;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:1.5rem;}
+  .brand{display:flex;align-items:center;gap:1rem;}
+  .logo-wrap{background:rgba(255,255,255,.08);border-radius:12px;padding:8px 10px;border:1px solid rgba(255,255,255,.13);}
+  .brand-name{font-family:'Playfair Display',serif;font-size:1.55rem;font-weight:700;line-height:1.1;}
+  .brand-name .phi{color:#7ab3d8;}
+  .brand-tagline{font-size:.57rem;letter-spacing:.18em;text-transform:uppercase;color:rgba(122,179,216,.65);margin-top:.28rem;}
+  .header-label{text-align:right;}
+  .header-label .eyebrow{font-size:.58rem;letter-spacing:.16em;text-transform:uppercase;opacity:.4;}
+  .header-label .title{font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;color:var(--blue-light);margin-top:.2rem;}
+  .header-label .sub{font-size:.68rem;opacity:.45;margin-top:.18rem;}
+
+  /* ── STACK CARDS ── */
+  .body{padding:2.5rem 3.5rem;}
+
+  .intro{font-size:.85rem;color:var(--muted);line-height:1.7;margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--rule);}
+  .intro strong{color:var(--navy);}
+
+  .stack-list{display:flex;flex-direction:column;gap:1rem;}
+
+  .stack-card{border:1px solid var(--rule);border-radius:12px;overflow:hidden;transition:box-shadow .15s;}
+  .stack-card:hover{box-shadow:0 4px 24px rgba(26,42,74,.09);}
+
+  .card-inner{display:grid;grid-template-columns:auto 1fr;gap:0;}
+
+  .card-accent{width:5px;flex-shrink:0;}
+  .card-accent.react{background:linear-gradient(180deg,#61dafb,#4a7fb5);}
+  .card-accent.node{background:linear-gradient(180deg,#68a063,#3d7a3a);}
+  .card-accent.supa-db{background:linear-gradient(180deg,#3ecf8e,#1a8a4a);}
+  .card-accent.supa-auth{background:linear-gradient(180deg,#9b6ef3,#6b3fa0);}
+  .card-accent.supa-edge{background:linear-gradient(180deg,#f6a623,#92600a);}
+  .card-accent.arkesel{background:linear-gradient(180deg,#7ab3d8,#4a7fb5);}
+  .card-accent.vercel{background:linear-gradient(180deg,#555,#111);}
+
+  .card-body{padding:1.2rem 1.4rem;}
+
+  .card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:.8rem;margin-bottom:.55rem;flex-wrap:wrap;}
+  .card-title{display:flex;align-items:center;gap:.6rem;}
+  .card-icon{font-size:1.2rem;line-height:1;}
+  .card-name{font-weight:700;font-size:.95rem;color:var(--navy);}
+  .card-tech{font-family:'DM Mono',monospace;font-size:.63rem;padding:.1rem .45rem;border-radius:4px;border:1px solid;white-space:nowrap;font-weight:500;}
+  .card-tech.react{color:#1a6a9a;background:#e3f4fc;border-color:#a8d8f0;}
+  .card-tech.node{color:#1a5a2a;background:var(--green-bg);border-color:#a0d4b8;}
+  .card-tech.supa{color:var(--green);background:var(--green-bg);border-color:#a0d4b8;}
+  .card-tech.auth{color:var(--sec-color);background:var(--sec-bg);border-color:var(--sec-border);}
+  .card-tech.edge{color:var(--amber);background:var(--amber-bg);border-color:var(--amber-border);}
+  .card-tech.ark{color:var(--blue);background:#e8f1f9;border-color:#b0cfe8;}
+  .card-tech.ver{color:#333;background:#f0f0f0;border-color:#ccc;}
+
+  .card-role{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.4rem;}
+  .card-role.react{color:#1a6a9a;}
+  .card-role.node{color:var(--green);}
+  .card-role.supa-db{color:var(--green);}
+  .card-role.supa-auth{color:var(--sec-color);}
+  .card-role.supa-edge{color:var(--amber);}
+  .card-role.arkesel{color:var(--blue);}
+  .card-role.vercel{color:#333;}
+
+  .card-desc{font-size:.81rem;color:var(--muted);line-height:1.65;}
+  .card-desc strong{color:var(--navy);font-weight:600;}
+
+  .card-bullets{list-style:none;margin-top:.6rem;display:flex;flex-direction:column;gap:.3rem;}
+  .card-bullets li{font-size:.77rem;color:var(--muted);display:flex;gap:.5rem;line-height:1.5;}
+  .card-bullets li::before{content:'·';font-weight:900;flex-shrink:0;}
+  .card-bullets li::before.react{color:#4a7fb5;}
+
+  /* ── SUMMARY TABLE ── */
+  .summary{margin-top:2rem;padding-top:1.8rem;border-top:1px solid var(--rule);}
+  .summary-title{font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;color:var(--navy);margin-bottom:1rem;}
+  .sum-table{width:100%;border-collapse:collapse;font-size:.81rem;}
+  .sum-table thead tr{background:var(--navy);color:#fff;}
+  .sum-table thead th{padding:.6rem 1rem;text-align:left;font-size:.6rem;text-transform:uppercase;letter-spacing:.1em;font-weight:600;}
+  .sum-table tbody tr{border-bottom:1px solid var(--rule);transition:background .12s;}
+  .sum-table tbody tr:hover{background:#f4f8fd;}
+  .sum-table tbody td{padding:.75rem 1rem;vertical-align:middle;}
+  .sum-table td:first-child{font-size:1rem;}
+  .sum-table td:nth-child(2){font-weight:700;color:var(--navy);font-size:.83rem;}
+  .sum-table td:nth-child(3){font-size:.78rem;color:var(--muted);}
+  .sum-table td:last-child{font-family:'DM Mono',monospace;font-size:.72rem;font-weight:600;}
+  .free-tag{display:inline-block;background:var(--green-bg);color:var(--green);border:1px solid #a0d4b8;border-radius:4px;font-size:.6rem;font-weight:700;padding:.08rem .35rem;}
+  .paid-tag{display:inline-block;background:#fff4ed;color:var(--orange);border:1px solid var(--orange-border);border-radius:4px;font-size:.6rem;font-weight:700;padding:.08rem .35rem;}
+
+  /* ── COST BOX ── */
+  .cost-box{margin-top:1rem;border:1px solid var(--rule);border-radius:10px;overflow:hidden;}
+  .cost-row{display:flex;justify-content:space-between;align-items:center;padding:.8rem 1.2rem;border-bottom:1px solid var(--rule);font-size:.83rem;}
+  .cost-row:last-child{border-bottom:none;}
+  .cost-row.grand{background:var(--navy);color:#fff;}
+  .cost-row.grand .cost-val{font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;color:var(--blue-light);}
+  .cost-lbl{color:inherit;}
+  .cost-val{font-family:'DM Mono',monospace;font-weight:600;}
+
+  /* ── FOOTER ── */
+  .footer{background:linear-gradient(135deg,#0d1b30 0%,#1e3a6e 100%);color:rgba(255,255,255,.6);padding:1.5rem 3.5rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;font-size:.72rem;}
+  .footer-brand{font-family:'Playfair Display',serif;font-size:.9rem;font-weight:700;}
+  .footer-brand .phi{color:var(--blue-light);}
+  .footer-brand .nova{color:#fff;}
+
+  /* PRINT */
+  .print-btn{display:flex;justify-content:flex-end;max-width:860px;margin:1.2rem auto 0;padding:0 1rem;}
+  .print-btn button{padding:.48rem 1.05rem;background:var(--navy);color:#fff;border:none;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:.78rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:.4rem;transition:background .15s;}
+  .print-btn button:hover{background:var(--navy-mid);}
+  @media print{body{padding:0;background:#fff;}.print-btn{display:none;}.doc{box-shadow:none;border:none;}}
+  @media(max-width:600px){.body,.header{padding-left:1.3rem;padding-right:1.3rem;}.card-inner{grid-template-columns:4px 1fr;}.footer{padding-left:1.3rem;padding-right:1.3rem;}}
+</style>
+</head>
+<body>
+
+<div class="print-btn">
+  <button onclick="window.print()">🖨 Print / Save PDF</button>
+</div>
+
+<div class="doc">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-inner">
+      <div class="brand">
+        <div class="logo-wrap">
+          <svg width="90" height="64" viewBox="0 0 90 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="4" y="4" width="9" height="56" rx="1" fill="white"/>
+            <rect x="4" y="4" width="28" height="9" rx="1" fill="white"/>
+            <rect x="4" y="29" width="28" height="8" rx="1" fill="white"/>
+            <rect x="29" y="4" width="9" height="33" rx="4" fill="white"/>
+            <circle cx="24" cy="22" r="10" fill="none" stroke="#7ab3d8" stroke-width="2.2"/>
+            <line x1="24" y1="10" x2="24" y2="34" stroke="#7ab3d8" stroke-width="2.4" stroke-linecap="round"/>
+            <ellipse cx="24" cy="22" rx="6" ry="4" fill="none" stroke="#7ab3d8" stroke-width="1.8"/>
+            <rect x="50" y="4" width="9" height="56" rx="1" fill="white"/>
+            <rect x="77" y="4" width="9" height="56" rx="1" fill="white"/>
+            <polygon points="59,4 68,4 77,60 68,60" fill="white"/>
+          </svg>
+        </div>
+        <div>
+          <div class="brand-name"><span class="phi">Phi</span>Nova</div>
+          <div class="brand-tagline">Architecting Digital Solutions</div>
+        </div>
+      </div>
+      <div class="header-label">
+        <div class="eyebrow">Internal Reference</div>
+        <div class="title">Tech Stack Summary</div>
+        <div class="sub">Bulk SMS Platform · May 2026</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BODY -->
+  <div class="body">
+
+    <p class="intro">
+      This document outlines the <strong>7 technologies</strong> that power the PhiNova Bulk SMS Platform —
+      what each one is, what role it plays in the project, and what it costs.
+      Every tool was chosen to be <strong>scalable, fast, and free to run</strong> — with Arkesel credits
+      being the only real ongoing expense.
+    </p>
+
+    <div class="stack-list">
+
+      <!-- 1. NEXT.JS -->
+      <div class="stack-card">
+        <div class="card-inner">
+          <div class="card-accent react"></div>
+          <div class="card-body">
+            <div class="card-top">
+              <div class="card-title">
+                <span class="card-icon">⚛️</span>
+                <span class="card-name">Next.js + Tailwind CSS</span>
+              </div>
+              <span class="card-tech react">React Framework</span>
+            </div>
+            <div class="card-role react">The Face of the Platform</div>
+            <div class="card-desc">
+              Every screen the user sees — the dashboard, contact list, template editor, send page, and reports — is built here.
+              <strong>Next.js</strong> handles routing, page rendering, and performance optimisation automatically.
+              <strong>Tailwind CSS</strong> styles everything without writing a single custom CSS file.
+              Unlike plain HTML, only the parts of the page that change re-render — making the UI feel instant and app-like.
+            </div>
+            <ul class="card-bullets">
+              <li>Faster than HTML — no full page reloads on navigation</li>
+              <li>Scales cleanly as new pages and features are added</li>
+              <li>Deployed and optimised automatically by Vercel</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. NODE.JS + EXPRESS -->
+      <div class="stack-card">
+        <div class="card-inner">
+          <div class="card-accent node"></div>
+          <div class="card-body">
+            <div class="card-top">
+              <div class="card-title">
+                <span class="card-icon">🟢</span>
+                <span class="card-name">Node.js + Express.js</span>
+              </div>
+              <span class="card-tech node">Backend Server</span>
+            </div>
+            <div class="card-role node">The Brain of the Platform</div>
+            <div class="card-desc">
+              Handles all the logic running behind the scenes. When a user hits <strong>Send SMS</strong>, Express receives that request,
+              validates it, calls the Arkesel API, and returns the delivery result.
+              Every action on the frontend — sending messages, saving contacts, managing templates — flows through an Express route.
+            </div>
+            <ul class="card-bullets">
+              <li>Processes all API calls between the frontend and external services</li>
+              <li>Talks directly to Supabase to read and write data</li>
+              <li>Runs as serverless functions on Vercel — no server to manage</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. SUPABASE DB -->
+      <div class="stack-card">
+        <div class="card-inner">
+          <div class="card-accent supa-db"></div>
+          <div class="card-body">
+            <div class="card-top">
+              <div class="card-title">
+                <span class="card-icon">🗄️</span>
+                <span class="card-name">Supabase — PostgreSQL Database</span>
+              </div>
+              <span class="card-tech supa">Cloud Database</span>
+            </div>
+            <div class="card-role supa-db">The Memory of the Platform</div>
+            <div class="card-desc">
+              Stores everything permanently in the cloud — <strong>contacts, message templates, sent message history,
+              scheduled reminders, and user accounts</strong>. Because it's cloud-hosted, data is never lost
+              between deploys or server restarts. The free tier provides 500MB of storage —
+              more than enough for thousands of contacts and message records.
+            </div>
+            <ul class="card-bullets">
+              <li>Replaces SQLite — data persists reliably in the cloud</li>
+              <li>Also handles CSV file storage for contact imports (1GB free)</li>
+              <li>Secure, backed up, and accessible from anywhere</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. SUPABASE AUTH -->
+      <div class="stack-card">
+        <div class="card-inner">
+          <div class="card-accent supa-auth"></div>
+          <div class="card-body">
+            <div class="card-top">
+              <div class="card-title">
+                <span class="card-icon">🔐</span>
+                <span class="card-name">Supabase Auth</span>
+              </div>
+              <span class="card-tech auth">Authentication</span>
+            </div>
+            <div class="card-role supa-auth">The Gatekeeper</div>
+            <div class="card-desc">
+              Manages who can log in and what they can access. Handles <strong>password hashing, session management,
+              and role-based access</strong> (admin vs standard user) — all out of the box.
+              Replaces the need for bcrypt and express-session entirely, with far more security built in.
+            </div>
+            <ul class="card-bullets">
+              <li>Admins can manage contacts, templates, and users</li>
+              <li>Standard users can send messages and view reports only</li>
+              <li>Row-Level Security ensures users only see their own data</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. SUPABASE EDGE FUNCTIONS -->
+      <div class="stack-card">
+        <div class="card-inner">
+          <div class="card-accent supa-edge"></div>
+          <div class="card-body">
+            <div class="card-top">
+              <div class="card-title">
+                <span class="card-icon">⏰</span>
+                <span class="card-name">Supabase Edge Functions</span>
+              </div>
+              <span class="card-tech edge">Scheduler</span>
+            </div>
+            <div class="card-role supa-edge">The Timekeeper</div>
+            <div class="card-desc">
+              Runs scheduled jobs automatically inside Supabase — <strong>no separate server or cron service needed</strong>.
+              Every day it checks the database for contacts with birthdays, anniversaries, or appointments due,
+              then calls the Arkesel API to send the right message at the right time.
+              Because it lives inside Supabase, it has direct, instant access to the database with zero latency.
+            </div>
+            <ul class="card-bullets">
+              <li>Fires reminders automatically — set once, runs forever</li>
+              <li>Direct database access — no external API calls needed to read contacts</li>
+              <li>Runs on a schedule as tight as every 1 minute</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6. ARKESEL -->
+      <div class="stack-card">
+        <div class="card-inner">
+          <div class="card-accent arkesel"></div>
+          <div class="card-body">
+            <div class="card-top">
+              <div class="card-title">
+                <span class="card-icon">📱</span>
+                <span class="card-name">Arkesel API</span>
+              </div>
+              <span class="card-tech ark">SMS Gateway</span>
+            </div>
+            <div class="card-role arkesel">The Messenger</div>
+            <div class="card-desc">
+              The only service that actually <strong>sends SMS messages to phone numbers</strong> through the telecom network.
+              Express sends Arkesel a recipient number and message text — Arkesel handles everything else,
+              including delivery, sender ID management, and returning a delivery status.
+              The platform is entirely invisible to the recipient — they just receive the message.
+            </div>
+            <ul class="card-bullets">
+              <li>Handles bulk sending to full contact lists in one API call</li>
+              <li>Returns real-time delivery confirmations per message</li>
+              <li>Credit balance is displayed live inside the dashboard</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- 7. VERCEL -->
+      <div class="stack-card">
+        <div class="card-inner">
+          <div class="card-accent vercel"></div>
+          <div class="card-body">
+            <div class="card-top">
+              <div class="card-title">
+                <span class="card-icon">🚀</span>
+                <span class="card-name">Vercel</span>
+              </div>
+              <span class="card-tech ver">Hosting & Deployment</span>
+            </div>
+            <div class="card-role vercel">The Landlord</div>
+            <div class="card-desc">
+              Hosts and serves the entire platform live on the internet. Built by the same team as Next.js,
+              so the two work together seamlessly — <strong>automatic HTTPS, global CDN, and instant deploys</strong>
+              every time code is pushed to GitHub. The free Hobby tier covers this project entirely
+              with no credit card required to start.
+            </div>
+            <ul class="card-bullets">
+              <li>Global CDN means fast load times regardless of where users are</li>
+              <li>Auto-deploys on every GitHub push — no manual uploads</li>
+              <li>Now viable because data lives in Supabase, not on local disk</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /.stack-list -->
+
+    <!-- SUMMARY TABLE -->
+    <div class="summary">
+      <div class="summary-title">Quick Reference</div>
+      <table class="sum-table">
+        <thead>
+          <tr>
+            <th style="width:4%"></th>
+            <th style="width:30%">Tool</th>
+            <th>Role in Project</th>
+            <th style="width:14%">Cost</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>⚛️</td>
+            <td>Next.js + Tailwind</td>
+            <td>What users see and interact with</td>
+            <td><span class="free-tag">Free</span></td>
+          </tr>
+          <tr>
+            <td>🟢</td>
+            <td>Node.js + Express</td>
+            <td>Processes all requests and logic</td>
+            <td><span class="free-tag">Free</span></td>
+          </tr>
+          <tr>
+            <td>🗄️</td>
+            <td>Supabase PostgreSQL</td>
+            <td>Stores all data permanently in the cloud</td>
+            <td><span class="free-tag">Free</span></td>
+          </tr>
+          <tr>
+            <td>🔐</td>
+            <td>Supabase Auth</td>
+            <td>Manages login, passwords, and user roles</td>
+            <td><span class="free-tag">Free</span></td>
+          </tr>
+          <tr>
+            <td>⏰</td>
+            <td>Supabase Edge Functions</td>
+            <td>Fires automated scheduled reminders</td>
+            <td><span class="free-tag">Free</span></td>
+          </tr>
+          <tr>
+            <td>📱</td>
+            <td>Arkesel API</td>
+            <td>Delivers SMS to phone numbers</td>
+            <td><span class="paid-tag">GHS 280</span></td>
+          </tr>
+          <tr>
+            <td>🚀</td>
+            <td>Vercel</td>
+            <td>Hosts and serves the platform live</td>
+            <td><span class="free-tag">Free</span></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="cost-box">
+        <div class="cost-row">
+          <span class="cost-lbl">All tools, frameworks & hosting</span>
+          <span class="cost-val">GHS 0</span>
+        </div>
+        <div class="cost-row">
+          <span class="cost-lbl">Arkesel Starter SMS Credits</span>
+          <span class="cost-val">GHS 280</span>
+        </div>
+        <div class="cost-row grand">
+          <span class="cost-lbl" style="font-family:'Playfair Display',serif;font-size:.95rem;font-weight:700;">Total Out-of-Pocket Tool Cost</span>
+          <span class="cost-val">GHS 280</span>
+        </div>
+      </div>
+      <p style="font-size:.69rem;color:var(--muted);margin-top:.7rem;">* The GHS 2,700 development fee in the quotation covers the labour and expertise to build, configure, and connect all of the above. The tools themselves are free.</p>
+    </div>
+
+  </div><!-- /.body -->
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div>
+      <div class="footer-brand"><span class="phi">Phi</span><span class="nova">Nova</span></div>
+      <div style="margin-top:.22rem;">📞 +233 204 906 780 &nbsp;·&nbsp; info@phinova.com</div>
+    </div>
+    <div style="text-align:right;">Bulk SMS Platform &nbsp;·&nbsp; Tech Stack Reference &nbsp;·&nbsp; May 2026</div>
+  </div>
+
+</div><!-- /.doc -->
+</body>
+</html>

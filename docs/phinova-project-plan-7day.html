@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Project Plan | PhiNova Bulk SMS Platform — 7-Day Sprint</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --navy:#1a2a4a; --navy-mid:#1e3a6e; --blue:#4a7fb5; --blue-light:#7ab3d8;
+    --paper:#f4f7fb; --white:#fff; --muted:#6b7a94; --rule:#d8e3ef;
+    --green:#1a7a4a; --green-bg:#edf7f2; --green-border:#a0d4b8;
+    --amber:#92600a; --amber-bg:#fdf4e3; --amber-border:#f0d090;
+    --sec-color:#6b3fa0; --sec-bg:#f0eafa; --sec-border:#c4a8e8;
+    --p1:#4a7fb5; --p1-bg:#e8f1f9; --p1-border:#b0cfe8;
+    --p2:#1a7a4a; --p2-bg:#edf7f2; --p2-border:#a0d4b8;
+    --p3:#6b3fa0; --p3-bg:#f0eafa; --p3-border:#c4a8e8;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--navy);min-height:100vh;padding:1.5rem 1rem 4rem;}
+
+  .page{max-width:980px;margin:0 auto;display:flex;flex-direction:column;gap:1.5rem;}
+
+  /* ── HEADER ── */
+  .header{background:linear-gradient(135deg,#0d1b30 0%,#1e3a6e 100%);border-radius:16px;padding:2rem 2.5rem;color:#fff;position:relative;overflow:hidden;}
+  .header::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(-55deg,transparent,transparent 28px,rgba(255,255,255,.015) 28px,rgba(255,255,255,.015) 29px);}
+  .header::after{content:'';position:absolute;right:-60px;top:-60px;width:220px;height:220px;border-radius:50%;border:36px solid rgba(74,144,196,.1);pointer-events:none;}
+  .header-inner{position:relative;z-index:1;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;}
+  .brand{display:flex;align-items:center;gap:.9rem;}
+  .logo-wrap{background:rgba(255,255,255,.09);border-radius:10px;padding:6px 8px;border:1px solid rgba(255,255,255,.12);}
+  .brand-name{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;}
+  .brand-name .phi{color:#7ab3d8;}
+  .brand-sub{font-size:.57rem;letter-spacing:.16em;text-transform:uppercase;color:rgba(122,179,216,.6);margin-top:.2rem;}
+  .header-right{text-align:right;}
+  .header-title{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--blue-light);}
+  .header-meta{font-size:.7rem;opacity:.5;margin-top:.2rem;}
+  .sprint-badge{display:inline-flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:20px;padding:.25rem .75rem;font-size:.68rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-top:.5rem;color:rgba(255,255,255,.85);}
+  .sprint-badge .dot{width:7px;height:7px;border-radius:50%;background:#3ecf8e;animation:pulse 1.8s infinite;}
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.6;transform:scale(.85);}}
+
+  .legend{display:flex;gap:.7rem;flex-wrap:wrap;margin-top:1.2rem;position:relative;z-index:1;}
+  .leg{display:flex;align-items:center;gap:.4rem;font-size:.72rem;font-weight:600;color:rgba(255,255,255,.75);}
+  .leg-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0;}
+  .leg-dot.p1{background:var(--p1);}
+  .leg-dot.p2{background:var(--p2);}
+  .leg-dot.p3{background:var(--p3);}
+
+  /* ── TABS ── */
+  .tabs{display:flex;gap:.5rem;background:var(--white);border:1px solid var(--rule);border-radius:10px;padding:.4rem;width:fit-content;}
+  .tab{padding:.45rem 1.2rem;border-radius:7px;font-size:.8rem;font-weight:600;cursor:pointer;border:none;background:transparent;font-family:'DM Sans',sans-serif;color:var(--muted);transition:all .15s;}
+  .tab.active{background:var(--navy);color:#fff;}
+
+  .panel{display:none;}
+  .panel.active{display:block;}
+
+  /* ══════════════════════════════
+     GANTT
+  ══════════════════════════════ */
+  .gantt-wrap{background:var(--white);border:1px solid var(--rule);border-radius:14px;overflow:hidden;}
+  .gantt-header{background:var(--navy);color:#fff;display:grid;grid-template-columns:200px repeat(7,1fr);font-size:.6rem;text-transform:uppercase;letter-spacing:.1em;}
+  .gantt-header .gh-label{padding:.7rem 1rem;font-weight:600;border-right:1px solid rgba(255,255,255,.1);}
+  .gantt-header .gh-day{padding:.7rem .3rem;text-align:center;font-weight:600;border-right:1px solid rgba(255,255,255,.06);}
+
+  .gantt-phase-row{display:grid;grid-template-columns:200px repeat(7,1fr);background:rgba(0,0,0,.02);border-bottom:1px solid var(--rule);}
+  .gantt-phase-label{padding:.5rem 1rem;font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;display:flex;align-items:center;border-right:1px solid var(--rule);}
+  .gantt-phase-label.p1{color:var(--p1);}
+  .gantt-phase-label.p2{color:var(--p2);}
+  .gantt-phase-label.p3{color:var(--p3);}
+  .gantt-phase-bar-cell{grid-column:2/-1;padding:.4rem .5rem;display:flex;align-items:center;}
+  .phase-bar{height:8px;border-radius:4px;opacity:.22;}
+  .phase-bar.p1{background:var(--p1);}
+  .phase-bar.p2{background:var(--p2);}
+  .phase-bar.p3{background:var(--p3);}
+
+  .gantt-row{display:grid;grid-template-columns:200px repeat(7,1fr);border-bottom:1px solid var(--rule);transition:background .12s;}
+  .gantt-row:hover{background:#f4f8fd;}
+  .gantt-row:last-child{border-bottom:none;}
+  .gantt-task{padding:.6rem 1rem;font-size:.78rem;font-weight:600;color:var(--navy);border-right:1px solid var(--rule);display:flex;align-items:center;gap:.5rem;line-height:1.3;}
+  .gantt-task .task-icon{font-size:.9rem;flex-shrink:0;}
+  .gantt-cell{border-right:1px solid var(--rule);position:relative;min-height:36px;}
+  .gantt-cell:last-child{border-right:none;}
+  .gantt-bar{position:absolute;top:50%;transform:translateY(-50%);height:18px;border-radius:4px;display:flex;align-items:center;padding:0 .4rem;font-size:.55rem;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:.03em;}
+  .gantt-bar.p1{background:var(--p1);}
+  .gantt-bar.p2{background:var(--p2);}
+  .gantt-bar.p3{background:var(--p3);}
+
+  /* ══════════════════════════════
+     CHECKLIST
+  ══════════════════════════════ */
+  .checklist-wrap{display:flex;flex-direction:column;gap:1.2rem;}
+
+  .phase-block{background:var(--white);border:1px solid var(--rule);border-radius:14px;overflow:hidden;}
+  .phase-head{padding:1rem 1.4rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;cursor:pointer;user-select:none;}
+  .phase-head.p1{border-left:4px solid var(--p1);}
+  .phase-head.p2{border-left:4px solid var(--p2);}
+  .phase-head.p3{border-left:4px solid var(--p3);}
+  .phase-head-left{display:flex;align-items:center;gap:.8rem;}
+  .phase-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;}
+  .phase-icon.p1{background:var(--p1-bg);}
+  .phase-icon.p2{background:var(--p2-bg);}
+  .phase-icon.p3{background:var(--p3-bg);}
+  .phase-name{font-weight:700;font-size:.92rem;color:var(--navy);}
+  .phase-days{font-size:.72rem;color:var(--muted);margin-top:.12rem;}
+  .phase-progress{display:flex;align-items:center;gap:.7rem;}
+  .progress-bar-wrap{width:80px;height:6px;background:var(--rule);border-radius:3px;overflow:hidden;}
+  .progress-bar-fill{height:100%;border-radius:3px;transition:width .3s ease;}
+  .progress-bar-fill.p1{background:var(--p1);}
+  .progress-bar-fill.p2{background:var(--p2);}
+  .progress-bar-fill.p3{background:var(--p3);}
+  .progress-pct{font-family:'DM Mono',monospace;font-size:.7rem;font-weight:600;min-width:28px;text-align:right;}
+  .progress-pct.p1{color:var(--p1);}
+  .progress-pct.p2{color:var(--p2);}
+  .progress-pct.p3{color:var(--p3);}
+  .phase-toggle{font-size:.75rem;color:var(--muted);transition:transform .2s;}
+  .phase-toggle.open{transform:rotate(180deg);}
+
+  .phase-tasks{border-top:1px solid var(--rule);padding:.5rem 0;}
+  .phase-tasks.hidden{display:none;}
+
+  .day-group{padding:.4rem 1.4rem;}
+  .day-label{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);padding:.5rem 0 .4rem;border-bottom:1px solid var(--rule);margin-bottom:.4rem;}
+
+  .task-item{display:flex;align-items:flex-start;gap:.75rem;padding:.5rem .3rem;border-radius:7px;cursor:pointer;transition:background .12s;}
+  .task-item:hover{background:var(--paper);}
+  .task-cb{width:18px;height:18px;border:2px solid var(--rule);border-radius:4px;flex-shrink:0;margin-top:.08rem;display:flex;align-items:center;justify-content:center;transition:all .15s;background:var(--white);}
+  .task-cb.checked{border-color:var(--green);background:var(--green);}
+  .task-cb.checked::after{content:'✓';color:#fff;font-size:.65rem;font-weight:700;}
+  .task-cb.p1-check.checked{border-color:var(--p1);background:var(--p1);}
+  .task-cb.p2-check.checked{border-color:var(--p2);background:var(--p2);}
+  .task-cb.p3-check.checked{border-color:var(--p3);background:var(--p3);}
+  .task-text{font-size:.8rem;line-height:1.5;color:var(--navy);transition:all .15s;}
+  .task-text.done{text-decoration:line-through;color:var(--muted);}
+  .task-tag{display:inline-block;font-size:.57rem;font-weight:600;border-radius:3px;padding:.05rem .3rem;margin-left:.4rem;border:1px solid;vertical-align:middle;}
+  .task-tag.critical{background:#fff0ed;border-color:#f5b09a;color:#b84a10;}
+  .task-tag.supabase{background:var(--green-bg);border-color:var(--green-border);color:var(--green);}
+  .task-tag.arkesel{background:var(--p1-bg);border-color:var(--p1-border);color:var(--p1);}
+  .task-tag.vercel{background:#f0f0f0;border-color:#ccc;color:#333;}
+
+  /* ── OVERALL PROGRESS ── */
+  .overall{background:var(--white);border:1px solid var(--rule);border-radius:14px;padding:1.4rem 1.8rem;display:flex;align-items:center;gap:2rem;flex-wrap:wrap;}
+  .overall-label{font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;color:var(--navy);}
+  .overall-sub{font-size:.73rem;color:var(--muted);margin-top:.1rem;}
+  .overall-bar-wrap{flex:1;min-width:160px;height:10px;background:var(--rule);border-radius:5px;overflow:hidden;}
+  .overall-fill{height:100%;border-radius:5px;background:linear-gradient(90deg,var(--p1),var(--p2));transition:width .4s ease;}
+  .overall-count{font-family:'DM Mono',monospace;font-size:.85rem;font-weight:600;color:var(--navy);white-space:nowrap;}
+  .overall-pct{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:var(--navy);white-space:nowrap;}
+
+  /* ── INTENSITY NOTICE ── */
+  .notice{background:var(--amber-bg);border:1px solid var(--amber-border);border-radius:10px;padding:.9rem 1.2rem;font-size:.78rem;color:var(--amber);line-height:1.6;}
+  .notice strong{font-weight:700;}
+
+  /* ── FOOTER ── */
+  .footer-bar{background:linear-gradient(135deg,#0d1b30 0%,#1e3a6e 100%);border-radius:12px;padding:1.2rem 2rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.8rem;font-size:.72rem;color:rgba(255,255,255,.55);}
+  .footer-brand{font-family:'Playfair Display',serif;font-size:.9rem;font-weight:700;}
+  .footer-brand .phi{color:#7ab3d8;}
+  .footer-brand .nova{color:#fff;}
+
+  .print-btn-wrap{display:flex;justify-content:flex-end;}
+  .print-btn-wrap button{padding:.45rem 1rem;background:var(--navy);color:#fff;border:none;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:.76rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:.35rem;}
+  .print-btn-wrap button:hover{background:var(--navy-mid);}
+  @media print{.print-btn-wrap,.tabs{display:none!important;}.panel{display:block!important;}}
+  @media(max-width:700px){.gantt-wrap{overflow-x:auto;}.gantt-header,.gantt-phase-row,.gantt-row{min-width:600px;}}
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <div class="print-btn-wrap">
+    <button onclick="window.print()">🖨 Print / Save PDF</button>
+  </div>
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-inner">
+      <div class="brand">
+        <div class="logo-wrap">
+          <svg width="72" height="52" viewBox="0 0 90 64" fill="none">
+            <rect x="4" y="4" width="9" height="56" rx="1" fill="white"/>
+            <rect x="4" y="4" width="28" height="9" rx="1" fill="white"/>
+            <rect x="4" y="29" width="28" height="8" rx="1" fill="white"/>
+            <rect x="29" y="4" width="9" height="33" rx="4" fill="white"/>
+            <circle cx="24" cy="22" r="10" fill="none" stroke="#7ab3d8" stroke-width="2.2"/>
+            <line x1="24" y1="10" x2="24" y2="34" stroke="#7ab3d8" stroke-width="2.4" stroke-linecap="round"/>
+            <ellipse cx="24" cy="22" rx="6" ry="4" fill="none" stroke="#7ab3d8" stroke-width="1.8"/>
+            <rect x="50" y="4" width="9" height="56" rx="1" fill="white"/>
+            <rect x="77" y="4" width="9" height="56" rx="1" fill="white"/>
+            <polygon points="59,4 68,4 77,60 68,60" fill="white"/>
+          </svg>
+        </div>
+        <div>
+          <div class="brand-name"><span class="phi">Phi</span>Nova</div>
+          <div class="brand-sub">Architecting Digital Solutions</div>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="header-title">Bulk SMS Platform — Project Plan</div>
+        <div class="header-meta">Solo Build · Intermediate · Full Scope · May 2026</div>
+        <div class="sprint-badge"><span class="dot"></span> 7-Day Sprint — All Features Included</div>
+      </div>
+    </div>
+    <div class="legend">
+      <div class="leg"><div class="leg-dot p1"></div> Phase 1 — Foundation (Day 1)</div>
+      <div class="leg"><div class="leg-dot p2"></div> Phase 2 — Core Features (Days 2–5)</div>
+      <div class="leg"><div class="leg-dot p3"></div> Phase 3 — Polish &amp; Launch (Days 6–7)</div>
+    </div>
+  </div>
+
+  <!-- INTENSITY NOTICE -->
+  <div class="notice">
+    <strong>⚡ Compressed Sprint — No features removed.</strong> This plan delivers the full original scope in 7 days by merging sequential tasks into parallel-friendly day blocks. Days 1, 4, 6, and 7 are especially dense — expect 8–10 focused hours each. Every task from the original plan is preserved.
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('gantt', this)">📅 Gantt Timeline</button>
+    <button class="tab" onclick="switchTab('checklist', this)">✅ Task Checklist</button>
+  </div>
+
+  <!-- ══ GANTT PANEL ══ -->
+  <div class="panel active" id="panel-gantt">
+    <div class="gantt-wrap">
+      <!-- Header: label col + 7 day cols -->
+      <div class="gantt-header">
+        <div class="gh-label">Task</div>
+        <div class="gh-day">1</div>
+        <div class="gh-day">2</div>
+        <div class="gh-day">3</div>
+        <div class="gh-day">4</div>
+        <div class="gh-day">5</div>
+        <div class="gh-day">6</div>
+        <div class="gh-day">7</div>
+      </div>
+
+      <!-- Phase 1: Day 1 only -->
+      <div class="gantt-phase-row">
+        <div class="gantt-phase-label p1">⚙ Phase 1 — Foundation</div>
+        <div class="gantt-phase-bar-cell">
+          <div class="phase-bar p1" style="width:calc(1/7*100%)"></div>
+        </div>
+      </div>
+      <!-- Setup & Auth: Day 1 -->
+      <div class="gantt-row">
+        <div class="gantt-task"><span class="task-icon">🛠</span>Setup, Supabase &amp; Auth</div>
+        <div class="gantt-cell" style="position:relative;">
+          <div class="gantt-bar p1" style="left:4px;right:4px;">Setup + Auth</div>
+        </div>
+        <div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div>
+        <div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div>
+      </div>
+
+      <!-- Phase 2: Days 2–5 -->
+      <div class="gantt-phase-row">
+        <div class="gantt-phase-label p2">⚡ Phase 2 — Core Features</div>
+        <div class="gantt-phase-bar-cell">
+          <div class="phase-bar p2" style="width:calc(4/7*100%);margin-left:calc(1/7*100%)"></div>
+        </div>
+      </div>
+      <!-- Layout & Navigation: Day 2 -->
+      <div class="gantt-row">
+        <div class="gantt-task"><span class="task-icon">🎨</span>Layout &amp; Navigation</div>
+        <div class="gantt-cell"></div>
+        <div class="gantt-cell" style="position:relative;">
+          <div class="gantt-bar p2" style="left:4px;right:4px;">Layout</div>
+        </div>
+        <div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div>
+        <div class="gantt-cell"></div><div class="gantt-cell"></div>
+      </div>
+      <!-- Contact Management: Days 2–3 -->
+      <div class="gantt-row">
+        <div class="gantt-task"><span class="task-icon">👥</span>Contact Management</div>
+        <div class="gantt-cell"></div>
+        <div class="gantt-cell" style="position:relative;">
+          <div class="gantt-bar p2" style="left:4px;right:-100%;">Contacts</div>
+        </div>
+        <div class="gantt-cell" style="position:relative;"></div>
+        <div class="gantt-cell"></div><div class="gantt-cell"></div>
+        <div class="gantt-cell"></div><div class="gantt-cell"></div>
+      </div>
+      <!-- Bulk SMS: Day 3 -->
+      <div class="gantt-row">
+        <div class="gantt-task"><span class="task-icon">📱</span>Bulk SMS Sending</div>
+        <div class="gantt-cell"></div><div class="gantt-cell"></div>
+        <div class="gantt-cell" style="position:relative;">
+          <div class="gantt-bar p2" style="left:4px;right:4px;">SMS Send</div>
+        </div>
+        <div class="gantt-cell"></div><div class="gantt-cell"></div>
+        <div class="gantt-cell"></div><div class="gantt-cell"></div>
+      </div>
+      <!-- Templates: Day 4 -->
+      <div class="gantt-row">
+        <div class="gantt-task"><span class="task-icon">📝</span>Message Templates</div>
+        <div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div>
+        <div class="gantt-cell" style="position:relative;">
+          <div class="gantt-bar p2" style="left:4px;right:4px;">Templates</div>
+        </div>
+        <div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div>
+      </div>
+      <!-- Automated Reminders: Day 4 -->
+      <div class="gantt-row">
+        <div class="gantt-task"><span class="task-icon">⏰</span>Automated Reminders</div>
+        <div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div>
+        <div class="gantt-cell" style="position:relative;">
+          <div class="gantt-bar p2" style="left:4px;right:4px;top:calc(50% + 10px);">Reminders</div>
+        </div>
+        <div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div>
+      </div>
+      <!-- Reports: Day 5 -->
+      <div class="gantt-row">
+        <div class="gantt-task"><span class="task-icon">📊</span>Reports &amp; Dashboard</div>
+        <div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div>
+        <div class="gantt-cell"></div>
+        <div class="gantt-cell" style="position:relative;">
+          <div class="gantt-bar p2" style="left:4px;right:4px;">Reports</div>
+        </div>
+        <div class="gantt-cell"></div><div class="gantt-cell"></div>
+      </div>
+
+      <!-- Phase 3: Days 6–7 -->
+      <div class="gantt-phase-row">
+        <div class="gantt-phase-label p3">✦ Phase 3 — Polish &amp; Launch</div>
+        <div class="gantt-phase-bar-cell">
+          <div class="phase-bar p3" style="width:calc(2/7*100%);margin-left:calc(5/7*100%)"></div>
+        </div>
+      </div>
+      <!-- Security: Day 6 -->
+      <div class="gantt-row">
+        <div class="gantt-task"><span class="task-icon">🛡</span>Security Hardening</div>
+        <div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div>
+        <div class="gantt-cell"></div><div class="gantt-cell"></div>
+        <div class="gantt-cell" style="position:relative;">
+          <div class="gantt-bar p3" style="left:4px;right:4px;">Security</div>
+        </div>
+        <div class="gantt-cell"></div>
+      </div>
+      <!-- UI Polish: Day 6 -->
+      <div class="gantt-row">
+        <div class="gantt-task"><span class="task-icon">✨</span>UI Polish</div>
+        <div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div>
+        <div class="gantt-cell"></div><div class="gantt-cell"></div>
+        <div class="gantt-cell" style="position:relative;">
+          <div class="gantt-bar p3" style="left:4px;right:4px;top:calc(50% + 10px);">Polish</div>
+        </div>
+        <div class="gantt-cell"></div>
+      </div>
+      <!-- Testing: Day 7 -->
+      <div class="gantt-row">
+        <div class="gantt-task"><span class="task-icon">🧪</span>End-to-End Testing</div>
+        <div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div>
+        <div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div>
+        <div class="gantt-cell" style="position:relative;">
+          <div class="gantt-bar p3" style="left:4px;right:4px;">Testing</div>
+        </div>
+      </div>
+      <!-- Go Live: Day 7 -->
+      <div class="gantt-row">
+        <div class="gantt-task"><span class="task-icon">🚀</span>Go Live</div>
+        <div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div>
+        <div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div>
+        <div class="gantt-cell" style="position:relative;">
+          <div class="gantt-bar p3" style="left:4px;right:4px;top:calc(50% + 10px);">🚀 Live</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ CHECKLIST PANEL ══ -->
+  <div class="panel" id="panel-checklist">
+    <div class="overall">
+      <div>
+        <div class="overall-label">Overall Progress</div>
+        <div class="overall-sub">Click tasks to mark them complete</div>
+      </div>
+      <div class="overall-bar-wrap">
+        <div class="overall-fill" id="overall-fill" style="width:0%"></div>
+      </div>
+      <div class="overall-count" id="overall-count">0 / 44 tasks</div>
+      <div class="overall-pct" id="overall-pct">0%</div>
+    </div>
+    <div style="height:.8rem;"></div>
+    <div class="checklist-wrap" id="checklist-root"></div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer-bar">
+    <div class="footer-brand"><span class="phi">Phi</span><span class="nova">Nova</span></div>
+    <div>Bulk SMS Platform · 7-Day Sprint Plan · Full Scope · May 2026</div>
+    <div>+233 204 906 780 · info@phinova.com</div>
+  </div>
+
+</div>
+
+<script>
+function switchTab(id, btn) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+const phases = [
+  {
+    id:'p1', icon:'⚙️', name:'Phase 1 — Foundation', days:'Day 1',
+    groups:[
+      { day:'Day 1 — Project Setup, Supabase & Auth', tasks:[
+        { text:'Create Next.js app with Tailwind CSS (npx create-next-app)', tags:[] },
+        { text:'Create Supabase project and define all tables: contacts, messages, templates, scheduled_reminders, users', tags:['critical','supabase'] },
+        { text:'Connect Supabase JS client to Next.js', tags:['supabase'] },
+        { text:'Push to GitHub and connect repo to Vercel — auto-deploy live', tags:['critical','vercel'] },
+        { text:'Implement Supabase Auth — login page, logout, session handling', tags:['supabase'] },
+        { text:'Set up admin and standard user roles', tags:['supabase'] },
+        { text:'Configure Row-Level Security (RLS) policies in Supabase', tags:['critical','supabase'] },
+        { text:'Protect all routes — redirect unauthenticated users to login', tags:[] },
+      ]},
+    ]
+  },
+  {
+    id:'p2', icon:'⚡', name:'Phase 2 — Core Features', days:'Days 2–5',
+    groups:[
+      { day:'Day 2 — Layout & Contact Management (Pt. 1)', tasks:[
+        { text:'Build main dashboard shell — sidebar, top nav, page layout', tags:[] },
+        { text:'Create placeholder pages: Dashboard, Send SMS, Contacts, Templates, Reminders, Reports', tags:[] },
+        { text:'Make layout fully responsive on mobile', tags:[] },
+        { text:'Build contacts page — list, search, and group filter', tags:[] },
+        { text:'Add manual contact creation form', tags:[] },
+      ]},
+      { day:'Day 3 — CSV Import & Bulk SMS Sending', tasks:[
+        { text:'CSV upload → parse with papaparse → bulk insert into Supabase', tags:['supabase'] },
+        { text:'Opt-out toggle per contact stored in Supabase', tags:['supabase'] },
+        { text:'Set up Express API route that calls Arkesel API', tags:['critical','arkesel'] },
+        { text:'Build Send SMS page — select contacts or group, write message, hit send', tags:['arkesel'] },
+        { text:'Show delivery confirmation results after each send', tags:['arkesel'] },
+        { text:'Store every sent message in messages table with status', tags:['supabase'] },
+      ]},
+      { day:'Day 4 — Message Templates & Automated Reminders', tasks:[
+        { text:'Build templates page — list all saved templates', tags:[] },
+        { text:'Create / edit / delete template form saved to Supabase', tags:['supabase'] },
+        { text:'Add "Use Template" button on Send SMS page that populates message field', tags:[] },
+        { text:'Build Reminders page — list all scheduled reminders', tags:[] },
+        { text:'Form to create reminder: contact(s), message, trigger type, time', tags:[] },
+        { text:'Write Supabase Edge Function — runs daily, queries reminders table, fires Arkesel API', tags:['critical','supabase','arkesel'] },
+        { text:'Deploy and test Edge Function inside Supabase dashboard', tags:['critical','supabase'] },
+      ]},
+      { day:'Day 5 — Reports & Dashboard', tasks:[
+        { text:'Build reports page — total sent, delivery rate, failed messages, credit usage', tags:[] },
+        { text:'Pull live Arkesel credit balance via API and display on dashboard', tags:['arkesel'] },
+        { text:'Add summary cards to main dashboard — messages today, total contacts, upcoming reminders', tags:[] },
+      ]},
+    ]
+  },
+  {
+    id:'p3', icon:'✦', name:'Phase 3 — Polish & Launch', days:'Days 6–7',
+    groups:[
+      { day:'Day 6 — Security Hardening & UI Polish', tasks:[
+        { text:'Add input validation and sanitisation on all Express routes', tags:['critical'] },
+        { text:'Confirm RLS policies are correctly blocking unauthorised data access', tags:['critical','supabase'] },
+        { text:'Store all API keys in Vercel environment variables — nothing hardcoded', tags:['critical','vercel'] },
+        { text:'Test all auth edge cases — expired sessions, wrong passwords, role restrictions', tags:[] },
+        { text:'Tighten spacing, typography, and responsiveness across all pages', tags:[] },
+        { text:'Add loading states, empty states, and error messages everywhere', tags:[] },
+        { text:'Verify dashboard looks great on both mobile and desktop', tags:[] },
+      ]},
+      { day:'Day 7 — End-to-End Testing & Go Live 🚀', tasks:[
+        { text:'Test full user journey: login → add contacts → send SMS → set reminder → check reports', tags:['critical'] },
+        { text:'Test CSV upload with a real contacts file', tags:[] },
+        { text:'Trigger Edge Function manually and confirm reminders fire correctly', tags:['supabase'] },
+        { text:'Test on mobile browsers (Chrome iOS / Android)', tags:[] },
+        { text:'Final Vercel deploy with production environment variables', tags:['critical','vercel'] },
+        { text:'Confirm custom domain (if any) and HTTPS is active', tags:['vercel'] },
+        { text:'Send a test SMS from the live production platform', tags:['critical','arkesel'] },
+        { text:'Hand over credentials and documentation to client', tags:[] },
+      ]},
+    ]
+  }
+];
+
+const root = document.getElementById('checklist-root');
+const state = {};
+let totalTasks = 0;
+phases.forEach(ph => ph.groups.forEach(g => totalTasks += g.tasks.length));
+document.getElementById('overall-count').textContent = '0 / ' + totalTasks + ' tasks';
+
+function updateOverall() {
+  const done = Object.values(state).filter(Boolean).length;
+  const pct = Math.round((done / totalTasks) * 100);
+  document.getElementById('overall-fill').style.width = pct + '%';
+  document.getElementById('overall-count').textContent = done + ' / ' + totalTasks + ' tasks';
+  document.getElementById('overall-pct').textContent = pct + '%';
+  phases.forEach(ph => {
+    let phTotal=0, phDone=0;
+    ph.groups.forEach(g => g.tasks.forEach((t,ti) => {
+      const id = ph.id+'_'+g.day+'_'+ti;
+      phTotal++;
+      if(state[id]) phDone++;
+    }));
+    const pct2 = phTotal ? Math.round((phDone/phTotal)*100) : 0;
+    const fill = document.getElementById('fill-'+ph.id);
+    const pctEl = document.getElementById('pct-'+ph.id);
+    if(fill) fill.style.width = pct2+'%';
+    if(pctEl) pctEl.textContent = pct2+'%';
+  });
+}
+
+function toggleTask(id, cb, textEl) {
+  state[id] = !state[id];
+  if(state[id]) { cb.classList.add('checked'); textEl.classList.add('done'); }
+  else { cb.classList.remove('checked'); textEl.classList.remove('done'); }
+  updateOverall();
+}
+
+phases.forEach(ph => {
+  const block = document.createElement('div');
+  block.className = 'phase-block';
+
+  const head = document.createElement('div');
+  head.className = 'phase-head '+ph.id;
+  head.innerHTML = `
+    <div class="phase-head-left">
+      <div class="phase-icon ${ph.id}">${ph.icon}</div>
+      <div>
+        <div class="phase-name">${ph.name}</div>
+        <div class="phase-days">${ph.days}</div>
+      </div>
+    </div>
+    <div class="phase-progress">
+      <div class="progress-bar-wrap"><div class="progress-bar-fill ${ph.id}" id="fill-${ph.id}" style="width:0%"></div></div>
+      <div class="progress-pct ${ph.id}" id="pct-${ph.id}">0%</div>
+      <div class="phase-toggle open" id="toggle-${ph.id}">▼</div>
+    </div>`;
+
+  const tasks = document.createElement('div');
+  tasks.className = 'phase-tasks';
+  tasks.id = 'tasks-'+ph.id;
+
+  ph.groups.forEach(g => {
+    const dayGroup = document.createElement('div');
+    dayGroup.className = 'day-group';
+    const dayLabel = document.createElement('div');
+    dayLabel.className = 'day-label';
+    dayLabel.textContent = g.day;
+    dayGroup.appendChild(dayLabel);
+
+    g.tasks.forEach((t, ti) => {
+      const id = ph.id+'_'+g.day+'_'+ti;
+      state[id] = false;
+
+      const item = document.createElement('div');
+      item.className = 'task-item';
+
+      const cb = document.createElement('div');
+      cb.className = 'task-cb '+ph.id+'-check';
+
+      const textWrap = document.createElement('div');
+      let tagsHtml = t.tags.map(tag =>
+        `<span class="task-tag ${tag}">${tag==='critical'?'⚡ Critical':tag.charAt(0).toUpperCase()+tag.slice(1)}</span>`
+      ).join('');
+      textWrap.innerHTML = `<span class="task-text" id="txt-${id}">${t.text}${tagsHtml}</span>`;
+
+      item.appendChild(cb);
+      item.appendChild(textWrap);
+      item.addEventListener('click', () => {
+        toggleTask(id, cb, document.getElementById('txt-'+id));
+      });
+
+      dayGroup.appendChild(item);
+    });
+
+    tasks.appendChild(dayGroup);
+  });
+
+  head.addEventListener('click', () => {
+    const t = document.getElementById('tasks-'+ph.id);
+    const tog = document.getElementById('toggle-'+ph.id);
+    t.classList.toggle('hidden');
+    tog.classList.toggle('open');
+  });
+
+  block.appendChild(head);
+  block.appendChild(tasks);
+  root.appendChild(block);
+});
+
+updateOverall();
+</script>
+</body>
+</html>
