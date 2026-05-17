@@ -1,12 +1,30 @@
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import { getServiceRoleClient } from "../_shared/supabase.ts";
 
-// Arkesel Delivery Webhook Handler
+// Arkesel v2 Delivery Webhook Handler
 serve(async (req) => {
-  // Arkesel usually sends DLRs via GET parameters
-  const url = new URL(req.url);
-  const status = url.searchParams.get("status") || url.searchParams.get("Status");
-  let phone = url.searchParams.get("number") || url.searchParams.get("to");
+  let status = "";
+  let phone = "";
+
+  // Arkesel v2 sends a POST request with JSON
+  if (req.method === "POST") {
+    try {
+      const body = await req.json();
+      status = body.status || body.Status || "";
+      phone = body.recipient || body.number || body.to || "";
+    } catch (e) {
+      // Fallback in case they send urlencoded data
+      const text = await req.text();
+      const params = new URLSearchParams(text);
+      status = params.get("status") || "";
+      phone = params.get("recipient") || params.get("number") || "";
+    }
+  } else {
+    // Fallback for GET requests
+    const url = new URL(req.url);
+    status = url.searchParams.get("status") || "";
+    phone = url.searchParams.get("number") || url.searchParams.get("to") || "";
+  }
 
   if (!status || !phone) {
     return new Response(JSON.stringify({ error: "Missing parameters" }), {
@@ -15,8 +33,8 @@ serve(async (req) => {
     });
   }
 
-  // Ensure phone has the plus sign if missing, or normalize to standard DB format
-  phone = phone.replace("+", "");
+  // Ensure phone has no plus sign or spaces
+  phone = phone.replace("+", "").trim();
 
   let supabaseAdmin;
   try {
@@ -42,13 +60,11 @@ serve(async (req) => {
   }
 
   try {
-    // Because Arkesel v1 doesn't easily map unique message IDs, 
-    // the safest fallback is to update the MOST RECENT message sent to this specific phone number.
     const { data: recentMessages, error: fetchError } = await supabaseAdmin
       .from("messages")
       .select("id")
       .eq("recipient", phone)
-      .in("status", ["sent", "pending", "processing"]) // Only update if it hasn't been finalized
+      .in("status", ["sent", "pending", "processing"]) 
       .order("sent_at", { ascending: false })
       .limit(1);
 

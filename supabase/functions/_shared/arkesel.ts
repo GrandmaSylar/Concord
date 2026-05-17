@@ -16,13 +16,27 @@ export async function sendSMS(recipients: string[], message: string) {
 
   try {
     const normalizedRecipients = recipients.map(normalizePhone);
-    const to = normalizedRecipients.join(",");
-    const sender = "Concord";
-    const encodedMessage = encodeURIComponent(message);
+    
+    // Using Arkesel v2 API which supports dynamic callbacks
+    const url = "https://sms.arkesel.com/api/v2/sms/send";
+    
+    const payload = {
+      sender: "Concord",
+      message: message,
+      recipients: normalizedRecipients,
+      // Dynamically tell Arkesel exactly where to send the delivery report!
+      callback_url: "https://vjcvmfnobjgsdsmkqijv.supabase.co/functions/v1/arkesel-webhook"
+    };
 
-    const url = `https://sms.arkesel.com/sms/api?action=send-sms&api_key=${apiKey}&to=${to}&from=${sender}&sms=${encodedMessage}&response=json`;
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "api-key": apiKey
+      },
+      body: JSON.stringify(payload)
+    });
 
-    const response = await fetch(url, { method: "GET" });
     const data = await response.json();
 
     if (!response.ok) {
@@ -30,12 +44,8 @@ export async function sendSMS(recipients: string[], message: string) {
       return { error: `Arkesel error: ${data?.message || response.status}` };
     }
 
-    if (
-      data.code === "100" ||
-      data.code === 100 ||
-      data.code === "ok" ||
-      data.message?.toLowerCase().includes("success")
-    ) {
+    // Arkesel v2 success payload contains data
+    if (data.status === "success" || data.message?.toLowerCase().includes("success")) {
       return { success: true, status: "success", data };
     } else {
       return { error: data.message || "Failed to send SMS via Arkesel" };
