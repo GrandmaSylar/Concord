@@ -4,19 +4,16 @@ import { useState } from 'react'
 import Papa from 'papaparse'
 import { bulkImportContacts } from './actions'
 import { Upload } from 'lucide-react'
+import { toast } from 'sonner'
 
 export default function ImportContacts() {
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-  const [success, setSuccess] = useState('')
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (!file) return
 
     setLoading(true)
-    setError('')
-    setSuccess('')
 
     Papa.parse(file, {
       header: true,
@@ -30,22 +27,22 @@ export default function ImportContacts() {
         })).filter(c => c.name && c.phone)
 
         if (contacts.length === 0) {
-          setError('No valid contacts found. Please ensure CSV has Name and Phone columns.')
+          toast.error('No valid contacts found. Please ensure CSV has Name and Phone columns.')
           setLoading(false)
           return
         }
 
         const res = await bulkImportContacts(contacts)
         if (res?.error) {
-          setError(res.error)
+          toast.error(res.error)
         } else {
-          setSuccess(`Successfully imported ${contacts.length} contacts!`)
+          toast.success(`Successfully imported ${contacts.length} contacts!`)
         }
         setLoading(false)
         event.target.value = '' // Reset input
       },
       error: (err) => {
-        setError('Failed to parse CSV file.')
+        toast.error('Failed to parse CSV file.')
         setLoading(false)
       }
     })
@@ -62,7 +59,7 @@ export default function ImportContacts() {
       </p>
 
       <div className="flex items-center justify-center w-full">
-        <label htmlFor="dropzone-file" className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
+        <label htmlFor="dropzone-file" className="flex flex-col items-center justify-center w-full h-32 border-2 border-slate-300 border-dashed rounded-xl cursor-pointer bg-slate-50 hover:bg-slate-100 hover:border-blue-400 transition-all duration-200 hover:shadow-sm">
           <div className="flex flex-col items-center justify-center pt-5 pb-6">
             <Upload className="w-8 h-8 mb-3 text-gray-400" />
             <p className="mb-2 text-sm text-gray-500"><span className="font-semibold">Click to upload</span></p>
@@ -72,9 +69,7 @@ export default function ImportContacts() {
         </label>
       </div>
 
-      {loading && <p className="mt-4 text-sm text-blue-600 font-medium">Processing CSV...</p>}
-      {error && <p className="mt-4 text-sm text-red-600 font-medium">{error}</p>}
-      {success && <p className="mt-4 text-sm text-green-600 font-medium">{success}</p>}
+      {loading && <p className="mt-4 text-sm text-blue-600 font-medium text-center">Processing CSV, please wait...</p>}
     </div>
   )
 }

@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { processBulkSMS, getFilteredContacts, getAllFilteredContacts } from './actions'
 import { Send, Search, ChevronLeft, ChevronRight, Filter, UserPlus } from 'lucide-react'
+import { toast } from 'sonner'
 
 type ContactInfo = { name: string, phone: string }
 
@@ -32,8 +33,6 @@ export default function SendMessageForm({
   availableTemplates: { id: string, name: string, content: string }[] 
 }) {
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-  const [success, setSuccess] = useState('')
   const [message, setMessage] = useState('')
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
@@ -134,13 +133,11 @@ export default function SendMessageForm({
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (selectedContacts.size === 0) {
-      setError('Please select at least one contact.')
+      toast.error('Please select at least one contact.')
       return
     }
 
     setLoading(true)
-    setError('')
-    setSuccess('')
 
     const formData = new FormData(event.currentTarget)
     // Send contacts as array of {name, phone} objects for merge tag support
@@ -151,9 +148,9 @@ export default function SendMessageForm({
     const result = await processBulkSMS(formData)
 
     if (result?.error) {
-      setError(result.error)
+      toast.error(result.error)
     } else {
-      setSuccess(`Successfully queued message for ${result.count} recipients!`)
+      toast.success(`Successfully queued message for ${result.count} recipients!`)
       setMessage('')
       setSelectedContacts(new Map())
       form.reset()
@@ -204,7 +201,7 @@ export default function SendMessageForm({
           <button 
             type="button" 
             onClick={handleSelectAllMatching}
-            className="text-blue-600 font-medium hover:text-blue-700 hover:underline"
+            className="text-blue-600 font-medium hover:text-blue-700 hover:underline transition-all active:scale-95"
           >
             Select All Matching Contacts ({total})
           </button>
@@ -212,7 +209,7 @@ export default function SendMessageForm({
             <button 
               type="button" 
               onClick={handleClearSelection}
-              className="text-red-600 font-medium hover:text-red-700 hover:underline"
+              className="text-red-600 font-medium hover:text-red-700 hover:underline transition-all active:scale-95"
             >
               Clear Selection
             </button>
@@ -346,7 +343,7 @@ export default function SendMessageForm({
                     key={tag}
                     type="button"
                     onClick={() => insertMergeTag(tag)}
-                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200 hover:bg-indigo-100 hover:border-indigo-300 transition-colors"
+                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200 hover:bg-indigo-100 hover:border-indigo-300 transition-all hover:scale-[1.02] active:scale-95 shadow-sm"
                   >
                     + {label}
                   </button>
@@ -377,13 +374,10 @@ export default function SendMessageForm({
               </div>
             </div>
 
-            {error && <p className="text-sm text-red-600 bg-red-50 p-3 rounded-md">{error}</p>}
-            {success && <p className="text-sm text-green-600 bg-green-50 p-3 rounded-md">{success}</p>}
-
             <button
               type="submit"
               disabled={loading || selectedContacts.size === 0}
-              className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 transition-colors items-center gap-2"
+              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] items-center gap-2"
             >
               {loading ? 'Sending...' : <>Send Campaign <Send className="w-4 h-4" /></>}
             </button>

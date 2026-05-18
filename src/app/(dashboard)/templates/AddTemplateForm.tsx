@@ -3,26 +3,23 @@
 import { useState } from 'react'
 import { addTemplate } from './actions'
 import { FileText } from 'lucide-react'
+import { toast } from 'sonner'
 
 export default function AddTemplateForm() {
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-  const [success, setSuccess] = useState('')
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
     setLoading(true)
-    setError('')
-    setSuccess('')
 
     const form = event.currentTarget
     const formData = new FormData(form)
     const result = await addTemplate(formData)
 
     if (result?.error) {
-      setError(result.error)
+      toast.error(result.error)
     } else {
-      setSuccess('Template added successfully!')
+      toast.success('Template added successfully!')
       form.reset()
     }
     setLoading(false)
@@ -60,13 +57,10 @@ export default function AddTemplateForm() {
           />
         </div>
 
-        {error && <p className="text-sm text-red-600">{error}</p>}
-        {success && <p className="text-sm text-green-600">{success}</p>}
-
         <button
           type="submit"
           disabled={loading}
-          className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+          className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98]"
         >
           {loading ? 'Saving...' : 'Save Template'}
         </button>
