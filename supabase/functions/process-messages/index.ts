@@ -2,7 +2,15 @@ import { serve } from "std/http/server.ts";
 import { sendSMS } from "../_shared/arkesel.ts";
 import { getServiceRoleClient } from "../_shared/supabase.ts";
 
-serve(async (_req) => {
+interface Message {
+  id: string;
+  content: string;
+  recipient: string;
+  status: string;
+  [key: string]: unknown;
+}
+
+serve(async (_req: Request) => {
   let supabaseAdmin;
   
   try {
@@ -31,16 +39,18 @@ serve(async (_req) => {
       );
     }
 
+    const typedMessages = messages as Message[];
+
     // 2. Mark them as processing to prevent duplicate sends
-    const messageIds = messages.map((m) => m.id);
+    const messageIds = typedMessages.map((m) => m.id);
     await supabaseAdmin
       .from("messages")
       .update({ status: "processing" })
       .in("id", messageIds);
 
     // 3. Group by identical content to save API requests
-    const groupedMessages: Record<string, typeof messages> = {};
-    for (const msg of messages) {
+    const groupedMessages: Record<string, Message[]> = {};
+    for (const msg of typedMessages) {
       if (!groupedMessages[msg.content]) {
         groupedMessages[msg.content] = [];
       }
@@ -67,7 +77,7 @@ serve(async (_req) => {
 
     return new Response(
       JSON.stringify({
-        message: `Processed ${messages.length} bulk messages`,
+        message: `Processed ${typedMessages.length} bulk messages`,
         results,
       }),
       { status: 200, headers: { "Content-Type": "application/json" } }

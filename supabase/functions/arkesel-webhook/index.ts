@@ -2,7 +2,7 @@ import { serve } from "std/http/server.ts";
 import { getServiceRoleClient } from "../_shared/supabase.ts";
 
 // Arkesel v2 Delivery Webhook Handler
-serve(async (req) => {
+serve(async (req: Request) => {
   let status = "";
   let phone = "";
 
@@ -12,7 +12,7 @@ serve(async (req) => {
       const body = await req.json();
       status = body.status || body.Status || "";
       phone = body.recipient || body.number || body.to || "";
-    } catch (e) {
+    } catch (_e) {
       // Fallback in case they send urlencoded data
       const text = await req.text();
       const params = new URLSearchParams(text);
@@ -39,8 +39,8 @@ serve(async (req) => {
   let supabaseAdmin;
   try {
     supabaseAdmin = getServiceRoleClient();
-  } catch (error: any) {
-    return new Response(JSON.stringify({ error: error.message }), {
+  } catch (error: unknown) {
+    return new Response(JSON.stringify({ error: (error as Error).message }), {
       status: 500,
       headers: { "Content-Type": "application/json" },
     });
@@ -85,10 +85,10 @@ serve(async (req) => {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Webhook DB update failed:", err);
     return new Response(
-      JSON.stringify({ error: "Database update failed", details: err.message }),
+      JSON.stringify({ error: "Database update failed", details: (err as Error).message }),
       {
         status: 500,
         headers: { "Content-Type": "application/json" },

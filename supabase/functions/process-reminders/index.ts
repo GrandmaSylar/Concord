@@ -2,14 +2,23 @@ import { serve } from "std/http/server.ts";
 import { sendSMS } from "../_shared/arkesel.ts";
 import { getServiceRoleClient } from "../_shared/supabase.ts";
 
-serve(async (req) => {
+interface Reminder {
+  id: string;
+  user_id: string;
+  message: string;
+  status: string;
+  contacts?: { phone: string };
+  [key: string]: unknown;
+}
+
+serve(async (_req: Request) => {
   let supabaseAdmin;
   
   try {
     supabaseAdmin = getServiceRoleClient();
-  } catch (error: any) {
+  } catch (error: unknown) {
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: (error as Error).message }),
       { status: 500, headers: { "Content-Type": "application/json" } }
     );
   }
@@ -33,8 +42,10 @@ serve(async (req) => {
       );
     }
 
+    const typedReminders = reminders as Reminder[];
+
     // 2. Mark them as processing to prevent double-sending
-    const reminderIds = reminders.map((r) => r.id);
+    const reminderIds = typedReminders.map((r) => r.id);
     await supabaseAdmin
       .from("scheduled_reminders")
       .update({ status: "processing" })
@@ -42,7 +53,7 @@ serve(async (req) => {
 
     // 3. Send the SMS messages
     const results = await Promise.all(
-      reminders.map(async (reminder) => {
+      typedReminders.map(async (reminder) => {
         try {
           const phone = reminder.contacts?.phone;
           if (!phone) throw new Error("No phone number found for contact");
@@ -69,7 +80,7 @@ serve(async (req) => {
           } else {
             throw new Error("Arkesel API rejected the message");
           }
-        } catch (err: any) {
+        } catch (err: unknown) {
           console.error(`Failed to send reminder ${reminder.id}:`, err);
           // Mark as failed
           await supabaseAdmin
@@ -77,23 +88,23 @@ serve(async (req) => {
             .update({ status: "failed" })
             .eq("id", reminder.id);
 
-          return { id: reminder.id, status: "failed", error: err.message };
+          return { id: reminder.id, status: "failed", error: (err as Error).message };
         }
       })
     );
 
     return new Response(
       JSON.stringify({
-        message: `Processed ${reminders.length} reminders`,
+        message: `Processed ${typedReminders.length} reminders`,
         results,
       }),
       { status: 200, headers: { "Content-Type": "application/json" } }
     );
 
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Error in reminder processing cron:", err);
     return new Response(
-      JSON.stringify({ error: "Internal Server Error", details: err.message }),
+      JSON.stringify({ error: "Internal Server Error", details: (err as Error).message }),
       { status: 500, headers: { "Content-Type": "application/json" } }
     );
   }
