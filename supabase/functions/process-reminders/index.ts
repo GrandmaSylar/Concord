@@ -11,7 +11,7 @@ interface Reminder {
   [key: string]: unknown;
 }
 
-serve(async (_req: Request) => {
+serve(async () => {
   let supabaseAdmin;
   
   try {
