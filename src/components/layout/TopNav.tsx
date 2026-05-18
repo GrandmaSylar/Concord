@@ -2,6 +2,7 @@
 
 import { logout } from '@/app/login/actions'
 import { Menu, LogOut } from 'lucide-react'
+import SmsBalanceBadge from './SmsBalanceBadge'
 
 interface TopNavProps {
   user: {
@@ -21,6 +22,7 @@ export default function TopNav({ user }: TopNavProps) {
         </button>
       </div>
       <div className="flex flex-1 justify-end items-center gap-4">
+        <SmsBalanceBadge />
         <div className="text-sm text-gray-700 hidden sm:block">
           <span className="font-medium">{user.fullName || user.email}</span>
           {user.role === 'admin' && (
