@@ -1,15 +1,15 @@
-import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
+import { serve } from "std/http/server.ts";
 import { sendSMS } from "../_shared/arkesel.ts";
 import { getServiceRoleClient } from "../_shared/supabase.ts";
 
-serve(async (req) => {
+serve(async (_req) => {
   let supabaseAdmin;
   
   try {
     supabaseAdmin = getServiceRoleClient();
-  } catch (error: any) {
+  } catch (error: unknown) {
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: (error as Error).message }),
       { status: 500, headers: { "Content-Type": "application/json" } }
     );
   }
@@ -72,10 +72,10 @@ serve(async (req) => {
       }),
       { status: 200, headers: { "Content-Type": "application/json" } }
     );
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Error in edge function:", err);
     return new Response(
-      JSON.stringify({ error: "Internal Server Error", details: err.message }),
+      JSON.stringify({ error: "Internal Server Error", details: (err as Error).message }),
       { status: 500, headers: { "Content-Type": "application/json" } }
     );
   }
