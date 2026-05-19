@@ -44,7 +44,7 @@ export async function getAllFilteredContacts(search: string) {
   if (!user) return []
 
   let query = supabase.from('contacts')
-    .select('name, phone')
+    .select('name, phone, position, sub_area, polling_station')
     .eq('user_id', user.id)
     .eq('opt_out', false)
 
@@ -57,7 +57,7 @@ export async function getAllFilteredContacts(search: string) {
 }
 
 // Replace merge tags in a message template with actual contact data
-function personalize(template: string, contact: { name: string, phone: string }): string {
+function personalize(template: string, contact: { name: string, phone: string, position?: string, sub_area?: string, polling_station?: string }): string {
   const nameParts = contact.name.trim().split(/\s+/)
   const firstName = nameParts[0] || ''
   const lastName = nameParts.slice(1).join(' ') || ''
@@ -67,6 +67,9 @@ function personalize(template: string, contact: { name: string, phone: string })
     .replace(/\[Lastname\]/gi, lastName)
     .replace(/\[Fullname\]/gi, contact.name)
     .replace(/\[Phone\]/gi, contact.phone)
+    .replace(/\[Position\]/gi, contact.position || '')
+    .replace(/\[SubArea\]/gi, contact.sub_area || '')
+    .replace(/\[Station\]/gi, contact.polling_station || '')
 }
 
 const sendSmsSchema = z.object({
@@ -91,16 +94,16 @@ export async function processBulkSMS(formData: FormData) {
 
   const { recipients, message } = parsed.data
   
-  let contactList: { name: string, phone: string }[] = []
+  let contactList: { name: string, phone: string, position?: string, sub_area?: string, polling_station?: string }[] = []
   try {
     contactList = JSON.parse(recipients)
     if (!Array.isArray(contactList) || contactList.length === 0) throw new Error()
-  } catch (e) {
+  } catch {
     return { error: 'Invalid recipients data.' }
   }
 
   // 2. Personalize messages per contact (merge tags)
-  const hasMergeTags = /\[(Firstname|Lastname|Fullname|Phone)\]/i.test(message)
+  const hasMergeTags = /\[(Firstname|Lastname|Fullname|Phone|Position|SubArea|Station)\]/i.test(message)
 
   const logs = contactList.map(contact => ({
     user_id: user.id,

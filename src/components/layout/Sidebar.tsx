@@ -10,12 +10,14 @@ import {
   FileText, 
   Clock, 
   Calendar, 
-  BarChart2 
+  BarChart2,
+  Landmark 
 } from 'lucide-react'
 
 const navigation = [
   { name: 'Dashboard', href: '/', icon: LayoutDashboard },
   { name: 'Contacts', href: '/contacts', icon: Users },
+  { name: 'Constituency', href: '/constituency', icon: Landmark },
   { name: 'Send SMS', href: '/send', icon: Send },
   { name: 'Templates', href: '/templates', icon: FileText },
   { name: 'Reminders', href: '/reminders', icon: Clock },

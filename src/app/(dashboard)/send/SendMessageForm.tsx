@@ -5,13 +5,16 @@ import { processBulkSMS, getFilteredContacts, getAllFilteredContacts } from './a
 import { Send, Search, ChevronLeft, ChevronRight, Filter, UserPlus } from 'lucide-react'
 import { toast } from 'sonner'
 
-type ContactInfo = { name: string, phone: string }
+type ContactInfo = { name: string, phone: string, position?: string, sub_area?: string, polling_station?: string }
 
 const MERGE_TAGS = [
   { tag: '[Firstname]', label: 'First Name', description: 'Contact\'s first name' },
   { tag: '[Lastname]', label: 'Last Name', description: 'Contact\'s last name' },
   { tag: '[Fullname]', label: 'Full Name', description: 'Contact\'s full name' },
   { tag: '[Phone]', label: 'Phone', description: 'Contact\'s phone number' },
+  { tag: '[Position]', label: 'Position', description: 'Contact\'s role (e.g. Chairman)' },
+  { tag: '[SubArea]', label: 'Sub-Area', description: 'Contact\'s constituency sub-area' },
+  { tag: '[Station]', label: 'Station', description: 'Contact\'s polling station' },
 ]
 
 // Preview how a message would look for a sample contact
@@ -25,6 +28,9 @@ function previewMessage(template: string, contact?: ContactInfo): string {
     .replace(/\[Lastname\]/gi, lastName)
     .replace(/\[Fullname\]/gi, contact.name)
     .replace(/\[Phone\]/gi, contact.phone)
+    .replace(/\[Position\]/gi, contact.position || '')
+    .replace(/\[SubArea\]/gi, contact.sub_area || '')
+    .replace(/\[Station\]/gi, contact.polling_station || '')
 }
 
 export default function SendMessageForm({ 
@@ -64,12 +70,12 @@ export default function SendMessageForm({
   }, [page, search, sort])
 
   // Toggle a single contact
-  const toggleContact = (contact: any) => {
+  const toggleContact = (contact: { name: string; phone: string; position?: string; sub_area?: string; polling_station?: string }) => {
     const next = new Map(selectedContacts)
     if (next.has(contact.phone)) {
       next.delete(contact.phone)
     } else {
-      next.set(contact.phone, { name: contact.name, phone: contact.phone })
+      next.set(contact.phone, { name: contact.name, phone: contact.phone, position: contact.position, sub_area: contact.sub_area, polling_station: contact.polling_station })
     }
     setSelectedContacts(next)
   }
@@ -81,7 +87,7 @@ export default function SendMessageForm({
     if (allSelected) {
       contacts.forEach(c => next.delete(c.phone))
     } else {
-      contacts.forEach(c => next.set(c.phone, { name: c.name, phone: c.phone }))
+      contacts.forEach(c => next.set(c.phone, { name: c.name, phone: c.phone, position: c.position, sub_area: c.sub_area, polling_station: c.polling_station }))
     }
     setSelectedContacts(next)
   }
@@ -91,7 +97,7 @@ export default function SendMessageForm({
     setLoadingContacts(true)
     const allContacts = await getAllFilteredContacts(search)
     const next = new Map(selectedContacts)
-    allContacts.forEach((c: any) => next.set(c.phone, { name: c.name, phone: c.phone }))
+    allContacts.forEach((c: { name: string; phone: string; position?: string; sub_area?: string; polling_station?: string }) => next.set(c.phone, { name: c.name, phone: c.phone, position: c.position, sub_area: c.sub_area, polling_station: c.polling_station }))
     setSelectedContacts(next)
     setLoadingContacts(false)
   }
@@ -120,7 +126,7 @@ export default function SendMessageForm({
 
   const totalPages = Math.ceil(total / 50) || 1
   const isPageAllSelected = contacts.length > 0 && contacts.every(c => selectedContacts.has(c.phone))
-  const hasMergeTags = /\[(Firstname|Lastname|Fullname|Phone)\]/i.test(message)
+  const hasMergeTags = /\[(Firstname|Lastname|Fullname|Phone|Position|SubArea|Station)\]/i.test(message)
 
   // Get a sample contact for preview
   const sampleContact: ContactInfo | undefined = selectedContacts.size > 0 
