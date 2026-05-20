@@ -4,7 +4,12 @@ import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 
-export async function getFilteredContacts(page: number, search: string, sort: string) {
+export async function getFilteredContacts(
+  page: number, 
+  search: string, 
+  sort: string, 
+  filters?: { sub_area?: string; position?: string; group_name?: string }
+) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { contacts: [], total: 0 }
@@ -17,6 +22,10 @@ export async function getFilteredContacts(page: number, search: string, sort: st
   if (search) {
     query = query.or(`name.ilike.%${search}%,phone.ilike.%${search}%,group_name.ilike.%${search}%`)
   }
+
+  if (filters?.sub_area) query = query.eq('sub_area', filters.sub_area)
+  if (filters?.position) query = query.eq('position', filters.position)
+  if (filters?.group_name) query = query.eq('group_name', filters.group_name)
 
   if (sort === 'name_asc') query = query.order('name', { ascending: true })
   else if (sort === 'name_desc') query = query.order('name', { ascending: false })
@@ -38,19 +47,26 @@ export async function getFilteredContacts(page: number, search: string, sort: st
   return { contacts: data, total: count || 0 }
 }
 
-export async function getAllFilteredContacts(search: string) {
+export async function getAllFilteredContacts(
+  search: string,
+  filters?: { sub_area?: string; position?: string; group_name?: string }
+) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return []
 
   let query = supabase.from('contacts')
-    .select('name, phone, position, sub_area, polling_station')
+    .select('id, name, phone, position, sub_area, polling_station')
     .eq('user_id', user.id)
     .eq('opt_out', false)
 
   if (search) {
     query = query.or(`name.ilike.%${search}%,phone.ilike.%${search}%,group_name.ilike.%${search}%`)
   }
+
+  if (filters?.sub_area) query = query.eq('sub_area', filters.sub_area)
+  if (filters?.position) query = query.eq('position', filters.position)
+  if (filters?.group_name) query = query.eq('group_name', filters.group_name)
 
   const { data } = await query
   return data || []
@@ -73,7 +89,8 @@ function personalize(template: string, contact: { name: string, phone: string, p
 }
 
 const sendSmsSchema = z.object({
-  recipients: z.string().min(1, 'Please select at least one recipient'),
+  recipients: z.string().optional(),
+  tempNumbers: z.string().optional(),
   message: z.string().min(1, 'Message cannot be empty').max(1600, 'Message too long'),
   senderId: z.enum(['Rachael-RTK', 'RachaelWG', 'RTK4SERVICE']),
 })
@@ -94,14 +111,33 @@ export async function processBulkSMS(formData: FormData) {
     return { error: parsed.error.issues?.[0]?.message || 'Validation failed' }
   }
 
-  const { recipients, message, senderId } = parsed.data
+  const { recipients, tempNumbers, message, senderId } = parsed.data
   
   let contactList: { name: string, phone: string, position?: string, sub_area?: string, polling_station?: string }[] = []
-  try {
-    contactList = JSON.parse(recipients)
-    if (!Array.isArray(contactList) || contactList.length === 0) throw new Error()
-  } catch {
-    return { error: 'Invalid recipients data.' }
+  
+  if (recipients) {
+    try {
+      const parsedRecipients = JSON.parse(recipients)
+      if (Array.isArray(parsedRecipients)) {
+        contactList = parsedRecipients
+      }
+    } catch {
+      return { error: 'Invalid recipients data.' }
+    }
+  }
+
+  if (tempNumbers && tempNumbers.trim()) {
+    const rawNumbers = tempNumbers.split(/[,;]/)
+    for (const num of rawNumbers) {
+      const cleanNum = num.replace(/[\s\-\(\)]/g, '')
+      if (cleanNum.length >= 9) { // Basic sanity check for valid number length
+        contactList.push({ name: 'Unknown', phone: cleanNum })
+      }
+    }
+  }
+
+  if (contactList.length === 0) {
+    return { error: 'Please select at least one contact or enter a valid temporary number.' }
   }
 
   // 2. Personalize messages per contact (merge tags)

@@ -1,4 +1,4 @@
-import { getContacts } from './actions'
+import { getContacts, getContactFilterOptions } from './actions'
 import ContactList from './ContactList'
 import AddContactForm from './AddContactForm'
 import ImportContacts from './ImportContacts'
@@ -6,9 +6,10 @@ import { getConstituencyGroups } from '../constituency/actions'
 
 export default async function ContactsPage() {
   // Fetch contacts and constituency groups on the server
-  const [contacts, groups] = await Promise.all([
+  const [contacts, groups, filterOptions] = await Promise.all([
     getContacts(),
-    getConstituencyGroups()
+    getConstituencyGroups(),
+    getContactFilterOptions()
   ])
 
   return (
@@ -23,7 +24,7 @@ export default async function ContactsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column: List & Filter */}
         <div className="lg:col-span-2 flex flex-col gap-4">
-          <ContactList initialContacts={contacts} />
+          <ContactList initialContacts={contacts} filterOptions={filterOptions} />
         </div>
 
         {/* Right Column: Add Contact Form & Import */}

@@ -77,3 +77,80 @@ export async function getDashboardStats() {
     positionDistribution
   }
 }
+
+/**
+ * Fetches real-time message queue stats for the dashboard live monitor.
+ * Excludes simulation dry-run messages to show only production traffic.
+ */
+export async function getLiveMessageQueueStats() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    throw new Error('Unauthorized')
+  }
+
+  // We need a service role client to bypass RLS for system-wide counts
+  const { createClient: createAdminClient } = await import('@supabase/supabase-js')
+  const adminSupabase = createAdminClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
+
+  try {
+    const statuses = ['pending', 'processing', 'sent', 'failed'] as const
+
+    // Get counts per status, excluding simulation messages
+    const countPromises = statuses.map(async (status) => {
+      const { count, error } = await adminSupabase
+        .from('messages')
+        .select('*', { count: 'exact', head: true })
+        .not('content', 'like', '[SIMULATION-DRYRUN]%')
+        .eq('status', status)
+
+      if (error) throw error
+      return { status, count: count || 0 }
+    })
+
+    // Get the 8 most recent messages that are actively being processed or pending
+    const recentActivityPromise = adminSupabase
+      .from('messages')
+      .select('id, recipient, content, status, sent_at, sender_id')
+      .not('content', 'like', '[SIMULATION-DRYRUN]%')
+      .in('status', ['pending', 'processing'])
+      .order('sent_at', { ascending: false })
+      .limit(8)
+
+    // Get the most recently completed messages (sent or failed in the last hour)
+    const recentCompletedPromise = adminSupabase
+      .from('messages')
+      .select('id, recipient, content, status, sent_at, sender_id')
+      .not('content', 'like', '[SIMULATION-DRYRUN]%')
+      .in('status', ['sent', 'failed'])
+      .order('sent_at', { ascending: false })
+      .limit(5)
+
+    const [countResults, recentActivity, recentCompleted] = await Promise.all([
+      Promise.all(countPromises),
+      recentActivityPromise,
+      recentCompletedPromise
+    ])
+
+    const counts = { pending: 0, processing: 0, sent: 0, failed: 0 }
+    countResults.forEach(({ status, count }) => {
+      counts[status] = count
+    })
+
+    return {
+      counts,
+      activeMessages: recentActivity.data || [],
+      recentCompleted: recentCompleted.data || []
+    }
+  } catch (err: any) {
+    console.error('Failed to get live message queue stats:', err)
+    return {
+      counts: { pending: 0, processing: 0, sent: 0, failed: 0 },
+      activeMessages: [],
+      recentCompleted: []
+    }
+  }
+}

@@ -1,8 +1,12 @@
 import { getTemplates } from '../templates/actions'
+import { getContactFilterOptions } from '../contacts/actions'
 import SendMessageForm from './SendMessageForm'
 
 export default async function SendSMSPage() {
-  const templates = await getTemplates()
+  const [templates, filterOptions] = await Promise.all([
+    getTemplates(),
+    getContactFilterOptions()
+  ])
 
   return (
     <div className="flex flex-col gap-6">
@@ -12,7 +16,10 @@ export default async function SendSMSPage() {
       </div>
       
       <div>
-        <SendMessageForm availableTemplates={templates} />
+        <SendMessageForm 
+          availableTemplates={templates} 
+          filterOptions={filterOptions} 
+        />
       </div>
     </div>
   )

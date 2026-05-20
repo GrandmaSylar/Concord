@@ -1,4 +1,5 @@
 import { getDashboardStats } from './reports/actions'
+import LiveMessageQueueMonitor from '@/components/dashboard/LiveMessageQueueMonitor'
 import { 
   Users, 
   Send, 
@@ -142,6 +143,9 @@ export default async function DashboardOverview() {
           </div>
         </div>
       </div>
+
+      {/* ── Live Message Queue Monitor ── */}
+      <LiveMessageQueueMonitor />
 
       {/* ── Quick Actions Launchpad ── */}
       <div className="space-y-4">

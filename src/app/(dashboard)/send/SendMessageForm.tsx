@@ -35,9 +35,11 @@ function previewMessage(template: string, contact?: ContactInfo): string {
 }
 
 export default function SendMessageForm({ 
-  availableTemplates 
+  availableTemplates,
+  filterOptions 
 }: { 
-  availableTemplates: { id: string, name: string, content: string }[] 
+  availableTemplates: { id: string, name: string, content: string }[],
+  filterOptions: { groups: string[], sub_areas: string[], positions: string[] }
 }) {
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
@@ -51,14 +53,27 @@ export default function SendMessageForm({
   const [contacts, setContacts] = useState<any[]>([])
   const [total, setTotal] = useState(0)
   const [loadingContacts, setLoadingContacts] = useState(true)
+
+  // New Filter State
+  const [filterSubArea, setFilterSubArea] = useState('')
+  const [filterPosition, setFilterPosition] = useState('')
+  const [filterGroup, setFilterGroup] = useState('')
   
   // Store full contact info (name + phone) for merge tag personalization
   const [selectedContacts, setSelectedContacts] = useState<Map<string, ContactInfo>>(new Map())
+  
+  // Temporary numbers state
+  const [tempNumbers, setTempNumbers] = useState('')
 
   useEffect(() => {
     async function loadContacts() {
       setLoadingContacts(true)
-      const res = await getFilteredContacts(page, search, sort)
+      const filters = {
+        sub_area: filterSubArea || undefined,
+        position: filterPosition || undefined,
+        group_name: filterGroup || undefined
+      }
+      const res = await getFilteredContacts(page, search, sort, filters)
       setContacts(res.contacts)
       setTotal(res.total)
       setLoadingContacts(false)
@@ -69,7 +84,7 @@ export default function SendMessageForm({
     }, 300)
 
     return () => clearTimeout(timer)
-  }, [page, search, sort])
+  }, [page, search, sort, filterSubArea, filterPosition, filterGroup])
 
   // Toggle a single contact
   const toggleContact = (contact: { name: string; phone: string; position?: string; sub_area?: string; polling_station?: string }) => {
@@ -97,7 +112,12 @@ export default function SendMessageForm({
   // Select ALL contacts matching the current search (fetches from DB)
   const handleSelectAllMatching = async () => {
     setLoadingContacts(true)
-    const allContacts = await getAllFilteredContacts(search)
+    const filters = {
+      sub_area: filterSubArea || undefined,
+      position: filterPosition || undefined,
+      group_name: filterGroup || undefined
+    }
+    const allContacts = await getAllFilteredContacts(search, filters)
     const next = new Map(selectedContacts)
     allContacts.forEach((c: { name: string; phone: string; position?: string; sub_area?: string; polling_station?: string }) => next.set(c.phone, { name: c.name, phone: c.phone, position: c.position, sub_area: c.sub_area, polling_station: c.polling_station }))
     setSelectedContacts(next)
@@ -142,16 +162,20 @@ export default function SendMessageForm({
   const [pendingFormData, setPendingFormData] = useState<FormData | null>(null)
   const [pendingFormRef, setPendingFormRef] = useState<HTMLFormElement | null>(null)
 
+  const totalTempNumbers = tempNumbers.trim() ? tempNumbers.split(/[,;]/).filter(n => n.replace(/[\s\-\(\)]/g, '').length >= 9).length : 0
+  const totalRecipientsCount = selectedContacts.size + totalTempNumbers
+
   function handleInitialSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    if (selectedContacts.size === 0) {
-      toast.error('Please select at least one contact.')
+    if (totalRecipientsCount === 0) {
+      toast.error('Please select at least one contact or enter a temporary number.')
       return
     }
     
     const formData = new FormData(event.currentTarget)
     const contactsArray = Array.from(selectedContacts.values())
     formData.append('recipients', JSON.stringify(contactsArray))
+    formData.append('tempNumbers', tempNumbers)
     
     setPendingFormData(formData)
     setPendingFormRef(event.currentTarget)
@@ -169,6 +193,7 @@ export default function SendMessageForm({
     } else {
       toast.success(`Successfully queued message for ${result.count} recipients!`)
       setMessage('')
+      setTempNumbers('')
       setSelectedContacts(new Map())
       pendingFormRef.reset()
     }
@@ -187,6 +212,72 @@ export default function SendMessageForm({
             {selectedContacts.size} Selected
           </span>
         </h2>
+
+        {/* Enhanced Filters Row */}
+        <div className="flex flex-wrap gap-3 mb-4">
+          {filterOptions.sub_areas.length > 0 && (
+            <div className="relative group">
+              <select
+                value={filterSubArea}
+                onChange={(e) => { setFilterSubArea(e.target.value); setPage(1); }}
+                className="appearance-none bg-white border border-blue-500 text-blue-700 hover:bg-blue-50 transition-colors pl-3 pr-8 py-1.5 rounded-full text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/20 shadow-sm cursor-pointer"
+              >
+                <option value="">Constituency: All</option>
+                {filterOptions.sub_areas.map(area => (
+                  <option key={area} value={area}>Constituency: {area}</option>
+                ))}
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-blue-600">
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+              </div>
+            </div>
+          )}
+
+          {filterOptions.positions.length > 0 && (
+            <div className="relative group">
+              <select
+                value={filterPosition}
+                onChange={(e) => { setFilterPosition(e.target.value); setPage(1); }}
+                className="appearance-none bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors pl-3 pr-8 py-1.5 rounded-full text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/20 shadow-sm cursor-pointer"
+              >
+                <option value="">Position: All</option>
+                {filterOptions.positions.map(pos => (
+                  <option key={pos} value={pos}>Position: {pos}</option>
+                ))}
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500">
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+              </div>
+            </div>
+          )}
+
+          {filterOptions.groups.length > 0 && (
+            <div className="relative group">
+              <select
+                value={filterGroup}
+                onChange={(e) => { setFilterGroup(e.target.value); setPage(1); }}
+                className="appearance-none bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors pl-3 pr-8 py-1.5 rounded-full text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/20 shadow-sm cursor-pointer"
+              >
+                <option value="">Group: All</option>
+                {filterOptions.groups.map(g => (
+                  <option key={g} value={g}>Group: {g}</option>
+                ))}
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500">
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+              </div>
+            </div>
+          )}
+          
+          {(filterSubArea || filterPosition || filterGroup) && (
+            <button 
+              onClick={() => { setFilterSubArea(''); setFilterPosition(''); setFilterGroup(''); setPage(1); }}
+              className="text-xs text-red-600 hover:underline flex items-center px-2 font-medium"
+            >
+              Clear Filters
+            </button>
+          )}
+        </div>
 
         <div className="flex flex-col sm:flex-row gap-4 mb-4">
           <div className="relative flex-1">
@@ -295,6 +386,24 @@ export default function SendMessageForm({
           </table>
         </div>
 
+        {/* Temporary Numbers Input */}
+        <div className="mt-6 border-t border-gray-200 pt-6">
+          <label htmlFor="tempNumbers" className="block text-sm font-medium text-gray-700 mb-2">
+            Temporary Numbers (Optional)
+          </label>
+          <textarea
+            id="tempNumbers"
+            rows={3}
+            value={tempNumbers}
+            onChange={(e) => setTempNumbers(e.target.value)}
+            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm py-2 px-3 border bg-white text-gray-900"
+            placeholder="Paste or type numbers separated by comma (,) or semicolon (;)"
+          />
+          <p className="mt-1 text-xs text-gray-500">
+            Send messages to these numbers without saving them to your contacts. Personalization Tags will be ignored for these numbers.
+          </p>
+        </div>
+
         {/* Pagination */}
         <div className="flex items-center justify-between mt-4">
           <p className="text-sm text-gray-500">
@@ -324,7 +433,7 @@ export default function SendMessageForm({
       <div className="border-t border-gray-200"></div>
 
       {/* 2. Message Composition Area */}
-      <div className={selectedContacts.size === 0 ? "opacity-50 pointer-events-none transition-opacity" : "transition-opacity"}>
+      <div className={totalRecipientsCount === 0 ? "opacity-50 pointer-events-none transition-opacity" : "transition-opacity"}>
         <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
           2. Compose Message
         </h2>
@@ -335,7 +444,7 @@ export default function SendMessageForm({
               <label htmlFor="template" className="block text-sm font-medium text-gray-700">Use a Template (Optional)</label>
               <select
                 id="template"
-                disabled={selectedContacts.size === 0}
+                disabled={totalRecipientsCount === 0}
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm py-2 px-3 border bg-white text-gray-900"
                 onChange={(e) => {
                   const tmpl = availableTemplates.find(t => t.id === e.target.value)
@@ -364,7 +473,7 @@ export default function SendMessageForm({
                   <button
                     key={s.id}
                     type="button"
-                    disabled={selectedContacts.size === 0}
+                    disabled={totalRecipientsCount === 0}
                     onClick={() => setSelectedSenderId(s.id as any)}
                     className={`flex flex-col items-center justify-center p-3 rounded-xl border text-center transition-all cursor-pointer select-none active:scale-[0.98] ${
                       selectedSenderId === s.id
@@ -419,11 +528,11 @@ export default function SendMessageForm({
                 id="message"
                 rows={5}
                 required
-                disabled={selectedContacts.size === 0}
+                disabled={totalRecipientsCount === 0}
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm py-2 px-3 border bg-white text-gray-900"
-                placeholder={selectedContacts.size === 0 ? "Please select contacts first..." : "Type your message here... Use [Firstname] etc."}
+                placeholder={totalRecipientsCount === 0 ? "Please select contacts or enter temporary numbers first..." : "Type your message here... Use [Firstname] etc."}
               />
               <div className="mt-1 flex justify-between text-xs text-gray-500">
                 <span>Standard SMS: 160 characters per part.</span>
@@ -435,7 +544,7 @@ export default function SendMessageForm({
 
             <button
               type="submit"
-              disabled={loading || selectedContacts.size === 0}
+              disabled={loading || totalRecipientsCount === 0}
               className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] items-center gap-2"
             >
               {loading ? 'Sending...' : <>Send Campaign <Send className="w-4 h-4" /></>}
@@ -479,7 +588,7 @@ export default function SendMessageForm({
         title="Initialize Dispatch Sequence?"
         description={
           <>
-            This will queue your message using sender ID <strong>{selectedSenderId}</strong> to be sent to <strong>{selectedContacts.size}</strong> contact{selectedContacts.size === 1 ? '' : 's'}. Are you sure you want to proceed?
+            This will queue your message using sender ID <strong>{selectedSenderId}</strong> to be sent to <strong>{totalRecipientsCount}</strong> recipient{totalRecipientsCount === 1 ? '' : 's'}. Are you sure you want to proceed?
           </>
         }
         confirmText="Yes, Send Messages"
