@@ -59,7 +59,8 @@ serve(async () => {
           if (!phone) throw new Error("No phone number found for contact");
 
           // Send via Arkesel
-          const response = await sendSMS([phone], reminder.message);
+          const sender = (reminder.sender_id as string) || undefined;
+          const response = await sendSMS([phone], reminder.message, sender);
           
           if (response && response.success) {
             // Success: Update reminder status
@@ -73,6 +74,7 @@ serve(async () => {
               user_id: reminder.user_id,
               recipient: phone,
               content: reminder.message,
+              sender_id: reminder.sender_id || null,
               status: "sent",
             });
 

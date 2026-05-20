@@ -48,21 +48,23 @@ serve(async () => {
       .update({ status: "processing" })
       .in("id", messageIds);
 
-    // 3. Group by identical content to save API requests
-    const groupedMessages: Record<string, Message[]> = {};
+    // 3. Group by identical content AND sender_id to save API requests and preserve sender
+    const groupedMessages: Record<string, { sender?: string; content: string; msgs: Message[] }> = {};
     for (const msg of typedMessages) {
-      if (!groupedMessages[msg.content]) {
-        groupedMessages[msg.content] = [];
+      const sender = (msg.sender_id as string) || undefined;
+      const key = `${sender || 'default'}::${msg.content}`;
+      if (!groupedMessages[key]) {
+        groupedMessages[key] = { sender, content: msg.content, msgs: [] };
       }
-      groupedMessages[msg.content].push(msg);
+      groupedMessages[key].msgs.push(msg);
     }
 
     const results = [];
 
     // 4. Send each group via Arkesel
-    for (const [content, msgs] of Object.entries(groupedMessages)) {
+    for (const { sender, content, msgs } of Object.values(groupedMessages)) {
       const recipients = msgs.map((m) => m.recipient);
-      const response = await sendSMS(recipients, content);
+      const response = await sendSMS(recipients, content, sender);
 
       const status = response?.success ? "sent" : "failed";
       const idsToUpdate = msgs.map((m) => m.id);
@@ -72,7 +74,7 @@ serve(async () => {
         .update({ status })
         .in("id", idsToUpdate);
 
-      results.push({ content, count: recipients.length, status });
+      results.push({ content, sender, count: recipients.length, status });
     }
 
     return new Response(

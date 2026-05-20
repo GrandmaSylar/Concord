@@ -11,16 +11,21 @@ export async function addReminder(formData: FormData) {
   const contact_id = formData.get('contact_id') as string
   const message = formData.get('message') as string
   const trigger_time = formData.get('trigger_time') as string
+  const sender_id = formData.get('senderId') as string
 
   if (!contact_id || !message || !trigger_time) {
     return { error: 'All fields are required.' }
   }
+
+  const allowedSenders = ['Rachael-RTK', 'RachaelWG', 'RTK4SERVICE']
+  const senderId = allowedSenders.includes(sender_id) ? sender_id : 'Rachael-RTK'
 
   const { error } = await supabase.from('scheduled_reminders').insert({
     user_id: user.id,
     contact_id,
     message: message.trim(),
     trigger_time: new Date(trigger_time).toISOString(),
+    sender_id: senderId
   })
 
   if (error) {

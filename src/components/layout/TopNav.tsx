@@ -3,6 +3,8 @@
 import { logout } from '@/app/login/actions'
 import { Menu, LogOut } from 'lucide-react'
 import SmsBalanceBadge from './SmsBalanceBadge'
+import { useState, useTransition } from 'react'
+import SystemConfirmDialog from '../ui/SystemConfirmDialog'
 
 interface TopNavProps {
   user: {
@@ -13,6 +15,15 @@ interface TopNavProps {
 }
 
 export default function TopNav({ user }: TopNavProps) {
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
+  const [isPending, startTransition] = useTransition()
+
+  const handleLogout = () => {
+    startTransition(async () => {
+      await logout()
+    })
+  }
+
   return (
     <header className="flex h-16 flex-shrink-0 items-center justify-between border-b border-gray-200 bg-white px-4 sm:px-6 lg:px-8">
       <div className="flex flex-1 items-center md:hidden">
@@ -31,13 +42,26 @@ export default function TopNav({ user }: TopNavProps) {
             </span>
           )}
         </div>
-        <form action={logout}>
-          <button className="flex items-center gap-2 text-sm font-semibold text-red-600 hover:text-red-500 transition-colors">
-            <LogOut className="h-4 w-4" />
-            <span className="hidden sm:inline">Log out</span>
-          </button>
-        </form>
+        <button 
+          onClick={() => setShowLogoutConfirm(true)}
+          className="flex items-center gap-2 text-sm font-semibold text-red-600 bg-white border border-red-200 px-3 py-1.5 rounded-lg hover:bg-red-50 hover:border-red-300 hover:text-red-700 transition-all duration-200 hover:scale-105 active:scale-95 shadow-sm"
+        >
+          <LogOut className="h-4 w-4" />
+          <span className="hidden sm:inline">Log out</span>
+        </button>
       </div>
+
+      <SystemConfirmDialog
+        isOpen={showLogoutConfirm}
+        onClose={() => setShowLogoutConfirm(false)}
+        onConfirm={handleLogout}
+        title="Exit Concord?"
+        description="Are you sure you want to securely end your session and return to the login screen?"
+        confirmText="Yes, Log out"
+        cancelText="Cancel"
+        type="danger"
+        isLoading={isPending}
+      />
     </header>
   )
 }

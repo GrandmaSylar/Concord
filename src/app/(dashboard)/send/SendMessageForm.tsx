@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { processBulkSMS, getFilteredContacts, getAllFilteredContacts } from './actions'
 import { Send, Search, ChevronLeft, ChevronRight, Filter, UserPlus } from 'lucide-react'
 import { toast } from 'sonner'
+import SystemConfirmDialog from '@/components/ui/SystemConfirmDialog'
 
 type ContactInfo = { name: string, phone: string, position?: string, sub_area?: string, polling_station?: string }
 
@@ -40,6 +41,7 @@ export default function SendMessageForm({
 }) {
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
+  const [selectedSenderId, setSelectedSenderId] = useState<'Rachael-RTK' | 'RachaelWG' | 'RTK4SERVICE'>('Rachael-RTK')
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   // Contact Selection State
@@ -136,22 +138,31 @@ export default function SendMessageForm({
     ? previewMessage(message, sampleContact) 
     : message
 
-  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  const [showConfirm, setShowConfirm] = useState(false)
+  const [pendingFormData, setPendingFormData] = useState<FormData | null>(null)
+  const [pendingFormRef, setPendingFormRef] = useState<HTMLFormElement | null>(null)
+
+  function handleInitialSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (selectedContacts.size === 0) {
       toast.error('Please select at least one contact.')
       return
     }
-
-    setLoading(true)
-
+    
     const formData = new FormData(event.currentTarget)
-    // Send contacts as array of {name, phone} objects for merge tag support
     const contactsArray = Array.from(selectedContacts.values())
     formData.append('recipients', JSON.stringify(contactsArray))
+    
+    setPendingFormData(formData)
+    setPendingFormRef(event.currentTarget)
+    setShowConfirm(true)
+  }
 
-    const form = event.currentTarget
-    const result = await processBulkSMS(formData)
+  async function executeSubmit() {
+    if (!pendingFormData || !pendingFormRef) return
+    setLoading(true)
+
+    const result = await processBulkSMS(pendingFormData)
 
     if (result?.error) {
       toast.error(result.error)
@@ -159,9 +170,10 @@ export default function SendMessageForm({
       toast.success(`Successfully queued message for ${result.count} recipients!`)
       setMessage('')
       setSelectedContacts(new Map())
-      form.reset()
+      pendingFormRef.reset()
     }
     setLoading(false)
+    setShowConfirm(false)
   }
 
   return (
@@ -318,7 +330,7 @@ export default function SendMessageForm({
         </h2>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleInitialSubmit} className="space-y-5">
             <div>
               <label htmlFor="template" className="block text-sm font-medium text-gray-700">Use a Template (Optional)</label>
               <select
@@ -335,6 +347,47 @@ export default function SendMessageForm({
                   <option key={t.id} value={t.id}>{t.name}</option>
                 ))}
               </select>
+            </div>
+
+            {/* Sender ID Cards Selection */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Select Sender ID
+              </label>
+              <input type="hidden" name="senderId" value={selectedSenderId} />
+              <div className="grid grid-cols-3 gap-3">
+                {[
+                  { id: 'Rachael-RTK', badge: 'Official', desc: 'Primary branding' },
+                  { id: 'RachaelWG', badge: 'Campaign', desc: 'Alternate route' },
+                  { id: 'RTK4SERVICE', badge: 'Service', desc: 'Utility alerts' }
+                ].map((s) => (
+                  <button
+                    key={s.id}
+                    type="button"
+                    disabled={selectedContacts.size === 0}
+                    onClick={() => setSelectedSenderId(s.id as any)}
+                    className={`flex flex-col items-center justify-center p-3 rounded-xl border text-center transition-all cursor-pointer select-none active:scale-[0.98] ${
+                      selectedSenderId === s.id
+                        ? 'border-blue-500 bg-blue-50/50 ring-2 ring-blue-500/20 shadow-sm font-semibold'
+                        : 'border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50/50 font-normal'
+                    }`}
+                  >
+                    <span className={`text-[9px] font-semibold px-2 py-0.5 rounded-full mb-1 ${
+                      selectedSenderId === s.id
+                        ? 'bg-blue-100 text-blue-700'
+                        : 'bg-gray-100 text-gray-600'
+                    }`}>
+                      {s.badge}
+                    </span>
+                    <span className="text-xs font-bold text-gray-900 tracking-tight leading-none mb-1">
+                      {s.id}
+                    </span>
+                    <span className="text-[9px] text-gray-400 font-medium leading-tight">
+                      {s.desc}
+                    </span>
+                  </button>
+                ))}
+              </div>
             </div>
 
             {/* Merge Tag Buttons */}
@@ -402,7 +455,9 @@ export default function SendMessageForm({
               
               {/* Phone Header */}
               <div className="bg-slate-100 h-20 border-b flex items-end justify-center pb-3 relative">
-                <span className="font-semibold text-slate-800 text-sm">Concord SMS</span>
+                <span className="font-semibold text-slate-800 text-sm tracking-wide transition-all duration-300">
+                  {selectedSenderId}
+                </span>
               </div>
               
               {/* Phone Body */}
@@ -416,6 +471,21 @@ export default function SendMessageForm({
           </div>
         </div>
       </div>
+
+      <SystemConfirmDialog
+        isOpen={showConfirm}
+        onClose={() => setShowConfirm(false)}
+        onConfirm={executeSubmit}
+        title="Initialize Dispatch Sequence?"
+        description={
+          <>
+            This will queue your message using sender ID <strong>{selectedSenderId}</strong> to be sent to <strong>{selectedContacts.size}</strong> contact{selectedContacts.size === 1 ? '' : 's'}. Are you sure you want to proceed?
+          </>
+        }
+        confirmText="Yes, Send Messages"
+        type="warning"
+        isLoading={loading}
+      />
     </div>
   )
 }

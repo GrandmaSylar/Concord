@@ -13,7 +13,7 @@ function normalizePhone(phone: string): string {
   return digits
 }
 
-export async function sendSMS(recipients: string[], message: string) {
+export async function sendSMS(recipients: string[], message: string, sender?: string) {
   const apiKey = process.env.ARKESEL_API_KEY
 
   if (!apiKey) {
@@ -25,11 +25,11 @@ export async function sendSMS(recipients: string[], message: string) {
     // Normalize all phone numbers to international format
     const normalizedRecipients = recipients.map(normalizePhone)
     const to = normalizedRecipients.join(',')
-    const sender = 'Concord'
+    const senderId = sender || 'Concord'
     const encodedMessage = encodeURIComponent(message)
     
     // Using the Arkesel v1 API
-    const url = `https://sms.arkesel.com/sms/api?action=send-sms&api_key=${apiKey}&to=${to}&from=${sender}&sms=${encodedMessage}&response=json`
+    const url = `https://sms.arkesel.com/sms/api?action=send-sms&api_key=${apiKey}&to=${to}&from=${senderId}&sms=${encodedMessage}&response=json`
 
     console.log('Arkesel request URL (redacted key):', url.replace(apiKey, '***'))
 

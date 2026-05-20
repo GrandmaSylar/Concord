@@ -9,6 +9,10 @@ const contactSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
   phone: z.string().regex(/^[\d\s\+\-\(\)]+$/, 'Invalid phone number format').min(9, 'Phone number too short'),
   group_name: z.string().optional(),
+  position: z.string().optional(),
+  sub_area: z.string().optional(),
+  polling_station_code: z.string().optional(),
+  polling_station: z.string().optional(),
 })
 
 export async function getContacts() {
@@ -36,6 +40,10 @@ export async function addContact(formData: FormData) {
     name: formData.get('name') || '',
     phone: formData.get('phone') || '',
     group_name: formData.get('group_name') || '',
+    position: formData.get('position') || '',
+    sub_area: formData.get('sub_area') || '',
+    polling_station_code: formData.get('polling_station_code') || '',
+    polling_station: formData.get('polling_station') || '',
   })
 
   if (!parsed.success) {
@@ -43,7 +51,7 @@ export async function addContact(formData: FormData) {
   }
 
   // Normalize phone number (strip spaces, dashes, parentheses)
-  let { name, phone, group_name } = parsed.data
+  let { name, phone, group_name, position, sub_area, polling_station_code, polling_station } = parsed.data
   phone = phone.replace(/[\s\-\(\)]/g, '')
 
   const { error } = await supabase.from('contacts').insert({
@@ -51,6 +59,11 @@ export async function addContact(formData: FormData) {
     name: name.trim(),
     phone,
     group_name: group_name ? group_name.trim() : null,
+    position: position ? position.trim() : null,
+    sub_area: sub_area ? sub_area.trim() : null,
+    polling_station_code: polling_station_code ? polling_station_code.trim() : null,
+    polling_station: polling_station ? polling_station.trim() : null,
+    has_contact: true
   })
 
   if (error) {

@@ -2,10 +2,14 @@ import { getContacts } from './actions'
 import ContactList from './ContactList'
 import AddContactForm from './AddContactForm'
 import ImportContacts from './ImportContacts'
+import { getConstituencyGroups } from '../constituency/actions'
 
 export default async function ContactsPage() {
-  // Fetch contacts on the server
-  const contacts = await getContacts()
+  // Fetch contacts and constituency groups on the server
+  const [contacts, groups] = await Promise.all([
+    getContacts(),
+    getConstituencyGroups()
+  ])
 
   return (
     <div className="flex flex-col gap-6">
@@ -24,7 +28,7 @@ export default async function ContactsPage() {
 
         {/* Right Column: Add Contact Form & Import */}
         <div className="flex flex-col gap-6">
-          <AddContactForm />
+          <AddContactForm groups={groups} />
           <ImportContacts />
         </div>
       </div>

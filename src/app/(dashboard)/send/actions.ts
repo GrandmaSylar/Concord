@@ -75,6 +75,7 @@ function personalize(template: string, contact: { name: string, phone: string, p
 const sendSmsSchema = z.object({
   recipients: z.string().min(1, 'Please select at least one recipient'),
   message: z.string().min(1, 'Message cannot be empty').max(1600, 'Message too long'),
+  senderId: z.enum(['Rachael-RTK', 'RachaelWG', 'RTK4SERVICE']),
 })
 
 export async function processBulkSMS(formData: FormData) {
@@ -86,13 +87,14 @@ export async function processBulkSMS(formData: FormData) {
   const parsed = sendSmsSchema.safeParse({
     recipients: formData.get('recipients'),
     message: formData.get('message'),
+    senderId: formData.get('senderId'),
   })
 
   if (!parsed.success) {
     return { error: parsed.error.issues?.[0]?.message || 'Validation failed' }
   }
 
-  const { recipients, message } = parsed.data
+  const { recipients, message, senderId } = parsed.data
   
   let contactList: { name: string, phone: string, position?: string, sub_area?: string, polling_station?: string }[] = []
   try {
@@ -109,6 +111,7 @@ export async function processBulkSMS(formData: FormData) {
     user_id: user.id,
     recipient: contact.phone,
     content: hasMergeTags ? personalize(message, contact) : message,
+    sender_id: senderId,
     status: 'pending' // Queued for the background worker
   }))
 

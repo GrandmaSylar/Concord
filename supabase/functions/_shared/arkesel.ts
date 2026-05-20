@@ -6,7 +6,7 @@ export function normalizePhone(phone: string): string {
   return digits;
 }
 
-export async function sendSMS(recipients: string[], message: string) {
+export async function sendSMS(recipients: string[], message: string, sender?: string) {
   const apiKey = Deno.env.get("ARKESEL_API_KEY");
 
   if (!apiKey) {
@@ -21,7 +21,7 @@ export async function sendSMS(recipients: string[], message: string) {
     const url = "https://sms.arkesel.com/api/v2/sms/send";
     
     const payload = {
-      sender: "Concord",
+      sender: sender || "Concord",
       message: message,
       recipients: normalizedRecipients,
       // Dynamically tell Arkesel exactly where to send the delivery report!

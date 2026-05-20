@@ -80,8 +80,15 @@ export default function LoginPage({
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-slate-950 p-4 font-sans select-none">
       
-      {/* ── Ambient Background Lighting ── */}
-      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+      {/* ── Dynamic Database Background Image ── */}
+      <div 
+        className="absolute inset-0 z-0 overflow-hidden bg-cover bg-center bg-no-repeat pointer-events-none transition-all duration-700 ease-in-out"
+        style={{ backgroundImage: 'var(--theme-login-bg)' }}
+      >
+        {/* Soft glassmorphism dark overlay to ensure text is highly readable */}
+        <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-[2px]" />
+        
+        {/* Ambient colored lighting on top of the image */}
         <motion.div
           animate={{
             scale: [1, 1.2, 1],
@@ -93,7 +100,7 @@ export default function LoginPage({
             repeat: Infinity,
             ease: 'easeInOut',
           }}
-          className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] rounded-full bg-blue-600/10 blur-[120px]"
+          className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] rounded-full bg-theme-primary opacity-20 blur-[120px] mix-blend-screen"
         />
         <motion.div
           animate={{
@@ -106,7 +113,7 @@ export default function LoginPage({
             repeat: Infinity,
             ease: 'easeInOut',
           }}
-          className="absolute -bottom-[20%] -right-[10%] w-[60%] h-[60%] rounded-full bg-indigo-600/10 blur-[150px]"
+          className="absolute -bottom-[20%] -right-[10%] w-[60%] h-[60%] rounded-full bg-theme-secondary opacity-20 blur-[150px] mix-blend-screen"
         />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_20%,rgba(10,10,10,0.85))] pointer-events-none" />
       </div>
@@ -131,7 +138,7 @@ export default function LoginPage({
               transition={{ delay: 0.1 }}
               className="text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-none"
             >
-              Concord <span className="bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent">SMS</span>
+              Concord <span className="text-theme-sms-gradient">SMS</span>
             </motion.h1>
             <motion.p
               initial={{ opacity: 0 }}
@@ -194,7 +201,7 @@ export default function LoginPage({
             {/* Ambient Card Accent Light */}
             <div className="absolute top-0 right-0 w-24 h-24 bg-blue-500/5 rounded-full blur-2xl pointer-events-none" />
 
-            <div className="text-center md:text-left mb-8 space-y-2">
+            <div className="text-center mb-8 space-y-2">
               <h2 className="text-2xl lg:text-3xl font-bold text-white tracking-tight">
                 Welcome Back
               </h2>
@@ -284,7 +291,7 @@ export default function LoginPage({
                 whileTap={{ scale: isPending ? 1 : 0.985 }}
                 type="submit"
                 disabled={isPending}
-                className="w-full flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3.5 text-sm font-semibold text-white hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all disabled:opacity-60 cursor-pointer shadow-lg shadow-blue-500/15"
+                className="w-full flex items-center justify-center gap-2 rounded-xl bg-theme-primary px-4 py-3.5 text-sm font-semibold text-white hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all disabled:opacity-60 cursor-pointer shadow-lg shadow-black/15"
               >
                 {isPending ? (
                   <>

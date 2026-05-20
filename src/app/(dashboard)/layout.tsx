@@ -19,9 +19,19 @@ export default async function DashboardLayout({ children }: { children: ReactNod
     .single()
 
   return (
-    <div className="flex h-screen bg-gray-50 overflow-hidden">
+    <div className="flex h-screen bg-slate-50 overflow-hidden relative">
+      {/* ── Dynamic Database System Watermark ── */}
+      <div 
+        className="absolute inset-0 pointer-events-none z-0 bg-center bg-no-repeat bg-cover"
+        style={{ 
+          backgroundImage: 'var(--theme-watermark)', 
+          backgroundPosition: 'center 60%',
+          opacity: 'var(--theme-watermark-opacity)'
+        }}
+      />
+      
       <Sidebar />
-      <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
+      <div className="flex flex-col flex-1 min-w-0 overflow-hidden relative z-10">
         <TopNav user={{ email: user.email!, fullName: profile?.full_name, role: profile?.role }} />
         <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
           {children}
