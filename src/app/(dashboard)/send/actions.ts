@@ -121,6 +121,16 @@ export async function processBulkSMS(formData: FormData) {
     return { error: 'Failed to queue messages for dispatch.' }
   }
 
+  // Trigger the Edge Function to process the queued messages immediately
+  try {
+    const { error: invokeError } = await supabase.functions.invoke('process-messages')
+    if (invokeError) {
+      console.error('Error invoking process-messages edge function:', invokeError)
+    }
+  } catch (err) {
+    console.error('Failed to invoke process-messages edge function:', err)
+  }
+
   revalidatePath('/reports')
   revalidatePath('/') // Revalidate dashboard stats
   return { success: true, count: contactList.length }

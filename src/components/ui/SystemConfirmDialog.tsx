@@ -2,7 +2,8 @@
 
 import { motion, AnimatePresence } from 'framer-motion'
 import { AlertCircle, CheckCircle2, AlertTriangle, Loader2 } from 'lucide-react'
-import { ReactNode, useEffect } from 'react'
+import { ReactNode, useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 
 export type DialogType = 'info' | 'warning' | 'success' | 'danger'
 
@@ -58,6 +59,11 @@ export default function SystemConfirmDialog({
 }: SystemConfirmDialogProps) {
   const config = typeConfig[type]
   const Icon = config.icon
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   // Prevent background scrolling when open
   useEffect(() => {
@@ -71,7 +77,9 @@ export default function SystemConfirmDialog({
     }
   }, [isOpen])
 
-  return (
+  if (!mounted) return null
+
+  return createPortal(
     <AnimatePresence>
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -152,6 +160,8 @@ export default function SystemConfirmDialog({
           </motion.div>
         </div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   )
 }
+

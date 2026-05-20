@@ -33,6 +33,16 @@ export async function addReminder(formData: FormData) {
     return { error: 'Failed to schedule reminder.' }
   }
 
+  // Trigger the Edge Function to check/process reminders immediately
+  try {
+    const { error: invokeError } = await supabase.functions.invoke('process-reminders')
+    if (invokeError) {
+      console.error('Error invoking process-reminders edge function:', invokeError)
+    }
+  } catch (err) {
+    console.error('Failed to invoke process-reminders edge function:', err)
+  }
+
   revalidatePath('/reminders')
   revalidatePath('/scheduled')
   return { success: true }
