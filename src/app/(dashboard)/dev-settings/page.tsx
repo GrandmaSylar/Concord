@@ -1220,8 +1220,14 @@ export default function DevSettingsPage() {
                             </span>
                           )}
                         </td>
-                        <td className="py-3 px-4 text-xs text-slate-500 whitespace-nowrap font-mono">
-                          {new Date(log.sent_at).toLocaleString()}
+                        <td className="py-3 px-4 text-xs text-slate-500 whitespace-nowrap font-mono" suppressHydrationWarning>
+                          {new Date(log.sent_at).toLocaleString('en-GB', {
+                            day: '2-digit',
+                            month: 'short',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })}
                         </td>
                       </tr>
                     ))}
