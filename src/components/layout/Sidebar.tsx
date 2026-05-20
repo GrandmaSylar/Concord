@@ -13,8 +13,10 @@ import {
   BarChart2,
   Landmark,
   X,
-  Lock
+  Lock,
+  Loader2
 } from 'lucide-react'
+import { verifyDevPassword } from '@/app/actions/settings'
 
 const navigation = [
   { name: 'Dashboard', href: '/', icon: LayoutDashboard },
@@ -38,6 +40,7 @@ export default function Sidebar() {
   const [showDevModal, setShowDevModal] = useState(false)
   const [devPassword, setDevPassword] = useState('')
   const [devError, setDevError] = useState('')
+  const [isVerifying, setIsVerifying] = useState(false)
 
   const handleLogoClick = () => {
     setClickCount((prev) => {
@@ -55,15 +58,28 @@ export default function Sidebar() {
     }, 2000)
   }
 
-  const handleDevSubmit = (e: React.FormEvent) => {
+  const handleDevSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (devPassword === process.env.NEXT_PUBLIC_DEV_ADMIN_PASSWORD) {
-      setShowDevModal(false)
-      setDevPassword('')
-      setDevError('')
-      router.push('/dev-settings')
-    } else {
-      setDevError('Incorrect password. Access denied.')
+    if (isVerifying) return
+
+    setIsVerifying(true)
+    setDevError('')
+
+    try {
+      const res = await verifyDevPassword(devPassword)
+      if (res.success) {
+        setShowDevModal(false)
+        setDevPassword('')
+        setDevError('')
+        router.push('/dev-settings')
+      } else {
+        setDevError('Incorrect password. Access denied.')
+      }
+    } catch (err) {
+      console.error('Password verification failed:', err)
+      setDevError('Verification failed. Please try again.')
+    } finally {
+      setIsVerifying(false)
     }
   }
 
@@ -181,13 +197,14 @@ export default function Sidebar() {
                       type="password"
                       autoFocus
                       required
+                      disabled={isVerifying}
                       placeholder="Passphrase..."
                       value={devPassword}
                       onChange={(e) => {
                         setDevPassword(e.target.value)
                         setDevError('')
                       }}
-                      className="block w-full rounded-lg border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm py-2.5 px-3 border bg-white text-slate-900 transition-all"
+                      className="block w-full rounded-lg border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm py-2.5 px-3 border bg-white text-slate-900 transition-all disabled:opacity-50"
                     />
                     {devError && (
                       <p className="mt-2 text-xs font-medium text-red-600 animate-in slide-in-from-top-1">
@@ -197,9 +214,17 @@ export default function Sidebar() {
                   </div>
                   <button
                     type="submit"
-                    className="w-full flex justify-center items-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
+                    disabled={isVerifying}
+                    className="w-full flex justify-center items-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors disabled:opacity-50 gap-2 cursor-pointer"
                   >
-                    Authenticate
+                    {isVerifying ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Verifying...
+                      </>
+                    ) : (
+                      'Authenticate'
+                    )}
                   </button>
                 </div>
               </form>

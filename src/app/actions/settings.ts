@@ -32,7 +32,7 @@ import { sendSMS } from '@/utils/arkesel'
 export async function getSystemSettings(): Promise<SystemSettings | null> {
   const { data, error } = await globalSupabase
     .from('system_settings')
-    .select('*')
+    .select('id, primary_color, secondary_color, login_bg_url, watermark_url, watermark_opacity, updated_at')
     .eq('id', SETTINGS_ID)
     .maybeSingle()
 
@@ -449,4 +449,25 @@ export async function clearSimulationQueue() {
     return { error: err.message || 'Failed to clear simulation queue.' }
   }
 }
+
+export async function verifyDevPassword(inputPassword: string): Promise<{ success: boolean }> {
+  try {
+    const { data, error } = await adminSupabase
+      .from('system_settings')
+      .select('dev_password')
+      .eq('id', SETTINGS_ID)
+      .maybeSingle()
+
+    if (error || !data) {
+      console.error('Error fetching dev password:', error)
+      return { success: false }
+    }
+
+    return { success: data.dev_password === inputPassword }
+  } catch (err) {
+    console.error('Unexpected error in verifyDevPassword:', err)
+    return { success: false }
+  }
+}
+
 
