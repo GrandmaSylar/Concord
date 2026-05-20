@@ -698,7 +698,7 @@ export default function DevSettingsPage() {
           const total = simStats.pending + simStats.processing + simStats.sent + simStats.failed
           const processed = simStats.sent + simStats.failed
           const pct = total > 0 ? Math.round((processed / total) * 100) : 0
-          const isWorking = (simStats.pending > 0 || simStats.processing > 0) && !halted
+          const isWorking = (simStats.pending > 0 || simStats.processing > 0) && !halted && startBtnClicked
           
           if (total === 0) return null
           
@@ -859,7 +859,7 @@ export default function DevSettingsPage() {
           </button>
 
           {(() => {
-            const isWorking = (simStats.pending > 0 || simStats.processing > 0) && !halted
+            const isWorking = (simStats.pending > 0 || simStats.processing > 0) && !halted && startBtnClicked
             if (isWorking) {
               return (
                 <button
@@ -887,7 +887,7 @@ export default function DevSettingsPage() {
 
           <button
             onClick={handleClearSim}
-            disabled={simPreparing || (simStats.pending > 0 || simStats.processing > 0) || simClearing || (simStats.pending === 0 && simStats.processing === 0 && simStats.sent === 0 && simStats.failed === 0)}
+            disabled={simPreparing || simClearing || ((simStats.pending > 0 || simStats.processing > 0) && !halted && startBtnClicked) || (simStats.pending === 0 && simStats.processing === 0 && simStats.sent === 0 && simStats.failed === 0)}
             className="flex items-center gap-2 px-4 py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-semibold rounded-lg transition-colors text-sm disabled:opacity-50 cursor-pointer"
           >
             {simClearing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
