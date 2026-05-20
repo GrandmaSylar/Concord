@@ -45,9 +45,15 @@ export default function ScheduledQueue({ reminders }: { reminders: any[] }) {
               </div>
               <div className="flex items-center gap-4">
                 <div className="text-right text-xs text-gray-500 flex flex-col items-end">
-                  <span className="flex items-center gap-1 font-medium text-gray-700">
+                  <span className="flex items-center gap-1 font-medium text-gray-700" suppressHydrationWarning>
                     <Clock className="w-3 h-3" />
-                    {new Date(r.trigger_time).toLocaleString()}
+                    {new Date(r.trigger_time).toLocaleString('en-GB', {
+                      day: '2-digit',
+                      month: 'short',
+                      year: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
                   </span>
                 </div>
                 {r.status === 'pending' && (
