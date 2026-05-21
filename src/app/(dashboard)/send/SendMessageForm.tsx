@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { processBulkSMS, getFilteredContacts, getAllFilteredContacts } from './actions'
-import { Send, Search, ChevronLeft, ChevronRight, Filter, UserPlus } from 'lucide-react'
+import { Send, Search, ChevronLeft, ChevronRight, Filter, UserPlus, X } from 'lucide-react'
 import { toast } from 'sonner'
 import SystemConfirmDialog from '@/components/ui/SystemConfirmDialog'
 
@@ -62,6 +62,29 @@ export default function SendMessageForm({
   // Store full contact info (name + phone) for merge tag personalization
   const [selectedContacts, setSelectedContacts] = useState<Map<string, ContactInfo>>(new Map())
   
+  // Contacts imported from the Constituency tab
+  const [constituencyBanner, setConstituencyBanner] = useState<string | null>(null)
+
+  // On mount: check sessionStorage for contacts passed from Constituency tab
+  useEffect(() => {
+    const raw = sessionStorage.getItem('constituency_sms_contacts')
+    if (!raw) return
+    sessionStorage.removeItem('constituency_sms_contacts')
+    try {
+      const parsed: ContactInfo[] = JSON.parse(raw)
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        const next = new Map<string, ContactInfo>()
+        parsed.forEach(c => next.set(c.phone, c))
+        setSelectedContacts(next)
+        setConstituencyBanner(
+          `${parsed.length} contact${parsed.length === 1 ? '' : 's'} pre-loaded from Constituency tab`
+        )
+      }
+    } catch {
+      // malformed data — ignore
+    }
+  }, [])
+
   // Temporary numbers state
   const [tempNumbers, setTempNumbers] = useState('')
 
@@ -203,6 +226,23 @@ export default function SendMessageForm({
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 flex flex-col gap-8">
+
+      {/* Constituency import banner */}
+      {constituencyBanner && (
+        <div className="flex items-center justify-between gap-3 px-4 py-3 rounded-lg bg-blue-50 border border-blue-200 text-blue-800 text-sm">
+          <span className="flex items-center gap-2">
+            <Send className="w-4 h-4 shrink-0" />
+            <strong>{constituencyBanner}.</strong>&nbsp;Review recipients below, then compose your message.
+          </span>
+          <button
+            onClick={() => setConstituencyBanner(null)}
+            className="shrink-0 p-1 rounded hover:bg-blue-100 transition-colors"
+            aria-label="Dismiss"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
       
       {/* 1. Recipient Selection Area */}
       <div>

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
 import { Search, X, Users, Phone, MapPin, ChevronLeft, ChevronRight, Send, Filter, AlertTriangle } from 'lucide-react'
 import { toast } from 'sonner'
 import {
@@ -30,6 +31,7 @@ interface Props {
 }
 
 export default function ConstituencySelector({ initialContacts, initialTotal, groups, initialStats }: Props) {
+  const router = useRouter()
   const [contacts, setContacts] = useState(initialContacts)
   const [total, setTotal] = useState(initialTotal)
   const [stats, setStats] = useState(initialStats)
@@ -401,7 +403,15 @@ export default function ConstituencySelector({ initialContacts, initialTotal, gr
         </div>
         <button
           disabled={smsReady.length === 0}
-          onClick={() => toast.info(`${smsReady.length} contacts ready — navigate to Send page to compose message`)}
+          onClick={() => {
+            if (smsReady.length === 0) return
+            sessionStorage.setItem(
+              'constituency_sms_contacts',
+              JSON.stringify(smsReady)
+            )
+            toast.success(`${smsReady.length} contact${smsReady.length === 1 ? '' : 's'} loaded — opening Send page…`)
+            router.push('/send')
+          }}
           className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm hover:shadow-md"
         >
           <Send className="w-4 h-4" /> Send SMS to Selected
