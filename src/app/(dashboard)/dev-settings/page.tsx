@@ -21,10 +21,25 @@ export default function DevSettingsPage() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
 
-  // Simulation Playground states
-  const [simCount, setSimCount] = useState(2000)
-  const [simTimeout, setSimTimeout] = useState(1.5) // in seconds
-  const [simLatency, setSimLatency] = useState(50) // in ms per chunk
+  // Simulation Playground states — persisted in sessionStorage so navigating
+  // away (auth gate, back button, reload) never resets an in-flight test.
+  const [simCount, setSimCount] = useState<number>(() => {
+    if (typeof window === 'undefined') return 2000
+    return parseInt(sessionStorage.getItem('sim_count') ?? '2000', 10) || 2000
+  })
+  const [simTimeout, setSimTimeout] = useState<number>(() => {
+    if (typeof window === 'undefined') return 1.5
+    return parseFloat(sessionStorage.getItem('sim_timeout') ?? '1.5') || 1.5
+  })
+  const [simLatency, setSimLatency] = useState<number>(() => {
+    if (typeof window === 'undefined') return 50
+    return parseInt(sessionStorage.getItem('sim_latency') ?? '50', 10) || 50
+  })
+
+  // Keep sessionStorage in sync whenever params change
+  useEffect(() => { sessionStorage.setItem('sim_count',   String(simCount))   }, [simCount])
+  useEffect(() => { sessionStorage.setItem('sim_timeout', String(simTimeout)) }, [simTimeout])
+  useEffect(() => { sessionStorage.setItem('sim_latency', String(simLatency)) }, [simLatency])
   const [simPreparing, setSimPreparing] = useState(false)
   const [simRunning, setSimRunning] = useState(false)
   const [simClearing, setSimClearing] = useState(false)
