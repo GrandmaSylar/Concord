@@ -5,6 +5,7 @@ import { ShieldAlert, Terminal, Palette, Image as ImageIcon, Check, Loader2, Log
 import Link from 'next/link'
 import { getSystemSettings, updateSystemSettings, sendTestSMS, getRecentSMSLogs, SystemSettings, prepareSimulationQueue, getSimulationStats, triggerSimulationRun, clearSimulationQueue, haltSimulation } from '@/app/actions/settings'
 import { toast } from 'sonner'
+import DevAuthGuard from '@/components/ui/DevAuthGuard'
 
 interface SMSLog {
   id: string
@@ -320,6 +321,7 @@ export default function DevSettingsPage() {
   }
 
   return (
+    <DevAuthGuard>
     <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in zoom-in-95 duration-300 pb-12">
       <div className="bg-indigo-600 rounded-2xl p-8 text-white shadow-lg relative overflow-hidden">
         <div className="absolute top-4 right-4 z-20">
@@ -1239,5 +1241,6 @@ export default function DevSettingsPage() {
         )}
       </div>
     </div>
+    </DevAuthGuard>
   )
 }
