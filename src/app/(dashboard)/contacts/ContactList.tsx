@@ -33,7 +33,7 @@ export default function ContactList({
 
  const filteredContacts = initialContacts.filter(contact => {
  const matchesSearch = contact.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
- contact.phone.includes(searchTerm)
+ (contact.phone || '').includes(searchTerm)
  const matchesGroup = !filterGroup || contact.group_name === filterGroup
  const matchesSubArea = !filterSubArea || contact.sub_area === filterSubArea
  const matchesPosition = !filterPosition || contact.position === filterPosition
