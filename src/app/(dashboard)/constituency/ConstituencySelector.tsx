@@ -154,6 +154,17 @@ export default function ConstituencySelector({ initialContacts, initialTotal, gr
  if (filters.has_contact === false) activeChips.push({ label: 'Missing Contact', key: 'has_contact' })
  if (filters.has_voter_id === false) activeChips.push({ label: 'Missing Voter ID', key: 'has_voter_id' })
 
+  // Static color mappings to prevent dynamic JIT purge issues
+  const colorMap: Record<string, { bg: string; text: string }> = {
+    blue: { bg: 'bg-blue-50', text: 'text-blue-600' },
+    emerald: { bg: 'bg-emerald-50', text: 'text-emerald-600' },
+    amber: { bg: 'bg-amber-50', text: 'text-amber-600' },
+    purple: { bg: 'bg-purple-50', text: 'text-purple-600' },
+    slate: { bg: 'bg-slate-50', text: 'text-slate-600' },
+    indigo: { bg: 'bg-indigo-50', text: 'text-indigo-600' },
+    green: { bg: 'bg-emerald-50', text: 'text-emerald-600' },
+  }
+
  return (
  <div className="flex flex-col gap-4">
  {/* Stats Bar */}
@@ -166,17 +177,20 @@ export default function ConstituencySelector({ initialContacts, initialTotal, gr
  { label: 'Stations', value: stats.station_count, icon: MapPin, color: 'slate' },
  { label: 'Selected', value: selected.size, icon: Users, color: 'indigo' },
  { label: 'SMS Ready', value: smsReady.length, icon: Send, color: 'green' },
- ].map(s => (
+ ].map(s => {
+  const mappedColor = colorMap[s.color] || { bg: 'bg-gray-50', text: 'text-gray-600' }
+  return (
  <div key={s.label} className={`bg-white rounded-lg border border-gray-200 p-3 flex items-center gap-2`}>
- <div className={`p-1.5 rounded bg-${s.color}-50`}>
- <s.icon className={`w-4 h-4 text-${s.color}-600`} />
+ <div className={`p-1.5 rounded ${mappedColor.bg}`}>
+ <s.icon className={`w-4 h-4 ${mappedColor.text}`} />
  </div>
  <div>
  <p className="text-xs text-gray-500">{s.label}</p>
  <p className="text-lg font-bold text-gray-900">{s.value}</p>
  </div>
  </div>
- ))}
+ )
+ })}
  </div>
 
  {/* Tabs */}
@@ -272,7 +286,7 @@ export default function ConstituencySelector({ initialContacts, initialTotal, gr
 
  {/* Search + Controls */}
  <div className="p-4 flex flex-col sm:flex-row gap-3 items-center justify-between">
- <div className="relative flex-1 max-w-md">
+ <div className="relative flex-1 w-full max-w-md">
  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
  <input
  type="text"
@@ -282,7 +296,7 @@ export default function ConstituencySelector({ initialContacts, initialTotal, gr
  className="pl-9 w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm py-2 px-3 border bg-white text-slate-900 "
  />
  </div>
- <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
+ <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer self-start sm:self-auto">
  <input type="checkbox" checked={excludeNoPhone} onChange={e => setExcludeNoPhone(e.target.checked)}
  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
  Exclude contacts without phone
@@ -315,7 +329,7 @@ export default function ConstituencySelector({ initialContacts, initialTotal, gr
  </div>
 
  {/* Contacts Table */}
- <div className="relative min-h-[300px]">
+ <div className="relative min-h-[300px] overflow-x-auto">
  {loading && (
  <div className="absolute inset-0 bg-white/60 flex items-center justify-center z-10">
  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
@@ -378,7 +392,7 @@ export default function ConstituencySelector({ initialContacts, initialTotal, gr
  </div>
 
  {/* Pagination */}
- <div className="p-4 flex items-center justify-between border-t border-gray-200">
+ <div className="p-4 flex flex-col sm:flex-row items-center justify-between border-t border-gray-200 gap-3">
  <p className="text-sm text-gray-500">
  {total > 0 ? `${(page - 1) * pageSize + 1}–${Math.min(page * pageSize, total)} of ${total}` : '0 results'}
  </p>
@@ -397,7 +411,7 @@ export default function ConstituencySelector({ initialContacts, initialTotal, gr
  </div>
 
  {/* Send SMS Footer */}
- <div className="sticky bottom-0 bg-white border border-gray-200 rounded-lg shadow-lg p-4 flex items-center justify-between">
+ <div className="sticky bottom-0 bg-white border border-gray-200 rounded-lg shadow-lg p-4 flex flex-col sm:flex-row items-center justify-between gap-3 z-10">
  <div className="text-sm text-gray-600">
  <span className="font-semibold text-gray-900">{selected.size}</span> selected · <span className="font-semibold text-emerald-600">{smsReady.length}</span> SMS ready
  </div>
@@ -412,7 +426,7 @@ export default function ConstituencySelector({ initialContacts, initialTotal, gr
  toast.success(`${smsReady.length} contact${smsReady.length === 1 ? '' : 's'} loaded — opening Send page…`)
  router.push('/send')
  }}
- className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm hover:shadow-md"
+ className="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm hover:shadow-md"
  >
  <Send className="w-4 h-4" /> Send SMS to Selected
  </button>

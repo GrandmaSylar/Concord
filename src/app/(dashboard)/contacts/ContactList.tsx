@@ -138,13 +138,13 @@ export default function ContactList({
  ) : (
  <ul className="divide-y divide-gray-200">
  {filteredContacts.map(contact => (
- <li key={contact.id} className="p-4 hover:bg-gray-50 transition-colors flex justify-between items-center">
+ <li key={contact.id} className="p-3 sm:p-4 hover:bg-gray-50 transition-colors flex justify-between items-center gap-2">
  <div>
  <p className={`text-sm font-medium ${contact.opt_out ? 'text-gray-400 line-through' : 'text-gray-900'}`}>{contact.name}</p>
  <div className="flex items-center gap-2 mt-0.5">
  <p className={`text-xs ${contact.opt_out ? 'text-gray-400' : 'text-gray-500'}`}>{contact.phone}</p>
  {contact.sub_area && (
- <span className="text-[10px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded font-medium">
+ <span className="text-[10px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded font-medium hidden sm:inline">
  {contact.sub_area}
  </span>
  )}
@@ -156,7 +156,7 @@ export default function ContactList({
  {contact.group_name || 'Ungrouped'}
  </span>
  {contact.position && (
- <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-indigo-50 text-indigo-700 border border-indigo-100">
+ <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-indigo-50 text-indigo-700 border border-indigo-100">
  {contact.position}
  </span>
  )}

@@ -41,12 +41,12 @@ export default async function DashboardOverview() {
  const successRate = totalSMS > 0 ? Math.round((stats.totalMessagesSent / totalSMS) * 100) : 100
 
  return (
- <div className="flex flex-col gap-8 animate-in fade-in duration-500 pb-12">
+ <div className="flex flex-col gap-5 sm:gap-8 animate-in fade-in duration-500 pb-8 sm:pb-12">
  {/* ── Dynamic Welcome Dashboard Header ── */}
- <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r bg-theme-primary/10 border border-theme-primary/20 p-6 md:p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 shadow-sm">
+ <div className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-gradient-to-r bg-theme-primary/10 border border-theme-primary/20 p-4 sm:p-6 md:p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 sm:gap-6 shadow-sm">
  <div className="absolute top-0 right-0 w-64 h-64 bg-theme-primary/5 rounded-full blur-[100px] pointer-events-none" />
  <div className="space-y-1.5 relative z-10">
- <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-slate-900">
+ <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight text-slate-900">
  Welcome to <span className="text-theme-primary">Concord</span> SMS
  </h1>
  <p className="text-sm md:text-base text-slate-500 max-w-xl">
@@ -63,12 +63,12 @@ export default async function DashboardOverview() {
  </div>
 
  {/* ── Gorgeous Metrics Grid ── */}
- <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+ <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
  
  {/* Metric 1: Total Contacts */}
- <div className="bg-white rounded-xl shadow-sm border border-slate-200/80 p-6 hover:-translate-y-1 transition-all duration-300 group">
+ <div className="bg-white rounded-xl shadow-sm border border-slate-200/80 p-3.5 sm:p-6 hover:-translate-y-1 transition-all duration-300 group">
  <div className="flex justify-between items-start">
- <div className="p-3 bg-blue-50 text-blue-600 rounded-lg group-hover:bg-blue-100 transition-colors">
+ <div className="p-2 sm:p-3 bg-blue-50 text-blue-600 rounded-lg group-hover:bg-blue-100 transition-colors">
  <Users className="w-6 h-6" />
  </div>
  <span className="text-xs font-semibold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full">
@@ -77,14 +77,14 @@ export default async function DashboardOverview() {
  </div>
  <div className="mt-4">
  <p className="text-sm font-medium text-slate-500">Total Constituents</p>
- <p className="text-3xl font-bold text-slate-900 mt-1">{stats.totalContacts.toLocaleString()}</p>
+ <p className="text-2xl sm:text-3xl font-bold text-slate-900 mt-1">{stats.totalContacts.toLocaleString()}</p>
  </div>
  </div>
 
  {/* Metric 2: Gateway Success Rate */}
- <div className="bg-white rounded-xl shadow-sm border border-slate-200/80 p-6 hover:-translate-y-1 transition-all duration-300 group">
+ <div className="bg-white rounded-xl shadow-sm border border-slate-200/80 p-3.5 sm:p-6 hover:-translate-y-1 transition-all duration-300 group">
  <div className="flex justify-between items-start">
- <div className="p-3 bg-emerald-50 text-emerald-600 rounded-lg group-hover:bg-emerald-100 transition-colors">
+ <div className="p-2 sm:p-3 bg-emerald-50 text-emerald-600 rounded-lg group-hover:bg-emerald-100 transition-colors">
  <CheckCircle2 className="w-6 h-6" />
  </div>
  <span className="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full">
@@ -94,16 +94,16 @@ export default async function DashboardOverview() {
  <div className="mt-4">
  <p className="text-sm font-medium text-slate-500">Gateway Deliverability</p>
  <div className="flex items-baseline gap-2 mt-1">
- <p className="text-3xl font-bold text-slate-900">{stats.totalMessagesSent.toLocaleString()}</p>
+ <p className="text-2xl sm:text-3xl font-bold text-slate-900">{stats.totalMessagesSent.toLocaleString()}</p>
  <p className="text-xs text-slate-400">delivered</p>
  </div>
  </div>
  </div>
 
  {/* Metric 3: Active Outgoing Queue */}
- <div className="bg-white rounded-xl shadow-sm border border-slate-200/80 p-6 hover:-translate-y-1 transition-all duration-300 group">
+ <div className="bg-white rounded-xl shadow-sm border border-slate-200/80 p-3.5 sm:p-6 hover:-translate-y-1 transition-all duration-300 group">
  <div className="flex justify-between items-start">
- <div className="p-3 bg-purple-50 text-purple-600 rounded-lg group-hover:bg-purple-100 transition-colors">
+ <div className="p-2 sm:p-3 bg-purple-50 text-purple-600 rounded-lg group-hover:bg-purple-100 transition-colors">
  <Send className="w-6 h-6" />
  </div>
  {stats.totalMessagesPending > 0 ? (
@@ -119,7 +119,7 @@ export default async function DashboardOverview() {
  <div className="mt-4">
  <p className="text-sm font-medium text-slate-500">Outgoing Campaigns</p>
  <div className="flex items-baseline gap-2 mt-1">
- <p className="text-3xl font-bold text-slate-900">
+ <p className="text-2xl sm:text-3xl font-bold text-slate-900">
  {(stats.totalMessagesSent + stats.totalMessagesFailed + stats.totalMessagesPending).toLocaleString()}
  </p>
  <p className="text-xs text-slate-400">total dispatches</p>
@@ -128,9 +128,9 @@ export default async function DashboardOverview() {
  </div>
 
  {/* Metric 4: Scheduled Workflows */}
- <div className="bg-white rounded-xl shadow-sm border border-slate-200/80 p-6 hover:-translate-y-1 transition-all duration-300 group">
+ <div className="bg-white rounded-xl shadow-sm border border-slate-200/80 p-3.5 sm:p-6 hover:-translate-y-1 transition-all duration-300 group">
  <div className="flex justify-between items-start">
- <div className="p-3 bg-amber-50 text-amber-600 rounded-lg group-hover:bg-amber-100 transition-colors">
+ <div className="p-2 sm:p-3 bg-amber-50 text-amber-600 rounded-lg group-hover:bg-amber-100 transition-colors">
  <Clock className="w-6 h-6" />
  </div>
  <span className="text-xs font-semibold text-amber-600 bg-amber-50 px-2.5 py-1 rounded-full">
@@ -139,7 +139,7 @@ export default async function DashboardOverview() {
  </div>
  <div className="mt-4">
  <p className="text-sm font-medium text-slate-500">Pending Reminders</p>
- <p className="text-3xl font-bold text-slate-900 mt-1">{stats.pendingReminders.toLocaleString()}</p>
+ <p className="text-2xl sm:text-3xl font-bold text-slate-900 mt-1">{stats.pendingReminders.toLocaleString()}</p>
  </div>
  </div>
  </div>
@@ -153,7 +153,7 @@ export default async function DashboardOverview() {
  <Activity className="w-5 h-5 text-slate-400" />
  Quick Navigation Launchpad
  </h2>
- <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+ <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
  <Link 
  href="/send" 
  className="group flex flex-col justify-between p-5 rounded-xl bg-white border border-slate-200/80 hover:border-theme-primary/30 hover:bg-slate-50/50 shadow-sm transition-all duration-200"

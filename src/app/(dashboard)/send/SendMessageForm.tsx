@@ -229,7 +229,7 @@ export default function SendMessageForm({
  }
 
  return (
- <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 flex flex-col gap-8">
+ <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 sm:p-6 flex flex-col gap-6 sm:gap-8">
 
  {/* Constituency import banner */}
  {constituencyBanner && (
@@ -250,7 +250,7 @@ export default function SendMessageForm({
  
  {/* 1. Recipient Selection Area */}
  <div>
- <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center justify-between">
+ <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4 flex items-center justify-between">
  <span>1. Select Recipients</span>
  <span className="text-sm font-normal text-blue-600 bg-blue-50 px-3 py-1 rounded-full">
  {selectedContacts.size} Selected
@@ -370,7 +370,7 @@ export default function SendMessageForm({
  </div>
 
  {/* Contacts Table */}
- <div className="border border-gray-200 rounded-lg overflow-hidden relative min-h-[300px]">
+ <div className="border border-gray-200 rounded-lg overflow-x-auto relative min-h-[200px] sm:min-h-[300px]">
  {loadingContacts && (
  <div className="absolute inset-0 bg-white/60 flex items-center justify-center z-10">
  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
@@ -389,7 +389,7 @@ export default function SendMessageForm({
  </th>
  <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
  <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Phone</th>
- <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Group</th>
+ <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase hidden sm:table-cell">Group</th>
  </tr>
  </thead>
  <tbody className="bg-white divide-y divide-gray-200">
@@ -416,7 +416,7 @@ export default function SendMessageForm({
  </td>
  <td className="px-4 py-3 text-sm font-medium text-gray-900">{contact.name}</td>
  <td className="px-4 py-3 text-sm text-gray-500">{contact.phone}</td>
- <td className="px-4 py-3 text-sm text-gray-500">
+ <td className="px-4 py-3 text-sm text-gray-500 hidden sm:table-cell">
  {contact.group_name && (
  <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-800">
  {contact.group_name}
@@ -449,7 +449,7 @@ export default function SendMessageForm({
  </div>
 
  {/* Pagination */}
- <div className="flex items-center justify-between mt-4">
+ <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mt-4 gap-2">
  <p className="text-sm text-gray-500">
  Showing {contacts.length > 0 ? (page - 1) * 50 + 1 : 0} to {Math.min(page * 50, total)} of {total}
  </p>
@@ -508,7 +508,7 @@ export default function SendMessageForm({
  Select Sender ID
  </label>
  <input type="hidden" name="senderId" value={selectedSenderId} />
- <div className="grid grid-cols-3 gap-3">
+ <div className="grid grid-cols-3 gap-2 sm:gap-3">
  {[
  { id: 'Rachael-RTK', badge: 'Official', desc: 'Primary branding' },
  { id: 'RachaelWG', badge: 'Campaign', desc: 'Alternate route' },
@@ -607,7 +607,7 @@ export default function SendMessageForm({
  </form>
 
  {/* SMS Preview UI */}
- <div className="bg-slate-50 rounded-lg border border-slate-200 p-6 flex flex-col items-center justify-center min-h-[400px]">
+ <div className="bg-slate-50 rounded-lg border border-slate-200 p-4 sm:p-6 flex flex-col items-center justify-center min-h-[300px] sm:min-h-[400px] hidden lg:flex">
  <h3 className="text-sm font-medium text-slate-500 mb-1 uppercase tracking-wider">Live SMS Preview</h3>
  {hasMergeTags && sampleContact && (
  <p className="text-xs text-indigo-500 mb-3">

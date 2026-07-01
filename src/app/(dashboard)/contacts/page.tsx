@@ -14,11 +14,9 @@ export default async function ContactsPage() {
 
  return (
  <div className="flex flex-col gap-6">
- <div className="flex justify-between items-end">
- <div>
- <h1 className="text-2xl font-bold tracking-tight text-gray-900">Contacts</h1>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-2">
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-gray-900">Contacts</h1>
  <p className="text-sm text-gray-500 mt-1">Manage your contacts and contact groups.</p>
- </div>
  </div>
 
  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

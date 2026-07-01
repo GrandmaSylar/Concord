@@ -13,9 +13,13 @@ export default async function DashboardLayout({ children }: { children: ReactNod
 
  const { data: profile } = await supabase
  .from('profiles')
- .select('full_name, role')
+ .select('full_name, role, force_password_change')
  .eq('id', user.id)
  .single()
+
+ if (profile?.force_password_change) {
+ redirect('/change-password')
+ }
 
  return (
  <ResponsiveLayout user={{ email: user.email!, fullName: profile?.full_name, role: profile?.role }}>

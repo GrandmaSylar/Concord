@@ -37,7 +37,7 @@ export default function SmsBalanceBadge() {
 
  if (loading) {
  return (
- <div className="hidden sm:flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-full px-3 py-1.5 animate-pulse">
+ <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-full px-2 sm:px-3 py-1 sm:py-1.5 animate-pulse">
  <div className="w-4 h-4 bg-slate-200 rounded-full"></div>
  <div className="w-24 h-3 bg-slate-200 rounded"></div>
  </div>
@@ -49,15 +49,15 @@ export default function SmsBalanceBadge() {
  const ghsValue = calculateGhsValue(balance)
 
  return (
- <div className="hidden sm:flex items-center gap-3 bg-slate-50 border border-slate-200 rounded-full px-3 py-1.5 text-sm font-medium text-slate-700 transition-colors hover:bg-blue-50 hover:border-blue-200">
+ <div className="flex items-center gap-2 sm:gap-3 bg-slate-50 border border-slate-200 rounded-full px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm font-medium text-slate-700 transition-colors hover:bg-blue-50 hover:border-blue-200">
  <div className="flex items-center gap-1.5">
  <MessageSquareText className="w-4 h-4 text-blue-500" />
  <span>
  <strong className="text-gray-900">{balance.toLocaleString()}</strong> SMS
  </span>
  </div>
- <div className="w-px h-4 bg-slate-300"></div>
- <div className="flex items-center gap-1.5">
+ <div className="w-px h-4 bg-slate-300 hidden sm:block"></div>
+ <div className="hidden sm:flex items-center gap-1.5">
  <Wallet className="w-4 h-4 text-emerald-500" />
  <span className="text-emerald-700">
  ₵{ghsValue.toLocaleString('en-GH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}

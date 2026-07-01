@@ -14,7 +14,8 @@ import {
  Landmark,
  X,
  Lock,
- Loader2
+ Loader2,
+ HelpCircle
 } from 'lucide-react'
 import { verifyDevPassword } from '@/app/actions/settings'
 
@@ -27,6 +28,7 @@ const navigation = [
  { name: 'Reminders', href: '/reminders', icon: Clock },
  { name: 'Scheduled', href: '/scheduled', icon: Calendar },
  { name: 'Reports', href: '/reports', icon: BarChart2 },
+ { name: 'User Guide', href: '/documentation', icon: HelpCircle },
 ]
 
 interface SidebarProps {

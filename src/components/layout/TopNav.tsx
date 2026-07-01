@@ -43,7 +43,7 @@ export default function TopNav({ user, onMenuClick }: TopNavProps) {
  <Menu className="h-6 w-6" aria-hidden="true" />
  </button>
  </div>
- <div className="flex flex-1 justify-end items-center gap-4">
+ <div className="flex flex-1 justify-end items-center gap-2 sm:gap-4">
  <SmsBalanceBadge />
 
  <div className="text-sm text-gray-700 hidden sm:block">
