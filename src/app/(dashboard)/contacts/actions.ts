@@ -130,32 +130,45 @@ export async function toggleOptOut(contactId: string, currentStatus: boolean) {
 }
 
 export async function getContactFilterOptions() {
- const supabase = await createClient()
- const { data: { user } } = await supabase.auth.getUser()
- if (!user) return { groups: [], sub_areas: [], positions: [] }
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { groups: [], sub_areas: [], positions: [] }
 
- // Fetch unique non-null values for group_name, sub_area, and position
- const [
- { data: groupData },
- { data: subAreaData },
- { data: positionData }
- ] = await Promise.all([
- supabase.from('contacts').select('group_name').eq('user_id', user.id).not('group_name', 'is', null),
- supabase.from('contacts').select('sub_area').eq('user_id', user.id).not('sub_area', 'is', null),
- supabase.from('contacts').select('position').eq('user_id', user.id).not('position', 'is', null)
- ])
+  const allContacts: { group_name: string | null; sub_area: string | null; position: string | null }[] = []
+  let from = 0
+  const limit = 1000
 
- // Extract unique values
- const groups = [...new Set((groupData || []).map(r => r.group_name))].filter(Boolean) as string[]
- const sub_areas = [...new Set((subAreaData || []).map(r => r.sub_area))].filter(Boolean) as string[]
- const positions = [...new Set((positionData || []).map(r => r.position))].filter(Boolean) as string[]
+  while (true) {
+    const { data, error } = await supabase
+      .from('contacts')
+      .select('group_name, sub_area, position')
+      .eq('user_id', user.id)
+      .range(from, from + limit - 1)
 
- // Sort them alphabetically
- groups.sort()
- sub_areas.sort()
- positions.sort()
+    if (error) {
+      console.error('Error fetching contacts filter options:', error)
+      break
+    }
+    allContacts.push(...(data || []))
+    if (!data || data.length < limit) break
+    from += limit
+  }
 
- return { groups, sub_areas, positions }
+  const groupsSet = new Set<string>()
+  const subAreasSet = new Set<string>()
+  const positionsSet = new Set<string>()
+
+  for (const c of allContacts) {
+    if (c.group_name) groupsSet.add(c.group_name)
+    if (c.sub_area) subAreasSet.add(c.sub_area)
+    if (c.position) positionsSet.add(c.position)
+  }
+
+  const groups = Array.from(groupsSet).sort()
+  const sub_areas = Array.from(subAreasSet).sort()
+  const positions = Array.from(positionsSet).sort()
+
+  return { groups, sub_areas, positions }
 }
 
 export async function updateContact(contactId: string, formData: FormData) {

@@ -119,28 +119,54 @@ export async function getAllConstituencyContacts(filters: FilterParams = {}) {
 
 // ── Get Group Options ──────────────────────────────────────────────────────
 export async function getConstituencyGroups(): Promise<GroupOptions> {
- const supabase = await createClient()
+  const supabase = await createClient()
+  const allContacts: { sub_area: string | null; position: string | null; polling_station_code: string | null; polling_station: string | null }[] = []
+  let from = 0
+  const limit = 1000
 
- const { data: subAreas } = await supabase
- .from('contacts').select('sub_area').not('sub_area', 'is', null).order('sub_area')
- const uniqueSubAreas = [...new Set((subAreas || []).map(r => r.sub_area))].filter(Boolean) as string[]
+  while (true) {
+    const { data, error } = await supabase
+      .from('contacts')
+      .select('sub_area, position, polling_station_code, polling_station')
+      .not('sub_area', 'is', null)
+      .range(from, from + limit - 1)
 
- const { data: positions } = await supabase
- .from('contacts').select('position').not('sub_area', 'is', null).not('position', 'is', null).order('position')
- const uniquePositions = [...new Set((positions || []).map(r => r.position))].filter(Boolean) as string[]
+    if (error) {
+      console.error('Error fetching constituency groups data:', error)
+      break
+    }
+    allContacts.push(...(data || []))
+    if (!data || data.length < limit) break
+    from += limit
+  }
 
- const { data: stations } = await supabase
- .from('contacts').select('polling_station_code, polling_station, sub_area')
- .not('sub_area', 'is', null).not('polling_station_code', 'is', null).order('polling_station')
+  const subAreasSet = new Set<string>()
+  const positionsSet = new Set<string>()
+  const stationMap = new Map<string, { code: string; name: string; sub_area: string }>()
 
- const stationMap = new Map<string, { code: string; name: string; sub_area: string }>()
- for (const s of stations || []) {
- if (s.polling_station_code && !stationMap.has(s.polling_station_code)) {
- stationMap.set(s.polling_station_code, { code: s.polling_station_code, name: s.polling_station || s.polling_station_code, sub_area: s.sub_area })
- }
- }
+  for (const c of allContacts) {
+    if (c.sub_area) {
+      subAreasSet.add(c.sub_area)
+    }
+    if (c.position) {
+      positionsSet.add(c.position)
+    }
+    if (c.polling_station_code && c.sub_area) {
+      if (!stationMap.has(c.polling_station_code)) {
+        stationMap.set(c.polling_station_code, {
+          code: c.polling_station_code,
+          name: c.polling_station || c.polling_station_code,
+          sub_area: c.sub_area
+        })
+      }
+    }
+  }
 
- return { sub_areas: uniqueSubAreas, positions: uniquePositions, polling_stations: Array.from(stationMap.values()) }
+  const sub_areas = Array.from(subAreasSet).sort()
+  const positions = Array.from(positionsSet).sort()
+  const polling_stations = Array.from(stationMap.values()).sort((a, b) => a.name.localeCompare(b.name))
+
+  return { sub_areas, positions, polling_stations }
 }
 
 // ── Get Stats ──────────────────────────────────────────────────────────────
