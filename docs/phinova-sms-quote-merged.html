@@ -1,0 +1,1397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Quotation – Concord Bulk SMS Platform | PhiNova</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --navy:#1a2a4a; --navy-mid:#1e3a6e; --blue:#4a7fb5; --blue-light:#7ab3d8;
+    --paper:#f4f7fb; --white:#fff; --muted:#6b7a94; --rule:#d8e3ef;
+    --tag-bg:#e8f1f9; --tag-border:#b0cfe8;
+    --green:#1a7a4a; --green-bg:#edf7f2;
+    --gold:#c9a84c; --gold-bg:#fdf8ed; --gold-border:#e8d49a;
+    --sec-bg:#f0eafa; --sec-border:#c4a8e8; --sec-color:#6b3fa0;
+    --amber:#92600a; --amber-bg:#fdf4e3; --amber-border:#f0d090;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Outfit',sans-serif;background:var(--paper);color:var(--navy);min-height:100vh;padding:2rem 1rem 4rem;}
+
+  .doc{max-width:920px;margin:0 auto;background:var(--white);border:1px solid var(--rule);box-shadow:0 8px 56px rgba(26,42,74,.12);overflow:hidden;}
+
+  /* HEADER */
+  .header{background:linear-gradient(135deg,#0d1b30 0%,#1e3a6e 100%);color:#fff;padding:2.8rem 3.5rem 2.4rem;position:relative;overflow:hidden;}
+  .header::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(-55deg,transparent,transparent 28px,rgba(255,255,255,.016) 28px,rgba(255,255,255,.016) 29px);}
+  .header::after{content:'';position:absolute;right:-100px;top:-100px;width:320px;height:320px;border-radius:50%;border:50px solid rgba(74,144,196,.09);pointer-events:none;}
+  .header-top{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:1.5rem;position:relative;z-index:1;}
+  .brand{display:flex;align-items:center;gap:1.2rem;}
+  .logo-wrap{
+    background:rgba(255,255,255,.08);
+    border-radius:12px;
+    padding:6px;
+    border:1px solid rgba(255,255,255,.13);
+    width:70px;
+    height:70px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+  }
+  .logo-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  .brand-name{font-family:'Cormorant Garamond',serif;font-size:1.7rem;font-weight:700;line-height:1.1;}
+  .brand-name .phi-part{color:#7ab3d8;}
+  .brand-name .nova-part{color:#fff;}
+  .brand-tagline{font-size:.57rem;letter-spacing:.18em;text-transform:uppercase;color:rgba(122,179,216,.65);margin-top:.3rem;}
+  .quote-meta{text-align:right;position:relative;z-index:1;}
+  .quote-label{font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;opacity:.4;}
+  .quote-num{font-family:'JetBrains Mono',monospace;font-size:1.05rem;font-weight:500;margin-top:.2rem;color:var(--blue-light);}
+  .quote-date{font-size:.7rem;opacity:.45;margin-top:.25rem;}
+  .header-title{position:relative;margin-top:2rem;z-index:1;}
+  .header-eyebrow{font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--blue-light);font-weight:600;margin-bottom:.5rem;}
+  .header-h1{font-family:'Cormorant Garamond',serif;font-size:clamp(1.8rem,5vw,2.8rem);font-weight:700;line-height:1.1;max-width:580px;}
+  .header-h1 span{color:var(--blue-light);}
+  .header-sub{font-size:.82rem;color:rgba(255,255,255,.55);margin-top:.75rem;max-width:520px;line-height:1.6;position:relative;z-index:1;}
+
+  /* PARTIES */
+  .parties{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:1rem;background:var(--white);padding:1.7rem 3.5rem;border-bottom:1px solid var(--rule);}
+  .party-label{font-size:.57rem;text-transform:uppercase;letter-spacing:.15em;color:var(--muted);margin-bottom:.35rem;}
+  .party-name{font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-weight:700;color:var(--navy);}
+  .party-detail{font-size:.75rem;color:var(--muted);margin-top:.15rem;line-height:1.55;}
+  .arrow-badge{width:36px;height:36px;background:var(--navy);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0;}
+  .party-right{text-align:right;}
+
+  /* SECTIONS */
+  .section{padding:2.4rem 3.5rem;border-bottom:1px solid var(--rule);}
+  .section:last-of-type{border-bottom:none;}
+  .s-title{font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:700;color:var(--navy);margin-bottom:1.2rem;display:flex;align-items:center;gap:.7rem;}
+  .s-title::after{content:'';flex:1;height:1px;background:var(--rule);}
+  .s-num{font-family:'JetBrains Mono',monospace;font-size:.67rem;background:var(--navy);color:#fff;border-radius:4px;padding:.13rem .38rem;}
+
+  /* INTRO CALLOUT */
+  .intro-box{background:linear-gradient(90deg,#edf7f2,#f4f7fb);border-left:4px solid var(--green);border-radius:0 10px 10px 0;padding:1.2rem 1.5rem;font-size:.84rem;color:var(--navy-mid);line-height:1.7;}
+  .intro-box strong{color:var(--navy);}
+
+  /* PLAN TOGGLE TABS */
+  .plan-switcher{display:flex;gap:0;margin-bottom:1.5rem;border:1px solid var(--rule);border-radius:10px;overflow:hidden;background:var(--paper);}
+  .plan-tab{flex:1;padding:.75rem 1.2rem;text-align:center;cursor:pointer;font-size:.82rem;font-weight:600;color:var(--muted);border:none;background:transparent;font-family:'Outfit',sans-serif;transition:all .2s;border-right:1px solid var(--rule);display:flex;flex-direction:column;align-items:center;gap:.3rem;}
+  .plan-tab:last-child{border-right:none;}
+  .plan-tab.active{background:var(--navy);color:#fff;}
+  .plan-tab .plan-tab-price{display:block;font-family:'JetBrains Mono',monospace;font-size:1rem;font-weight:500;color:var(--blue-light);margin-top:.15rem;}
+  .plan-tab.active .plan-tab-price{color:#fff;opacity:.8;}
+  .plan-panel{display:none;}
+  .plan-panel.active{display:block;}
+
+  /* DELIVERABLE CARDS */
+  .deliv-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+  @media(max-width:600px){.deliv-grid{grid-template-columns:1fr;}}
+  .deliv-card{border:1px solid var(--rule);border-radius:10px;padding:1.1rem 1.3rem;transition:box-shadow .15s;}
+  .deliv-card:hover{box-shadow:0 4px 18px rgba(26,42,74,.08);}
+  .deliv-card.wide{grid-column:1/-1;}
+  .deliv-card.premium{border-color:var(--gold-border);background:var(--gold-bg);}
+  .deliv-card.premium-only{border-color:var(--sec-border);background:#faf6ff;}
+  .deliv-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.55rem;gap:.5rem;}
+  .deliv-title{font-weight:700;font-size:.9rem;color:var(--navy);display:flex;align-items:center;gap:.45rem;}
+  .deliv-badge{font-size:.6rem;font-weight:700;border-radius:4px;padding:.12rem .42rem;white-space:nowrap;flex-shrink:0;border:1px solid;letter-spacing:.04em;}
+  .deliv-badge.both{background:#edf7f2;border-color:#a0d4b8;color:var(--green);}
+  .deliv-badge.premium-tag{background:var(--gold-bg);border-color:var(--gold-border);color:#7a5a0a;display:flex;align-items:center;gap:.3rem;}
+  .deliv-badge.foundation{background:var(--tag-bg);border-color:var(--tag-border);color:var(--blue);}
+  .deliv-desc{font-size:.79rem;color:var(--muted);line-height:1.65;}
+  .deliv-bullets{list-style:none;margin-top:.55rem;display:flex;flex-direction:column;gap:.28rem;}
+  .deliv-bullets li{font-size:.76rem;color:var(--muted);display:flex;gap:.55rem;line-height:1.5;}
+  .deliv-bullets li svg{flex-shrink:0;margin-top:2px;}
+  .deliv-bullets li.premium-li svg{color:var(--gold);}
+
+  /* COMPARISON TABLE */
+  .compare-box{border:1px solid var(--rule);border-radius:12px;overflow:hidden;margin-top:1.5rem;}
+  .compare-header{background:var(--navy);padding:.75rem 1.3rem;font-size:.6rem;text-transform:uppercase;letter-spacing:.14em;color:rgba(255,255,255,.6);font-weight:600;display:flex;align-items:center;gap:.6rem;}
+  .compare-row{display:grid;grid-template-columns:1.4fr 1fr 1fr;border-bottom:1px solid var(--rule);}
+  .compare-row:last-child{border-bottom:none;}
+  .compare-cell{padding:.78rem 1rem;font-size:.8rem;}
+  .compare-cell:not(:last-child){border-right:1px solid var(--rule);}
+  .compare-cell.clabel{font-weight:600;color:var(--navy);background:var(--paper);font-size:.78rem;}
+  .compare-cell.clo{color:var(--blue);}
+  .compare-cell.chi{color:var(--gold);font-weight:500;}
+  .compare-cell.cheader{font-weight:700;font-size:.78rem;padding:.65rem 1rem;display:flex;flex-direction:column;gap:.2rem;}
+
+  /* EXPLANATION CALLOUT */
+  .explain-box{margin-top:1.3rem;border-radius:10px;overflow:hidden;border:1px solid var(--gold-border);}
+  .explain-header{background:linear-gradient(90deg,var(--gold-bg),#fff);padding:.7rem 1.2rem;font-size:.65rem;text-transform:uppercase;letter-spacing:.12em;color:var(--amber);font-weight:700;border-bottom:1px solid var(--gold-border);display:flex;align-items:center;gap:.6rem;}
+  .explain-body{padding:1.2rem 1.4rem;font-size:.82rem;color:var(--navy-mid);line-height:1.75;}
+  .explain-body p+p{margin-top:.75rem;}
+  .explain-body strong{color:var(--navy);}
+  .explain-body .highlight{background:var(--gold-bg);border-left:3px solid var(--gold);padding:.55rem .85rem;border-radius:0 6px 6px 0;margin:.9rem 0;font-size:.8rem;}
+
+  /* FEE TABLE */
+  .fee-table-wrap{overflow-x:auto;}
+  .fee-table{width:100%;border-collapse:collapse;font-size:.82rem;min-width:560px;}
+  .fee-table thead tr{background:var(--navy);color:#fff;}
+  .fee-table thead th{padding:.65rem 1rem;text-align:left;font-size:.6rem;text-transform:uppercase;letter-spacing:.1em;font-weight:600;}
+  .fee-table thead th:last-child{text-align:right;}
+  .fee-table tbody tr{border-bottom:1px solid var(--rule);}
+  .fee-table tbody tr:hover{background:#f4f8fd;}
+  .fee-table tbody tr.premium-row{background:#fdf8ed;}
+  .fee-table tbody tr.premium-row:hover{background:#faf3e0;}
+  .fee-table tbody td{padding:.85rem 1rem;vertical-align:top;}
+  .fee-table td:last-child{text-align:right;font-family:'JetBrains Mono',monospace;font-weight:600;color:var(--navy);white-space:nowrap;}
+  .fee-table td:first-child{font-weight:600;color:var(--navy);}
+  .fee-sub{font-size:.73rem;color:var(--muted);margin-top:.2rem;font-weight:400;line-height:1.5;}
+  .plan-label-pill{display:inline-block;font-size:.57rem;border-radius:3px;padding:.08rem .36rem;font-weight:700;letter-spacing:.06em;border:1px solid;margin-left:.4rem;vertical-align:middle;}
+  .plan-label-pill.starter{background:var(--tag-bg);border-color:var(--tag-border);color:var(--blue);}
+  .plan-label-pill.growth{background:var(--gold-bg);border-color:var(--gold-border);color:#7a5a0a;}
+
+  /* TOTALS */
+  .totals-wrap{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;margin-top:1.3rem;}
+  @media(max-width:600px){.totals-wrap{grid-template-columns:1fr;}}
+  .totals-card{border:1px solid var(--rule);border-radius:10px;overflow:hidden;}
+  .totals-card.gold-card{border-color:var(--gold-border);}
+  .totals-card-header{padding:.55rem 1.1rem;font-size:.6rem;text-transform:uppercase;letter-spacing:.13em;font-weight:700;background:var(--paper);border-bottom:1px solid var(--rule);color:var(--muted);display:flex;align-items:center;gap:.5rem;}
+  .totals-card.gold-card .totals-card-header{background:var(--gold-bg);border-color:var(--gold-border);color:#7a5a0a;}
+  .totals-row{display:flex;justify-content:space-between;align-items:center;padding:.75rem 1.1rem;border-bottom:1px solid var(--rule);font-size:.81rem;}
+  .totals-row:last-child{border-bottom:none;}
+  .totals-row.grand{background:var(--navy);color:#fff;}
+  .totals-card.gold-card .totals-row.grand{background:linear-gradient(90deg,#7a5a0a,#b8860b);}
+  .totals-val{font-weight:600;font-family:'JetBrains Mono',monospace;}
+  .totals-row.grand .totals-val{font-family:'Cormorant Garamond',serif;font-size:1.25rem;font-weight:700;color:var(--blue-light);}
+  .totals-card.gold-card .totals-row.grand .totals-val{color:#fff9ec;}
+
+  /* SMS PLANS */
+  .sms-tabs{display:flex;gap:.5rem;margin-bottom:1.2rem;flex-wrap:wrap;}
+  .sms-tab-btn{padding:.36rem .82rem;border:1px solid var(--rule);background:var(--paper);border-radius:6px;font-size:.73rem;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;color:var(--navy);transition:all .15s;}
+  .sms-tab-btn.active,.sms-tab-btn:hover{background:var(--navy);color:#fff;border-color:var(--navy);}
+  .sms-panel{display:none;}
+  .sms-panel.active{display:block;}
+  .price-table{width:100%;border-collapse:collapse;font-size:.81rem;}
+  .price-table thead tr{background:#eef3fa;}
+  .price-table thead th{padding:.56rem .9rem;text-align:left;font-size:.6rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:600;}
+  .price-table tbody tr{border-bottom:1px solid var(--rule);}
+  .price-table tbody tr:hover{background:#f4f8fd;}
+  .price-table tbody td{padding:.65rem .9rem;}
+  .price-table td:first-child{font-family:'JetBrains Mono',monospace;font-weight:500;color:var(--green);}
+  .price-table .bold{font-weight:700;color:var(--navy);}
+  .expiry-badge{display:inline-block;font-size:.58rem;border-radius:3px;padding:.09rem .33rem;font-weight:600;}
+  .expiry-badge.no{background:var(--green-bg);color:var(--green);}
+  .expiry-badge.yes{background:var(--tag-bg);color:var(--blue);}
+
+  /* TERMS */
+  .terms-list{list-style:none;display:flex;flex-direction:column;gap:.7rem;}
+  .terms-list li{display:flex;gap:.68rem;font-size:.81rem;color:var(--muted);line-height:1.55;}
+  .terms-list li svg{color:var(--blue);flex-shrink:0;margin-top:2px;}
+  .terms-list li strong{color:var(--navy);}
+
+  /* FOOTER */
+  .footer{background:linear-gradient(135deg,#0d1b30 0%,#1e3a6e 100%);color:rgba(255,255,255,.6);padding:1.8rem 3.5rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;font-size:.73rem;}
+  .footer-sig{font-family:'Cormorant Garamond',serif;font-size:1rem;color:#fff;font-style:italic;}
+  .footer-brand{font-family:'Cormorant Garamond',serif;font-size:.95rem;font-weight:700;}
+  .footer-brand .phi-part{color:var(--blue-light);}
+  .footer-brand .nova-part{color:#fff;}
+  .footer a{color:var(--blue-light);text-decoration:none;}
+
+  /* ON REQUEST */
+  .on-request{margin-top:1.1rem;background:linear-gradient(90deg,#e8f1f9,#f4f7fb);border-left:3px solid var(--blue);border-radius:0 8px 8px 0;padding:.85rem 1.15rem;font-size:.8rem;color:var(--navy-mid);display:flex;align-items:center;gap:.7rem;}
+  .on-request svg{color:var(--blue);}
+  .on-request strong{font-weight:700;}
+
+  /* PRINT */
+  .print-btn{display:flex;align-items:center;justify-content:flex-end;max-width:920px;margin:1.3rem auto 0;padding:0 1rem;}
+  /* PRINT */
+  .print-btn{display:flex;align-items:center;justify-content:flex-end;max-width:920px;margin:1.3rem auto 0;padding:0 1rem;}
+  .print-btn button{padding:.5rem 1.1rem;background:var(--navy);color:#fff;border:none;border-radius:7px;font-family:'Outfit',sans-serif;font-size:.79rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:.5rem;transition:background .15s;}
+  .print-btn button:hover{background:var(--navy-mid);}
+  @media print{body{padding:0;background:#fff;}.print-btn{display:none;}.doc{box-shadow:none;border:none;}}
+  @media(max-width:620px){.header,.parties,.section,.footer{padding-left:1.3rem;padding-right:1.3rem;}.parties{grid-template-columns:1fr;}.arrow-badge{transform:rotate(90deg);margin:0 auto;}.party-right{text-align:left;}.compare-row{grid-template-columns:1fr;}.compare-cell:not(:last-child){border-right:none;border-bottom:1px solid var(--rule);}}
+
+  /* SYSTEM SHOWCASE - LIVE PREVIEWS */
+  .showcase-grid {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 2rem;
+    margin-top: 1.5rem;
+  }
+  @media(max-width: 850px){.showcase-grid { grid-template-columns: 1fr; }}
+  
+  /* Mock Dashboard Card styling */
+  .mock-dashboard {
+    background: #0d1527; /* Deep Slate Dark Mode */
+    color: #cbd5e1;
+    border-radius: 12px;
+    border: 1px solid #1e293b;
+    padding: 1.4rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    box-shadow: 0 12px 36px rgba(13, 21, 39, 0.15);
+  }
+  
+  .mock-dash-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #1e293b;
+    padding-bottom: 0.7rem;
+  }
+  .mock-dash-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #f8fafc;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .mock-dash-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    background: rgba(16, 185, 129, 0.08);
+    color: #34d399;
+    padding: 0.2rem 0.55rem;
+    border-radius: 9999px;
+    font-size: 0.62rem;
+    font-weight: 600;
+  }
+  .mock-dash-pulse {
+    width: 6px;
+    height: 6px;
+    background-color: #10b981;
+    border-radius: 50%;
+    animation: pulse 1.8s infinite;
+  }
+  
+  .mock-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.7rem;
+  }
+  .mock-stat-card {
+    background: #151f32;
+    border: 1px solid #223049;
+    border-radius: 8px;
+    padding: 0.7rem;
+    text-align: left;
+    transition: all 0.2s;
+  }
+  .mock-stat-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--blue-light);
+    background: #1a273e;
+  }
+  .mock-stat-label {
+    font-size: 0.6rem;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .mock-stat-val {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #f8fafc;
+    margin-top: 0.2rem;
+  }
+  .mock-stat-sub {
+    font-size: 0.55rem;
+    color: #34d399;
+    margin-top: 0.15rem;
+  }
+  .mock-stat-sub.pending {
+    color: #fbbf24;
+  }
+  .mock-stat-sub.purple {
+    color: #a78bfa;
+  }
+  
+  .mock-chart-container {
+    background: #151f32;
+    border: 1px solid #223049;
+    border-radius: 8px;
+    padding: 0.7rem;
+  }
+  .mock-chart-title {
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+  }
+  .mock-chart-bar-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+  }
+  .mock-chart-bar-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6rem;
+  }
+  .mock-chart-bar-lbl {
+    font-size: 0.68rem;
+    color: #94a3b8;
+    width: 65px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .mock-chart-bar-outer {
+    flex: 1;
+    background: #0d1527;
+    height: 5px;
+    border-radius: 9999px;
+    overflow: hidden;
+  }
+  .mock-chart-bar-inner {
+    height: 100%;
+    background: var(--blue-light);
+    border-radius: 9999px;
+  }
+  .mock-chart-bar-inner.purple {
+    background: #a78bfa;
+  }
+  .mock-chart-bar-inner.green {
+    background: #34d399;
+  }
+  .mock-chart-bar-val {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    color: #64748b;
+    text-align: right;
+    width: 45px;
+  }
+  
+  .mock-feed-container {
+    background: #151f32;
+    border: 1px solid #223049;
+    border-radius: 8px;
+    padding: 0.7rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+  .mock-feed-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(13, 21, 39, 0.4);
+    padding: 0.45rem 0.55rem;
+    border-radius: 6px;
+    border: 1px solid rgba(34, 48, 73, 0.5);
+    gap: 0.5rem;
+  }
+  .mock-feed-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    overflow: hidden;
+  }
+  .mock-feed-rec {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    color: #cbd5e1;
+    font-weight: 500;
+  }
+  .mock-feed-msg {
+    font-size: 0.62rem;
+    color: #64748b;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 220px;
+  }
+  .mock-feed-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.15rem;
+  }
+  .mock-feed-badge {
+    font-size: 0.52rem;
+    font-weight: 600;
+    padding: 0.08rem 0.3rem;
+    border-radius: 4px;
+    border: 1px solid;
+    text-transform: uppercase;
+  }
+  .mock-feed-badge.sent {
+    background: rgba(52, 211, 153, 0.08);
+    color: #34d399;
+    border-color: rgba(52, 211, 153, 0.15);
+  }
+  .mock-feed-badge.pending {
+    background: rgba(251, 191, 36, 0.08);
+    color: #fbbf24;
+    border-color: rgba(251, 191, 36, 0.15);
+    animation: mock-pulse 1.5s infinite;
+  }
+  .mock-feed-time {
+    font-size: 0.55rem;
+    color: #64748b;
+  }
+
+  /* Interactive Composer Widget */
+  .interactive-composer {
+    background: var(--white);
+    border: 1px solid var(--rule);
+    border-radius: 12px;
+    padding: 1.4rem;
+    box-shadow: 0 12px 36px rgba(26,42,74,.04);
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+  }
+  
+  .composer-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+  .composer-label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--navy-mid);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .composer-select, .composer-textarea {
+    width: 100%;
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.78rem;
+    color: var(--navy);
+    font-family: 'Outfit', sans-serif;
+    outline: none;
+    transition: all 0.2s;
+    background: var(--paper);
+  }
+  .composer-select:focus, .composer-textarea:focus {
+    border-color: var(--blue);
+    background: var(--white);
+    box-shadow: 0 0 0 3px rgba(74, 127, 181, 0.15);
+  }
+  .composer-textarea {
+    resize: none;
+    height: 95px;
+    line-height: 1.5;
+  }
+  
+  /* Tag Buttons styling */
+  .tag-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+  .tag-btn {
+    font-size: 0.65rem;
+    font-weight: 600;
+    background: #eef5fc;
+    color: var(--blue);
+    border: 1px solid #b3d4f0;
+    border-radius: 9999px;
+    padding: 0.2rem 0.6rem;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: 'Outfit', sans-serif;
+  }
+  .tag-btn:hover {
+    background: var(--blue);
+    color: var(--white);
+    border-color: var(--blue);
+    transform: translateY(-1px);
+  }
+  
+  /* Sender ID Selector */
+  .sender-selector {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.45rem;
+  }
+  .sender-card {
+    border: 1px solid var(--rule);
+    background: var(--paper);
+    border-radius: 8px;
+    padding: 0.45rem 0.3rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    user-select: none;
+  }
+  .sender-card:hover {
+    border-color: var(--blue-light);
+  }
+  .sender-card.active {
+    border-color: var(--blue);
+    background: #edf5fc;
+    box-shadow: 0 0 0 2px rgba(74, 127, 181, 0.1);
+  }
+  .sender-card-name {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--navy);
+  }
+  .sender-card-desc {
+    display: block;
+    font-size: 0.52rem;
+    color: var(--muted);
+    margin-top: 0.1rem;
+  }
+  
+  /* Character count bar */
+  .composer-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.65rem;
+    color: var(--muted);
+    border-top: 1px solid var(--rule);
+    padding-top: 0.5rem;
+  }
+  .composer-footer .count {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
+    color: var(--navy);
+  }
+  
+  /* Phone Emulator Box */
+  .phone-emulator-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1.2rem;
+    background: #f1f5f9;
+    border-radius: 12px;
+    border: 1px solid var(--rule);
+  }
+  .phone-frame {
+    width: 230px;
+    height: 400px;
+    background: #0f172a; /* Slate Dark Frame */
+    border-radius: 32px;
+    box-shadow: 0 16px 40px rgba(15, 23, 42, 0.18);
+    border: 5px solid #1e293b;
+    padding: 0.45rem;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  /* Notch */
+  .phone-notch {
+    width: 80px;
+    height: 14px;
+    background: #1e293b;
+    position: absolute;
+    top: 4px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 0 0 9px 9px;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .phone-notch::before {
+    content: '';
+    width: 40px;
+    height: 3px;
+    background: #334155;
+    border-radius: 9999px;
+  }
+  
+  /* Screen */
+  .phone-screen {
+    flex: 1;
+    background: #f8fafc;
+    border-radius: 24px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid rgba(255,255,255,0.05);
+  }
+  
+  /* Phone Status Bar */
+  .phone-status-bar {
+    height: 22px;
+    background: #f1f5f9;
+    padding: 0.5rem 0.7rem 0.1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.55rem;
+    font-weight: 600;
+    color: #64748b;
+    z-index: 10;
+  }
+  
+  /* Phone Message Header */
+  .phone-header {
+    height: 42px;
+    background: #f1f5f9;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    flex-direction: column;
+    padding-bottom: 0.2rem;
+  }
+  .phone-avatar {
+    width: 16px;
+    height: 16px;
+    background: #cbd5e1;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.42rem;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 0.05rem;
+  }
+  .phone-sender-id {
+    font-size: 0.6rem;
+    font-weight: 700;
+    color: var(--navy);
+    line-height: 1;
+  }
+  
+  /* Phone Chat Area */
+  .phone-chat {
+    flex: 1;
+    padding: 0.7rem;
+    background: #ffffff;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    overflow-y: auto;
+  }
+  
+  .phone-bubble {
+    background: #e2e8f0;
+    color: #0f172a;
+    font-size: 0.68rem;
+    line-height: 1.4;
+    padding: 0.4rem 0.6rem;
+    border-radius: 12px 12px 12px 2px;
+    align-self: flex-start;
+    max-width: 88%;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+    word-break: break-word;
+    white-space: pre-wrap;
+  }
+  .phone-bubble-time {
+    font-size: 0.48rem;
+    color: #94a3b8;
+    margin-top: 0.1rem;
+    align-self: flex-start;
+    margin-left: 0.15rem;
+  }
+
+  /* CODE CONSOLE DEVELOPER WINDOW */
+  .code-console {
+    background: #0d1527;
+    border: 1px solid #1e293b;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 1.5rem;
+    box-shadow: 0 12px 36px rgba(13,21,39,0.22);
+  }
+  .code-console-header {
+    background: #090e1b;
+    padding: 0.5rem 0.9rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #1c273c;
+  }
+  .code-console-dots {
+    display: flex;
+    gap: 0.3rem;
+  }
+  .code-console-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+  .code-console-dot.red { background-color: #ef4444; }
+  .code-console-dot.yellow { background-color: #f59e0b; }
+  .code-console-dot.green { background-color: #10b981; }
+  
+  .code-console-tabs {
+    display: flex;
+    gap: 0.2rem;
+  }
+  .code-console-tab {
+    padding: 0.2rem 0.55rem;
+    background: transparent;
+    border: none;
+    color: #475569;
+    font-size: 0.65rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'Outfit', sans-serif;
+    border-radius: 4px;
+    transition: all 0.15s;
+  }
+  .code-console-tab:hover {
+    color: #94a3b8;
+    background: #152035;
+  }
+  .code-console-tab.active {
+    color: #38bdf8;
+    background: #111a2e;
+    border: 1px solid #1c273c;
+  }
+  
+  .code-console-body {
+    padding: 1rem 1.2rem;
+    margin: 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    line-height: 1.55;
+    overflow-x: auto;
+    color: #cbd5e1;
+  }
+  .code-panel {
+    display: none;
+  }
+  .code-panel.active {
+    display: block;
+  }
+  
+  /* SYNTAX HIGHLIGHTING COLORS */
+  .syntax-kw { color: #f472b6; }      /* keyword - pink */
+  .syntax-fn { color: #38bdf8; }      /* function - light blue */
+  .syntax-str { color: #34d399; }     /* string - green */
+  .syntax-num { color: #fbbf24; }     /* number - yellow */
+  .syntax-cmt { color: #576f93; font-style: italic; } /* comment - slate gray */
+  .syntax-typ { color: #a78bfa; }      /* type - purple */
+  .syntax-prop { color: #f43f5e; }     /* property - red-pink */
+  .syntax-punc { color: #94a3b8; }     /* punctuation */
+  
+  /* Animations */
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: .4; transform: scale(1.15); }
+  }
+  @keyframes mock-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+  }
+</style>
+
+</head>
+<body>
+
+<div class="print-btn">
+  <button onclick="window.print()">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 9V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v5"/><rect x="6" y="14" width="12" height="8" rx="2"/></svg>
+    Print / Save PDF
+  </button>
+</div>
+
+<div class="doc">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-top">
+      <div class="brand">
+        <div>
+          <div class="brand-name"><span class="phi-part">Phi</span><span class="nova-part">Nova</span></div>
+          <div class="brand-tagline">Architecting Digital Solutions</div>
+        </div>
+      </div>
+      <div class="quote-meta">
+        <div class="quote-label">Quotation No.</div>
+        <div class="quote-num">PN-2026-0514</div>
+        <div class="quote-date">Issued: 13 May 2026 &nbsp;·&nbsp; Valid 30 days</div>
+      </div>
+    </div>
+    <div class="header-title">
+      <div class="header-eyebrow">Proposal &amp; Price Quotation</div>
+      <h1 class="header-h1">Concord Bulk SMS<br/><span>Platform</span></h1>
+    </div>
+    <p class="header-sub">Concord is a clean, capable tool for sending messages, managing contacts, and automating reminders — built and supported by our team with care.</p>
+  </div>
+
+  <!-- PARTIES -->
+  <div class="parties">
+    <div>
+      <div class="party-label">Prepared by</div>
+      <div class="party-name">PhiNova</div>
+      <div class="party-detail">info@phinova.com<br/>+233 204 906 780</div>
+    </div>
+    <div class="arrow-badge">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+    </div>
+    <div class="party-right">
+      <div class="party-label">Prepared for</div>
+      <div class="party-name">Client Name</div>
+      <div class="party-detail">client@domain.com<br/>Organisation / Company</div>
+    </div>
+  </div>
+
+  <!-- SECTION 1: OVERVIEW -->
+  <div class="section">
+    <div class="s-title"><span class="s-num">01</span> Overview</div>
+    <div class="intro-box">
+      Concord gives you a clean, working tool that handles everything you need — sending messages, managing contacts, and setting up automated reminders. Here's what's included:
+    </div>
+
+    <!-- DELIVERABLES -->
+    <div class="deliv-grid" style="margin-top:1.5rem;">
+
+        <div class="deliv-card">
+          <div class="deliv-top">
+            <div class="deliv-title"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;color:var(--blue);"><path d="M12 20a7.966 7.966 0 0 1-5.002-1.756l.002.001v-.683c0-1.794 1.492-3.25 3.333-3.25h3.334c1.84 0 3.333 1.456 3.333 3.25v.683A7.966 7.966 0 0 1 12 20Z"/><circle cx="12" cy="12" r="10"/><path d="m2 12 5-3"/><path d="m7 12 5 3 5-3"/><path d="m17 12 5-3"/></svg> Clean, Mobile-Friendly Design</div>
+            <span class="deliv-badge foundation">Included</span>
+          </div>
+          <div class="deliv-desc">A polished dashboard that works beautifully on both phone and desktop. No clutter — just the tools you need, laid out in a way that's easy to pick up and use from day one.</div>
+        </div>
+
+        <div class="deliv-card">
+          <div class="deliv-top">
+            <div class="deliv-title"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;color:var(--blue);"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/></svg> Bulk SMS Sending</div>
+            <span class="deliv-badge foundation">Included</span>
+          </div>
+          <div class="deliv-desc">Send messages to your full contact list or paste in a custom group of numbers. You'll see delivery confirmations after every send so you always know what went through.</div>
+        </div>
+
+        <div class="deliv-card">
+          <div class="deliv-top">
+            <div class="deliv-title"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;color:var(--blue);"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></svg> Message Templates</div>
+            <span class="deliv-badge foundation">Included</span>
+          </div>
+          <div class="deliv-desc">Save your most-used messages as templates — promotions, appointment reminders, alerts — so your team isn't retyping the same thing every time.</div>
+        </div>
+
+        <div class="deliv-card">
+          <div class="deliv-top">
+            <div class="deliv-title"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;color:var(--blue);"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M5 3 2 6"/><path d="m22 6-3-3"/></svg> Automated Reminders</div>
+            <span class="deliv-badge foundation">Included</span>
+          </div>
+          <div class="deliv-desc">Schedule messages to go out automatically on birthdays, anniversaries, or appointment dates. Set it once and let the system handle it.</div>
+        </div>
+
+        <div class="deliv-card">
+          <div class="deliv-top">
+            <div class="deliv-title"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;color:var(--blue);"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> Contact Management</div>
+            <span class="deliv-badge foundation">Included</span>
+          </div>
+          <div class="deliv-desc">Upload your contact list, organise people into groups, and keep everything in one place. Import from a spreadsheet in seconds.</div>
+        </div>
+
+        <div class="deliv-card">
+          <div class="deliv-top">
+            <div class="deliv-title"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;color:var(--blue);"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Login &amp; User Access</div>
+            <span class="deliv-badge foundation">Included</span>
+          </div>
+          <div class="deliv-desc">Secure login with password protection. You can set up separate access levels — admins can manage everything, while regular users have a more limited view.</div>
+        </div>
+
+        <div class="deliv-card wide">
+          <div class="deliv-top">
+            <div class="deliv-title"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;color:var(--blue);"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg> Hosting &amp; Setup</div>
+            <span class="deliv-badge foundation">Included</span>
+          </div>
+          <div class="deliv-desc">Everything lives on one reliable hosting platform. We handle the setup, the security certificate (so your site runs on https://), and the go-live process. You don't touch anything technical.</div>
+        </div>
+
+
+
+    </div>
+
+    <div class="on-request">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>
+      <span><strong>Have something extra in mind?</strong> Things like WhatsApp messaging, email campaigns, or connecting with your existing tools can all be scoped and quoted separately — just ask.</span>
+    </div>
+  </div>
+
+  <!-- SECTION 2: INTERACTIVE PRODUCT SHOWCASE -->
+  <div class="section" id="section-showcase">
+    <div class="s-title"><span class="s-num">02</span> Interactive System Showcase</div>
+    <p style="font-size:.82rem;color:var(--muted);margin-bottom:1.2rem;line-height:1.65;">Experience the Concord platform's core dashboard analytics and real-time campaign composition live. Try selecting a template, switching Sender IDs, or typing a customized message to watch it instantly render.</p>
+    
+    <div class="showcase-grid">
+      <!-- MOCK DASHBOARD COLUMN -->
+      <div class="mock-dashboard">
+        <div class="mock-dash-header">
+          <div class="mock-dash-title">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--blue-light);"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/></svg>
+            Concord Core Dashboard
+          </div>
+          <div class="mock-dash-status">
+            <span class="mock-dash-pulse"></span>
+            Gateway API Online
+          </div>
+        </div>
+        
+        <!-- Stats Widgets -->
+        <div class="mock-stats-grid">
+          <div class="mock-stat-card">
+            <div class="mock-stat-label">Subscribers</div>
+            <div class="mock-stat-val">14,832</div>
+            <div class="mock-stat-sub">&uarr; 12% monthly</div>
+          </div>
+          <div class="mock-stat-card">
+            <div class="mock-stat-label">Deliverability</div>
+            <div class="mock-stat-val">98.4%</div>
+            <div class="mock-stat-sub">High Priority</div>
+          </div>
+          <div class="mock-stat-card">
+            <div class="mock-stat-label">Active Queue</div>
+            <div class="mock-stat-val">0</div>
+            <div class="mock-stat-sub pending">Idle / Standby</div>
+          </div>
+        </div>
+        
+        <!-- Chart Widget -->
+        <div class="mock-chart-container">
+          <div class="mock-chart-title">Top Demographic Regions</div>
+          <div class="mock-chart-bar-group">
+            <div class="mock-chart-bar-row">
+              <span class="mock-chart-bar-lbl">Greater Accra</span>
+              <div class="mock-chart-bar-outer">
+                <div class="mock-chart-bar-inner" style="width: 45%;"></div>
+              </div>
+              <span class="mock-chart-bar-val">45%</span>
+            </div>
+            <div class="mock-chart-bar-row">
+              <span class="mock-chart-bar-lbl">Ashanti Region</span>
+              <div class="mock-chart-bar-outer">
+                <div class="mock-chart-bar-inner purple" style="width: 30%;"></div>
+              </div>
+              <span class="mock-chart-bar-val">30%</span>
+            </div>
+            <div class="mock-chart-bar-row">
+              <span class="mock-chart-bar-lbl">Western Region</span>
+              <div class="mock-chart-bar-outer">
+                <div class="mock-chart-bar-inner green" style="width: 25%;"></div>
+              </div>
+              <span class="mock-chart-bar-val">25%</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Recent Activity Logs -->
+        <div class="mock-feed-container">
+          <div class="mock-chart-title">Real-Time Dispatch Activity</div>
+          <div class="mock-feed-row">
+            <div class="mock-feed-info">
+              <span class="mock-feed-rec">+233 24 490 6780</span>
+              <span class="mock-feed-msg">Hello John, enjoy 15% discount...</span>
+            </div>
+            <div class="mock-feed-right">
+              <span class="mock-feed-badge sent">Sent</span>
+              <span class="mock-feed-time">Just now</span>
+            </div>
+          </div>
+          <div class="mock-feed-row">
+            <div class="mock-feed-info">
+              <span class="mock-feed-rec">+233 55 382 1994</span>
+              <span class="mock-feed-msg">Hi Akosua, subscription renewed...</span>
+            </div>
+            <div class="mock-feed-right">
+              <span class="mock-feed-badge sent">Sent</span>
+              <span class="mock-feed-time">2m ago</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- INTERACTIVE COMPOSER COLUMN -->
+      <div class="interactive-composer">
+        <!-- Choose a Template -->
+        <div class="composer-form-group">
+          <label class="composer-label" for="playground-template">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>
+            Pre-Saved Templates
+          </label>
+          <select class="composer-select" id="playground-template">
+            <option value="">-- Choose a template to load --</option>
+            <option value="promo">Promo suite discount alert (15% off)</option>
+            <option value="alert">Subscription expiration warning</option>
+            <option value="shipping">Order shipment dispatch notification</option>
+          </select>
+        </div>
+        
+        <!-- Select Sender ID -->
+        <div class="composer-form-group">
+          <label class="composer-label">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Branded Sender ID (Dynamic Masking)
+          </label>
+          <div class="sender-selector">
+            <div class="sender-card active" data-sender="PHINOVA">
+              <span class="sender-card-name">PHINOVA</span>
+              <span class="sender-card-desc">Official Alerts</span>
+            </div>
+            <div class="sender-card" data-sender="PROMO-SMS">
+              <span class="sender-card-name">PROMO-SMS</span>
+              <span class="sender-card-desc">Marketing Campaigns</span>
+            </div>
+            <div class="sender-card" data-sender="SECURE-KEY">
+              <span class="sender-card-name">SECURE-KEY</span>
+              <span class="sender-card-desc">Transactional OTPs</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Insert Merge Tags -->
+        <div class="composer-form-group">
+          <label class="composer-label">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+            Personalization Fields (Merge Tags)
+          </label>
+          <div class="tag-container">
+            <button type="button" class="tag-btn" data-tag="[Firstname]">+ First Name</button>
+            <button type="button" class="tag-btn" data-tag="[Lastname]">+ Last Name</button>
+            <button type="button" class="tag-btn" data-tag="[Phone]">+ Phone Number</button>
+            <button type="button" class="tag-btn" data-tag="[CustomField]">+ Custom Field</button>
+          </div>
+        </div>
+        
+        <!-- Textarea -->
+        <div class="composer-form-group">
+          <label class="composer-label" for="playground-message">Message Body</label>
+          <textarea class="composer-textarea" id="playground-message" placeholder="Type a message or load a template... Add tags like [Firstname] to personalize automatically!"></textarea>
+        </div>
+        
+        <!-- Footer -->
+        <div class="composer-footer">
+          <span>Standard SMS parts are 160 characters.</span>
+          <div>
+            <span class="count" id="playground-char-count">0</span> characters &nbsp;·&nbsp; 
+            <span class="count" id="playground-part-count">0</span> SMS parts
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Phone Simulator Preview Panel -->
+    <div class="phone-emulator-container" style="margin-top: 1.5rem;">
+      <div class="phone-frame">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+          <div class="phone-status-bar">
+            <span>9:41</span>
+            <div style="display: flex; gap: 0.2rem; align-items: center;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 20h.01"/><path d="M5 12.859a10 10 0 0 1 14 0"/><path d="M8.5 16.42a5 5 0 0 1 7 0"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="7" width="16" height="10" rx="2" ry="2"/><line x1="22" y1="11" x2="22" y2="13"/></svg>
+            </div>
+          </div>
+          <div class="phone-header">
+            <div class="phone-avatar" id="phone-avatar-char">P</div>
+            <div class="phone-sender-id" id="phone-sender-id-display">PHINOVA</div>
+          </div>
+          <div class="phone-chat">
+            <div class="phone-bubble" id="phone-preview-bubble">Your message preview will appear here... Type something!</div>
+            <div class="phone-bubble-time">Just now</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 3: SMS CREDIT PLANS -->
+  <div class="section">
+    <div class="s-title"><span class="s-num">03</span> SMS Credit Plans</div>
+    <p style="font-size:.82rem;color:var(--muted);margin-bottom:1.1rem;line-height:1.65;">SMS credits are what you use to actually send messages — think of them like airtime for Concord. You top up whenever you need more. The more you buy at once, the cheaper each message becomes.</p>
+    <div class="sms-tabs">
+      <button class="sms-tab-btn active" onclick="showSmsTab('expires', this)">Pay as You Go (3-Month Validity)</button>
+      <button class="sms-tab-btn" onclick="showSmsTab('noexpiry', this)">No Expiry (Credits Never Lapse)</button>
+    </div>
+    <div class="sms-panel active" id="sms-expires">
+      <table class="price-table">
+        <thead><tr><th>Top-Up Amount (GHS)</th><th>Messages You Get</th><th>Cost Per Message</th><th>Validity</th></tr></thead>
+        <tbody>
+          <tr><td>28</td><td>696</td><td class="bold">GHS 0.04</td><td><span class="expiry-badge yes">3 Months</span></td></tr>
+          <tr><td>70</td><td>1,812</td><td class="bold">GHS 0.039</td><td><span class="expiry-badge yes">3 Months</span></td></tr>
+          <tr><td>140</td><td>3,781</td><td class="bold">GHS 0.037</td><td><span class="expiry-badge yes">3 Months</span></td></tr>
+          <tr><td>280</td><td>7,905</td><td class="bold">GHS 0.035</td><td><span class="expiry-badge yes">3 Months</span></td></tr>
+          <tr><td>700</td><td>20,704</td><td class="bold">GHS 0.034</td><td><span class="expiry-badge yes">3 Months</span></td></tr>
+          <tr><td>1,400</td><td>43,478</td><td class="bold">GHS 0.032</td><td><span class="expiry-badge yes">3 Months</span></td></tr>
+          <tr><td>2,800</td><td>91,533</td><td class="bold">GHS 0.031</td><td><span class="expiry-badge yes">3 Months</span></td></tr>
+          <tr><td>7,000</td><td>228,311</td><td class="bold">GHS 0.031</td><td><span class="expiry-badge yes">3 Months</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="sms-panel" id="sms-noexpiry">
+      <table class="price-table">
+        <thead><tr><th>Top-Up Amount (GHS)</th><th>Messages You Get</th><th>Cost Per Message</th><th>Validity</th></tr></thead>
+        <tbody>
+          <tr><td>28</td><td>645</td><td class="bold">GHS 0.043</td><td><span class="expiry-badge no">No Expiry</span></td></tr>
+          <tr><td>70</td><td>1,667</td><td class="bold">GHS 0.042</td><td><span class="expiry-badge no">No Expiry</span></td></tr>
+          <tr><td>140</td><td>3,448</td><td class="bold">GHS 0.041</td><td><span class="expiry-badge no">No Expiry</span></td></tr>
+          <tr><td>280</td><td>7,143</td><td class="bold">GHS 0.039</td><td><span class="expiry-badge no">No Expiry</span></td></tr>
+          <tr><td>700</td><td>18,519</td><td class="bold">GHS 0.038</td><td><span class="expiry-badge no">No Expiry</span></td></tr>
+          <tr><td>1,400</td><td>38,462</td><td class="bold">GHS 0.036</td><td><span class="expiry-badge no">No Expiry</span></td></tr>
+          <tr><td>2,800</td><td>80,000</td><td class="bold">GHS 0.035</td><td><span class="expiry-badge no">No Expiry</span></td></tr>
+          <tr><td>7,000</td><td>208,333</td><td class="bold">GHS 0.035</td><td><span class="expiry-badge no">No Expiry</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:.71rem;color:var(--muted);margin-top:.9rem;display:flex;align-items:center;gap:.4rem;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="17" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg>
+      Credits are charged only when you send. Unused credits on the No Expiry plan never disappear. For high-volume needs above GHS 7,000, we can negotiate a custom rate.
+    </p>
+  </div>
+
+  <!-- SECTION 4: DEVELOPMENT BREAKDOWN -->
+  <div class="section">
+    <div class="s-title"><span class="s-num">04</span> Development Breakdown</div>
+    <p style="font-size:.82rem;color:var(--muted);margin-bottom:1.2rem;line-height:1.6;">Here's exactly what goes into building Concord and what each component costs.</p>
+    <div class="fee-table-wrap">
+    <table class="fee-table">
+      <thead>
+        <tr>
+          <th style="width:60%">What We're Building</th>
+          <th>Cost</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Dashboard Design &amp; Layout<div class="fee-sub">Mobile-friendly interface your team will use daily</div></td>
+          <td style="text-align:right;font-family:'JetBrains Mono',monospace;font-weight:600;">GHS 700</td>
+        </tr>
+        <tr>
+          <td>SMS Sending &amp; Contact Management<div class="fee-sub">Bulk sending, contact upload, delivery confirmation</div></td>
+          <td style="text-align:right;font-family:'JetBrains Mono',monospace;font-weight:600;">GHS 900</td>
+        </tr>
+        <tr>
+          <td>Automated Reminders &amp; Scheduling<div class="fee-sub">Birthday, appointment, and recurring message triggers</div></td>
+          <td style="text-align:right;font-family:'JetBrains Mono',monospace;font-weight:600;">GHS 500</td>
+        </tr>
+        <tr>
+          <td>Templates, Login &amp; User Roles<div class="fee-sub">Save messages, manage who has access to what</div></td>
+          <td style="text-align:right;font-family:'JetBrains Mono',monospace;font-weight:600;">GHS 400</td>
+        </tr>
+        <tr>
+          <td>Hosting Setup &amp; Go-Live<div class="fee-sub">Everything configured, tested, and launched</div></td>
+          <td style="text-align:right;font-family:'JetBrains Mono',monospace;font-weight:600;">GHS 200</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <!-- TOTALS -->
+    <div class="totals-wrap" style="grid-template-columns:1fr;">
+      <div class="totals-card">
+        <div class="totals-card-header">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4.5c1.62-1.63 5-2.5 5-2.5"/><path d="M12 15v5s3.03-.55 4.5-2c1.63-1.62 2.5-5 2.5-5"/></svg>
+          Investment Summary
+        </div>
+        <div class="totals-row">
+          <span>Development</span>
+          <span class="totals-val">GHS 2,700</span>
+        </div>
+        <div class="totals-row">
+          <span>Starter SMS Credits (recommended)</span>
+          <span class="totals-val">GHS 280</span>
+        </div>
+        <div class="totals-row">
+          <span style="color:var(--muted);font-size:.78rem;">VAT (if applicable)</span>
+          <span class="totals-val" style="color:var(--muted);">TBD</span>
+        </div>
+        <div class="totals-row grand">
+          <span style="font-family:'Cormorant Garamond',serif;font-size:.95rem;font-weight:700;">Total Investment</span>
+          <span class="totals-val">GHS 2,980</span>
+        </div>
+      </div>
+    </div>
+    <p style="font-size:.7rem;color:var(--muted);margin-top:.75rem;">* SMS credits are charged based on usage. Monthly hosting costs (typically GHS 70–100/mo after the free tier) are not included in the development fee. Development fees are fixed as quoted.</p>
+  </div>
+
+  <!-- SECTION 5: TERMS & CONDITIONS -->
+  <div class="section">
+    <div class="s-title"><span class="s-num">05</span> Terms &amp; Conditions</div>
+    <ul class="terms-list">
+      <li>
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+        <span>This quote is valid for <strong>30 days</strong> from the date of issue (13 May 2026).</span>
+      </li>
+      <li>
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+        <span>A <strong>50% deposit</strong> is required to begin work. The remaining 50% is due when the project is delivered to you.</span>
+      </li>
+      <li>
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+        <span>Build time is approximately <strong>2–3 weeks</strong>, starting from the day we kick off — provided we receive your feedback and approvals on time.</span>
+      </li>
+      <li>
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+        <span>Hosting and domain costs are <strong>not included</strong> in the development fee — these are usually low (GHS 70–100/month) and billed directly to you.</span>
+      </li>
+      <li>
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+        <span><strong>30 days of free support</strong> after launch — if anything breaks or behaves unexpectedly, we fix it at no cost.</span>
+      </li>
+      <li>
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+        <span>Any features outside this scope will be <strong>quoted separately</strong> before any work begins.</span>
+      </li>
+      <li>
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+        <span>Everything we build — the design, the code, and your data — becomes <strong>fully yours</strong> once final payment is made.</span>
+      </li>
+    </ul>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div>
+      <div class="footer-sig">Thank you for your business.</div>
+      <div style="margin-top:.35rem; display: flex; align-items: center; gap: 0.6rem;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        +233 204 906 780 &nbsp;·&nbsp; <a href="mailto:info@phinova.com">info@phinova.com</a>
+      </div>
+    </div>
+    <div style="text-align:right;">
+      <div class="footer-brand"><span class="phi-part">Phi</span><span class="nova-part">Nova</span></div>
+      <div style="margin-top:.22rem;font-size:.62rem;">Architecting Digital Solutions</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // SMS Credit Plan Tab Switcher
+  function showSmsTab(id, btn) {
+    document.querySelectorAll('.sms-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.sms-tab-btn').forEach(b => b.classList.remove('active'));
+    const targetPanel = document.getElementById('sms-' + id);
+    if (targetPanel) targetPanel.classList.add('active');
+    if (btn) btn.classList.add('active');
+  }
+
+
+
+  // Live Interactive Composer Playground
+  document.addEventListener('DOMContentLoaded', () => {
+    const templateSelect = document.getElementById('playground-template');
+    const messageTextarea = document.getElementById('playground-message');
+    const charCountSpan = document.getElementById('playground-char-count');
+    const partCountSpan = document.getElementById('playground-part-count');
+    const phoneBubble = document.getElementById('phone-preview-bubble');
+    const phoneSenderDisplay = document.getElementById('phone-sender-id-display');
+    const phoneAvatarChar = document.getElementById('phone-avatar-char');
+    const senderCards = document.querySelectorAll('.sender-card');
+    const tagButtons = document.querySelectorAll('.tag-btn');
+
+    // Pre-saved Templates definition
+    const templates = {
+      promo: "Hello [Firstname], get 15% off our premium subscription this week! Use code SMS15 at checkout. Support: +233204906780",
+      alert: "Dear [Firstname] [Lastname], your subscription for account [Phone] expires in 3 days. Please top up to avoid service disruption.",
+      shipping: "Hi [Firstname], your order [CustomField] has been shipped via PhiNova Express and will arrive in 24 hours. Track status on your portal."
+    };
+
+    // Live personalizations mapping
+    const mockReplacements = {
+      "[Firstname]": "Rachael",
+      "[Lastname]": "Mensah",
+      "[Phone]": "+233 24 490 6780",
+      "[CustomField]": "#PN-8392"
+    };
+
+    // Update character counters and preview bubble
+    function updatePreview() {
+      const rawText = messageTextarea.value;
+      
+      // Update counters
+      const charLength = rawText.length;
+      charCountSpan.textContent = charLength;
+
+      let parts = 0;
+      if (charLength > 0) {
+        if (charLength <= 160) {
+          parts = 1;
+        } else {
+          parts = Math.ceil(charLength / 153);
+        }
+      }
+      partCountSpan.textContent = parts;
+
+      // Interpolate merge tags safely for preview
+      if (charLength === 0) {
+        phoneBubble.textContent = "Your message preview will appear here... Type something!";
+      } else {
+        let interpolatedText = rawText;
+        Object.entries(mockReplacements).forEach(([tag, replacement]) => {
+          // Replace all occurrences using split/join to avoid RegExp escaping issues
+          interpolatedText = interpolatedText.split(tag).join(replacement);
+        });
+        phoneBubble.textContent = interpolatedText;
+      }
+    }
+
+    // Set up template loader
+    if (templateSelect) {
+      templateSelect.addEventListener('change', () => {
+        const val = templateSelect.value;
+        if (val && templates[val]) {
+          messageTextarea.value = templates[val];
+          updatePreview();
+        }
+      });
+    }
+
+    // Set up text input listener
+    if (messageTextarea) {
+      messageTextarea.addEventListener('input', updatePreview);
+    }
+
+    // Set up sender ID card selection
+    senderCards.forEach(card => {
+      card.addEventListener('click', () => {
+        senderCards.forEach(c => c.classList.remove('active'));
+        card.classList.add('active');
+        
+        const sender = card.getAttribute('data-sender') || 'PHINOVA';
+        if (phoneSenderDisplay) phoneSenderDisplay.textContent = sender;
+        if (phoneAvatarChar) phoneAvatarChar.textContent = sender.charAt(0);
+      });
+    });
+
+    // Set up merge tag insertion (cursor position aware)
+    tagButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tag = btn.getAttribute('data-tag');
+        if (!tag || !messageTextarea) return;
+
+        const startPos = messageTextarea.selectionStart;
+        const endPos = messageTextarea.selectionEnd;
+        const text = messageTextarea.value;
+
+        // Insert tag at current cursor position
+        messageTextarea.value = text.substring(0, startPos) + tag + text.substring(endPos, text.length);
+
+        // Put cursor right after the inserted tag
+        const newCursorPos = startPos + tag.length;
+        messageTextarea.selectionStart = newCursorPos;
+        messageTextarea.selectionEnd = newCursorPos;
+
+        // Focus back to textarea
+        messageTextarea.focus();
+
+        // Trigger updates
+        updatePreview();
+      });
+    });
+
+    // Run initial execution to set correct placeholder/counts
+    updatePreview();
+  });
+</script>
+</body>
+</html>

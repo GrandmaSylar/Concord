@@ -88,14 +88,14 @@
   .step-list li span{font-size:.82rem;line-height:1.55;color:var(--navy);}
   .step-list li span strong{color:var(--p1);}
 
-  .tip{background:var(--p1-bg);border:1px solid var(--p1-border);border-radius:9px;padding:.75rem 1rem;font-size:.79rem;line-height:1.6;color:var(--navy);}
-  .tip::before{content:'💡 ';font-size:.85rem;}
+  .tip{background:var(--p1-bg);border:1px solid var(--p1-border);border-radius:9px;padding:.75rem 1rem .75rem 2.5rem;font-size:.79rem;line-height:1.6;color:var(--navy);position:relative;}
+  .tip::before{content:'';position:absolute;left:.95rem;top:.9rem;width:15px;height:15px;background:currentColor;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .6 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5'/%3E%3Cpath d='M9 18h6'/%3E%3Cpath d='M10 22h4'/%3E%3C/svg%3E") no-repeat center/contain;WebkitMask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .6 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5'/%3E%3Cpath d='M9 18h6'/%3E%3Cpath d='M10 22h4'/%3E%3C/svg%3E") no-repeat center/contain;}
 
-  .warn{background:var(--amber-bg);border:1px solid var(--amber-border);border-radius:9px;padding:.75rem 1rem;font-size:.79rem;line-height:1.6;color:var(--amber);}
-  .warn::before{content:'⚠️ ';font-size:.85rem;}
+  .warn{background:var(--amber-bg);border:1px solid var(--amber-border);border-radius:9px;padding:.75rem 1rem .75rem 2.5rem;font-size:.79rem;line-height:1.6;color:var(--amber);position:relative;}
+  .warn::before{content:'';position:absolute;left:.95rem;top:.9rem;width:15px;height:15px;background:currentColor;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z'/%3E%3Cline x1='12' y1='9' x2='12' y2='13'/%3E%3Cline x1='12' y1='17' x2='12.01' y2='17'/%3E%3C/svg%3E") no-repeat center/contain;WebkitMask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z'/%3E%3Cline x1='12' y1='9' x2='12' y2='13'/%3E%3Cline x1='12' y1='17' x2='12.01' y2='17'/%3E%3C/svg%3E") no-repeat center/contain;}
 
-  .success-note{background:var(--green-bg);border:1px solid var(--green-border);border-radius:9px;padding:.75rem 1rem;font-size:.79rem;line-height:1.6;color:var(--green);}
-  .success-note::before{content:'✅ ';font-size:.85rem;}
+  .success-note{background:var(--green-bg);border:1px solid var(--green-border);border-radius:9px;padding:.75rem 1rem .75rem 2.5rem;font-size:.79rem;line-height:1.6;color:var(--green);position:relative;}
+  .success-note::before{content:'';position:absolute;left:.95rem;top:.9rem;width:15px;height:15px;background:currentColor;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M22 11.08V12a10 10 0 1 1-5.93-9.14'/%3E%3Cpolyline points='22 4 12 14.01 9 11.01'/%3E%3C/svg%3E") no-repeat center/contain;WebkitMask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M22 11.08V12a10 10 0 1 1-5.93-9.14'/%3E%3Cpolyline points='22 4 12 14.01 9 11.01'/%3E%3C/svg%3E") no-repeat center/contain;}
 
   .feature-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.75rem;}
   .feat-card{background:var(--paper);border:1px solid var(--rule);border-radius:10px;padding:.85rem 1rem;}
@@ -168,6 +168,42 @@
   .print-btn-wrap button:hover{background:var(--navy-mid);}
   @media print{.print-btn-wrap,.tabs,.dev-toggle-bar{display:none!important;}.panel{display:block!important;}.chapter-body.hidden{display:flex!important;}.dev-body{display:flex!important;}}
   @media(max-width:640px){.sender-cards{grid-template-columns:1fr 1fr;}.feature-grid{grid-template-columns:1fr 1fr;}}
+
+  /* ── Vector Icon Styling ── */
+  svg.icon {
+    width: 1.1em;
+    height: 1.1em;
+    vertical-align: -0.18em;
+    display: inline-block;
+    stroke-width: 2.2;
+    margin-right: 0.25em;
+    flex-shrink: 0;
+  }
+  .chapter-icon svg.icon {
+    width: 1.5rem;
+    height: 1.5rem;
+    vertical-align: middle;
+    margin: 0;
+  }
+  .feat-icon svg.icon {
+    width: 1.7rem;
+    height: 1.7rem;
+    vertical-align: middle;
+    margin: 0;
+  }
+  .dev-section-head svg.icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    vertical-align: -0.2em;
+    margin-right: 0.4em;
+  }
+  button svg.icon {
+    width: 1em;
+    height: 1em;
+    vertical-align: -0.12em;
+    margin-right: 0.35em;
+  }
+
 </style>
 </head>
 <body>
@@ -175,7 +211,7 @@
 <div class="page">
 
   <div class="print-btn-wrap">
-    <button onclick="window.print()">🖨 Print / Save PDF</button>
+    <button onclick="window.print()"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg> Print / Save PDF</button>
   </div>
 
   <!-- HEADER -->
@@ -216,13 +252,13 @@
 
   <!-- NOTICE -->
   <div class="notice">
-    <strong>📖 About This Manual.</strong> This guide covers every feature of the Concord Bulk SMS platform from first login to advanced scheduling. Read it top-to-bottom for a complete walkthrough, or jump to any chapter using the Table of Contents. Screenshots are not included — the platform is designed to be self-explanatory, and this guide describes every screen in plain language.
+    <strong><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg> <strong>About This Manual.</strong></strong> This guide covers every feature of the Concord Bulk SMS platform from first login to advanced scheduling. Read it top-to-bottom for a complete walkthrough, or jump to any chapter using the Table of Contents. Screenshots are not included — the platform is designed to be self-explanatory, and this guide describes every screen in plain language.
   </div>
 
   <!-- TABS -->
   <div class="tabs">
-    <button class="tab active" onclick="switchTab('manual',this)">📖 Full Manual</button>
-    <button class="tab" onclick="switchTab('quickref',this)">⚡ Quick Reference</button>
+    <button class="tab active" onclick="switchTab('manual',this)"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg> Full Manual</button>
+    <button class="tab" onclick="switchTab('quickref',this)"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> Quick Reference</button>
   </div>
 
   <!-- ══ MANUAL PANEL ══ -->
@@ -251,7 +287,7 @@
       <div class="chapter" id="ch1">
         <div class="chapter-head" onclick="toggleChapter('ch1')">
           <div class="chapter-head-left">
-            <div class="chapter-icon">📊</div>
+            <div class="chapter-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg></div>
             <div>
               <div class="chapter-name">1. Dashboard Overview</div>
               <div class="chapter-sub">Your command centre — stats, queue monitor, and navigation</div>
@@ -264,22 +300,22 @@
 
           <div class="feature-grid">
             <div class="feat-card">
-              <div class="feat-icon">👥</div>
+              <div class="feat-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></div>
               <div class="feat-title">Total Contacts</div>
               <div class="feat-desc">How many contacts are stored in the system.</div>
             </div>
             <div class="feat-card">
-              <div class="feat-icon">📨</div>
+              <div class="feat-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg></div>
               <div class="feat-title">Messages Sent</div>
               <div class="feat-desc">Total messages successfully delivered across all time.</div>
             </div>
             <div class="feat-card">
-              <div class="feat-icon">⏰</div>
+              <div class="feat-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></div>
               <div class="feat-title">Pending Reminders</div>
               <div class="feat-desc">Upcoming scheduled messages not yet dispatched.</div>
             </div>
             <div class="feat-card">
-              <div class="feat-icon">📊</div>
+              <div class="feat-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg></div>
               <div class="feat-title">Message Breakdown</div>
               <div class="feat-desc">Live donut chart — sent, failed, and pending counts.</div>
             </div>
@@ -314,7 +350,7 @@
       <div class="chapter" id="ch2">
         <div class="chapter-head c2" onclick="toggleChapter('ch2')">
           <div class="chapter-head-left">
-            <div class="chapter-icon c2">👥</div>
+            <div class="chapter-icon c2"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></div>
             <div>
               <div class="chapter-name">2. Managing Contacts</div>
               <div class="chapter-sub">Add, import, search, and organise your contact list</div>
@@ -373,7 +409,7 @@
       <div class="chapter" id="ch3">
         <div class="chapter-head" onclick="toggleChapter('ch3')">
           <div class="chapter-head-left">
-            <div class="chapter-icon">🏛</div>
+            <div class="chapter-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="22" x2="21" y2="22"></line><line x1="6" y1="18" x2="6" y2="11"></line><line x1="10" y1="18" x2="10" y2="11"></line><line x1="14" y1="18" x2="14" y2="11"></line><line x1="18" y1="18" x2="18" y2="11"></line><polygon points="12 2 2 7 22 7"></polygon></svg></div>
             <div>
               <div class="chapter-name">3. Constituency Browser</div>
               <div class="chapter-sub">Filter, select, and message your constituency contacts with precision</div>
@@ -388,13 +424,13 @@
             <h3>Statistics Bar</h3>
             <p>At the top, seven stat cards update live as you apply filters:</p>
             <div class="feature-grid" style="margin-top:.5rem;">
-              <div class="feat-card"><div class="feat-icon">👥</div><div class="feat-title">Total</div><div class="feat-desc">Contacts matching current filters.</div></div>
-              <div class="feat-card"><div class="feat-icon">📞</div><div class="feat-title">With Contact</div><div class="feat-desc">How many have a phone number.</div></div>
-              <div class="feat-card"><div class="feat-icon">⚠️</div><div class="feat-title">No Contact</div><div class="feat-desc">Contacts without a phone number.</div></div>
-              <div class="feat-card"><div class="feat-icon">📍</div><div class="feat-title">Sub-Areas</div><div class="feat-desc">Number of distinct sub-areas.</div></div>
-              <div class="feat-card"><div class="feat-icon">🗳</div><div class="feat-title">Stations</div><div class="feat-desc">Number of polling stations.</div></div>
-              <div class="feat-card"><div class="feat-icon">✅</div><div class="feat-title">Selected</div><div class="feat-desc">Contacts you have checked.</div></div>
-              <div class="feat-card"><div class="feat-icon">📱</div><div class="feat-title">SMS Ready</div><div class="feat-desc">Selected contacts with a valid phone number.</div></div>
+              <div class="feat-card"><div class="feat-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></div><div class="feat-title">Total</div><div class="feat-desc">Contacts matching current filters.</div></div>
+              <div class="feat-card"><div class="feat-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg></div><div class="feat-title">With Contact</div><div class="feat-desc">How many have a phone number.</div></div>
+              <div class="feat-card"><div class="feat-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></div><div class="feat-title">No Contact</div><div class="feat-desc">Contacts without a phone number.</div></div>
+              <div class="feat-card"><div class="feat-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg></div><div class="feat-title">Sub-Areas</div><div class="feat-desc">Number of distinct sub-areas.</div></div>
+              <div class="feat-card"><div class="feat-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg></div><div class="feat-title">Stations</div><div class="feat-desc">Number of polling stations.</div></div>
+              <div class="feat-card"><div class="feat-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg></div><div class="feat-title">Selected</div><div class="feat-desc">Contacts you have checked.</div></div>
+              <div class="feat-card"><div class="feat-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg></div><div class="feat-title">SMS Ready</div><div class="feat-desc">Selected contacts with a valid phone number.</div></div>
             </div>
           </div>
 
@@ -431,7 +467,7 @@
       <div class="chapter" id="ch4">
         <div class="chapter-head c2" onclick="toggleChapter('ch4')">
           <div class="chapter-head-left">
-            <div class="chapter-icon c2">📱</div>
+            <div class="chapter-icon c2"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg></div>
             <div>
               <div class="chapter-name">4. Sending Bulk SMS</div>
               <div class="chapter-sub">Compose, personalise, and dispatch messages to any number of recipients</div>
@@ -547,7 +583,7 @@
       <div class="chapter" id="ch5">
         <div class="chapter-head c3" onclick="toggleChapter('ch5')">
           <div class="chapter-head-left">
-            <div class="chapter-icon c3">📝</div>
+            <div class="chapter-icon c3"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg></div>
             <div>
               <div class="chapter-name">5. Message Templates</div>
               <div class="chapter-sub">Save and reuse your best messages to save time on every campaign</div>
@@ -587,7 +623,7 @@
       <div class="chapter" id="ch6">
         <div class="chapter-head" onclick="toggleChapter('ch6')">
           <div class="chapter-head-left">
-            <div class="chapter-icon">⏰</div>
+            <div class="chapter-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></div>
             <div>
               <div class="chapter-name">6. Scheduled Reminders</div>
               <div class="chapter-sub">Create messages that send automatically at the exact date and time you choose</div>
@@ -637,7 +673,7 @@
       <div class="chapter" id="ch7">
         <div class="chapter-head c2" onclick="toggleChapter('ch7')">
           <div class="chapter-head-left">
-            <div class="chapter-icon c2">📅</div>
+            <div class="chapter-icon c2"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></div>
             <div>
               <div class="chapter-name">7. Scheduled Queue</div>
               <div class="chapter-sub">View and manage all upcoming scheduled messages in one place</div>
@@ -672,7 +708,7 @@
       <div class="chapter" id="ch8">
         <div class="chapter-head c3" onclick="toggleChapter('ch8')">
           <div class="chapter-head-left">
-            <div class="chapter-icon c3">📊</div>
+            <div class="chapter-icon c3"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg></div>
             <div>
               <div class="chapter-name">8. Delivery Reports</div>
               <div class="chapter-sub">Track every message sent — delivery status, timestamps, and recipients</div>
@@ -726,7 +762,7 @@
           <!-- Dev settings toggle -->
           <div class="dev-toggle-bar">
             <p><strong>⚙️ Developer content is hidden by default.</strong> These settings are intended for administrators and technical operators only. Click the button to reveal or hide the full Developer Settings documentation.</p>
-            <button class="dev-toggle-btn" onclick="toggleDev()" id="dev-toggle-btn">👁 Show Dev Instructions</button>
+            <button class="dev-toggle-btn" onclick="toggleDev()" id="dev-toggle-btn"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg> Show Dev Instructions</button>
           </div>
 
           <div id="dev-content" style="display:none;flex-direction:column;gap:1.1rem;">
@@ -747,7 +783,7 @@
             </div>
 
             <div class="dev-section">
-              <div class="dev-section-head">🎨 <span>Global Theming Engine</span></div>
+              <div class="dev-section-head"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22C17.52 22 22 17.52 22 12S17.52 2 12 2 2 6.48 2 12s4.48 10 10 10zM12 4a8 8 0 1 1 0 16 8 8 0 0 1 0-16z"></path><circle cx="7.5" cy="10.5" r="1.5" fill="currentColor"></circle><circle cx="11.5" cy="7.5" r="1.5" fill="currentColor"></circle><circle cx="16.5" cy="9.5" r="1.5" fill="currentColor"></circle><circle cx="15.5" cy="14.5" r="1.5" fill="currentColor"></circle></svg> <span>Global Theming Engine</span></div>
               <div class="dev-body">
                 <p>The Theming Engine lets administrators change the platform's visual branding across all users instantly. Changes are stored in the database and reflected for every logged-in user on next page load.</p>
                 <table class="field-table">
@@ -765,7 +801,7 @@
             </div>
 
             <div class="dev-section">
-              <div class="dev-section-head">📱 <span>Test SMS Sender</span></div>
+              <div class="dev-section-head"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg> <span>Test SMS Sender</span></div>
               <div class="dev-body">
                 <p>Send a one-off test SMS to any phone number to verify that message delivery is working correctly. Enter the number with country code and click <strong>Send Test Message</strong>. The result (success or error) is displayed immediately below the button.</p>
                 <div class="tip">Use Test SMS after any configuration change to confirm the platform is still able to send messages before running a real campaign.</div>
@@ -773,7 +809,7 @@
             </div>
 
             <div class="dev-section">
-              <div class="dev-section-head">⚡ <span>Simulation Playground (Stress Test)</span></div>
+              <div class="dev-section-head"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> <span>Simulation Playground (Stress Test)</span></div>
               <div class="dev-body">
                 <p>The Simulation Playground lets you stress-test the message queue pipeline without sending real SMS messages. It creates simulated "pending" message records in the database and runs them through the processing engine.</p>
 
@@ -805,7 +841,7 @@
             </div>
 
             <div class="dev-section">
-              <div class="dev-section-head">📋 <span>Recent SMS Logs</span></div>
+              <div class="dev-section-head"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg> <span>Recent SMS Logs</span></div>
               <div class="dev-body">
                 <p>The bottom of the Developer Settings page shows the 50 most recent SMS log entries in a detailed table — including Recipient, Sender ID, Message Content, Status, and Timestamp. Click <strong>Refresh Logs</strong> to reload the latest data.</p>
               </div>
@@ -819,7 +855,7 @@
       <div class="chapter" id="ch10">
         <div class="chapter-head c3" onclick="toggleChapter('ch10')">
           <div class="chapter-head-left">
-            <div class="chapter-icon c3">💡</div>
+            <div class="chapter-icon c3"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .6 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"></path><line x1="9" y1="18" x2="15" y2="18"></line><line x1="10" y1="22" x2="14" y2="22"></line></svg></div>
             <div>
               <div class="chapter-name">10. Tips &amp; Best Practices</div>
               <div class="chapter-sub">Get the most out of Concord on every campaign</div>
@@ -887,14 +923,14 @@
     <div class="section-wrap">
 
       <div class="toc" style="background:var(--navy);border-color:var(--navy-mid);">
-        <div class="toc-title" style="color:#fff;font-size:1.1rem;">⚡ Quick Reference Card</div>
+        <div class="toc-title" style="color:#fff;font-size:1.1rem;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> Quick Reference Card</div>
         <p style="color:rgba(255,255,255,.6);font-size:.78rem;margin-top:.2rem;">Everything you need in one glance.</p>
       </div>
 
       <div class="chapter">
         <div class="chapter-head" style="cursor:default;">
           <div class="chapter-head-left">
-            <div class="chapter-icon">🗺</div>
+            <div class="chapter-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"></polygon><line x1="9" y1="3" x2="9" y2="18"></line><line x1="15" y1="6" x2="15" y2="21"></line></svg></div>
             <div><div class="chapter-name">Page Navigation Map</div></div>
           </div>
         </div>
@@ -918,7 +954,7 @@
       <div class="chapter">
         <div class="chapter-head c2" style="cursor:default;">
           <div class="chapter-head-left">
-            <div class="chapter-icon c2">📱</div>
+            <div class="chapter-icon c2"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg></div>
             <div><div class="chapter-name">How to Send a Bulk SMS — 5 Steps</div></div>
           </div>
         </div>
@@ -936,7 +972,7 @@
       <div class="chapter">
         <div class="chapter-head c3" style="cursor:default;">
           <div class="chapter-head-left">
-            <div class="chapter-icon c3">🏷</div>
+            <div class="chapter-icon c3"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg></div>
             <div><div class="chapter-name">Personalisation Tag Cheatsheet</div></div>
           </div>
         </div>
@@ -959,7 +995,7 @@
       <div class="chapter">
         <div class="chapter-head" style="cursor:default;">
           <div class="chapter-head-left">
-            <div class="chapter-icon">📊</div>
+            <div class="chapter-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg></div>
             <div><div class="chapter-name">Message Status Reference</div></div>
           </div>
         </div>
@@ -976,22 +1012,7 @@
         </div>
       </div>
 
-      <div class="chapter">
-        <div class="chapter-head cdev" style="cursor:default;">
-          <div class="chapter-head-left">
-            <div class="chapter-icon cdev">🔐</div>
-            <div><div class="chapter-name">Developer Portal Quick Access</div></div>
-          </div>
-        </div>
-        <div class="chapter-body">
-          <ol class="step-list">
-            <li><span>Click the <strong>Concord logo (C icon)</strong> in the sidebar <strong>7 times</strong> rapidly.</span></li>
-            <li><span>Enter the developer <strong>passphrase</strong> in the modal that appears.</span></li>
-            <li><span>You are taken to the Developer Settings page. Password is required again on every visit.</span></li>
-            <li><span>After 5 failed attempts a lockout applies (30s → 60s → 120s escalating each cycle).</span></li>
-          </ol>
-        </div>
-      </div>
+
 
     </div>
   </div><!-- /panel-quickref -->
@@ -1047,10 +1068,10 @@ function toggleDev() {
   const visible = el.style.display !== 'none' && el.style.display !== '';
   if (visible) {
     el.style.display = 'none';
-    btn.textContent = '👁 Show Dev Instructions';
+    btn.innerHTML = '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg> Show Dev Instructions';
   } else {
     el.style.display = 'flex';
-    btn.textContent = '🙈 Hide Dev Instructions';
+    btn.innerHTML = '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg> Hide Dev Instructions';
   }
 }
 </script>
