@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { Search, X, Users, Phone, MapPin, ChevronLeft, ChevronRight, Send, Filter, AlertTriangle } from 'lucide-react'
+import { Search, X, Users, Phone, MapPin, ChevronLeft, ChevronRight, Send, Filter, AlertTriangle, Landmark } from 'lucide-react'
 import { toast } from 'sonner'
 import {
  getConstituencyContacts,
@@ -13,6 +13,7 @@ import {
  type GroupOptions,
  type ContactStats,
 } from './actions'
+import ManageConstituencyDialog from './ManageConstituencyDialog'
 
 const TABS = ['All Members', 'By Sub-Area', 'By Position', 'By Station', 'Smart Filters'] as const
 type TabKey = typeof TABS[number]
@@ -40,6 +41,7 @@ export default function ConstituencySelector({ initialContacts, initialTotal, gr
  const [search, setSearch] = useState('')
  const [activeTab, setActiveTab] = useState<TabKey>('All Members')
  const [excludeNoPhone, setExcludeNoPhone] = useState(false)
+ const [isManageOpen, setIsManageOpen] = useState(false)
 
  // Active filters
  const [filters, setFilters] = useState<FilterParams>({})
@@ -167,6 +169,17 @@ export default function ConstituencySelector({ initialContacts, initialTotal, gr
 
  return (
  <div className="flex flex-col gap-4">
+    {/* Manage Layout Button */}
+    <div className="flex justify-end">
+      <button
+        onClick={() => setIsManageOpen(true)}
+        className="flex items-center gap-2 px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg transition-all shadow-sm active:scale-95 cursor-pointer"
+      >
+        <Landmark className="w-3.5 h-3.5" />
+        Configure Sub-Areas & Stations
+      </button>
+    </div>
+
  {/* Stats Bar */}
  <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
  {[
@@ -431,6 +444,13 @@ export default function ConstituencySelector({ initialContacts, initialTotal, gr
  <Send className="w-4 h-4" /> Send SMS to Selected
  </button>
  </div>
+
+ <ManageConstituencyDialog
+    isOpen={isManageOpen}
+    onClose={() => setIsManageOpen(false)}
+    groups={groups}
+    onRefresh={() => router.refresh()}
+ />
  </div>
  )
 }

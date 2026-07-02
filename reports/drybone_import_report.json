@@ -1,7 +1,7 @@
 {
   "total_imported": 1497,
   "missing_contact": 42,
-  "missing_voter_id": 565,
+  "missing_voter_id": 563,
   "duplicated_station_codes": [],
   "positions_normalized": {
     "Chairman": 217,
@@ -13,7 +13,7 @@
     "Electoral Affairs Officer": 207,
     "Women Organizer (Previous)": 1
   },
-  "empty_rows_skipped": 425,
+  "empty_rows_skipped": 426,
   "sheets_processed": 13,
   "records_per_sheet": {
     "GBAWE WEST": 77,

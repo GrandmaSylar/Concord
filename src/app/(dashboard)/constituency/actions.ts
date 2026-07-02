@@ -202,3 +202,114 @@ export async function getConstituencyStats(filters: FilterParams = {}): Promise<
  station_count: new Set(allData.map(r => r.polling_station_code).filter(Boolean)).size,
  }
 }
+
+// ── Manage Sub-Areas & Polling Stations Actions ─────────────────────────────
+
+export async function renameSubArea(oldName: string, newName: string) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error('Unauthorized')
+
+  // Get user profile to check role
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single()
+  const isAdmin = profile?.role === 'admin'
+
+  let query = supabase
+    .from('contacts')
+    .update({ 
+      sub_area: newName.trim(), 
+      group_name: `Constituency: ${newName.trim()}` 
+    })
+    .eq('sub_area', oldName)
+
+  if (!isAdmin) {
+    query = query.eq('user_id', user.id)
+  }
+
+  const { error } = await query
+  if (error) {
+    console.error('Error renaming sub-area:', error)
+    return { error: 'Failed to rename sub-area.' }
+  }
+
+  return { success: true }
+}
+
+export async function updatePollingStation(
+  subArea: string,
+  oldStation: string,
+  oldCode: string | null,
+  newStation: string,
+  newCode: string | null
+) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error('Unauthorized')
+
+  // Get user profile to check role
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single()
+  const isAdmin = profile?.role === 'admin'
+
+  let query = supabase
+    .from('contacts')
+    .update({ 
+      polling_station: newStation.trim(), 
+      polling_station_code: newCode ? newCode.trim() : null 
+    })
+    .eq('sub_area', subArea)
+
+  if (oldCode) {
+    query = query.eq('polling_station_code', oldCode)
+  } else {
+    query = query.eq('polling_station', oldStation)
+  }
+
+  if (!isAdmin) {
+    query = query.eq('user_id', user.id)
+  }
+
+  const { error } = await query
+  if (error) {
+    console.error('Error updating polling station:', error)
+    return { error: 'Failed to update polling station details.' }
+  }
+
+  return { success: true }
+}
+
+export async function createNewSubArea(
+  subAreaName: string,
+  pollingStationName?: string,
+  pollingStationCode?: string
+) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error('Unauthorized')
+
+  // Insert a placeholder contact to initialize the sub-area in the DB
+  const { error } = await supabase.from('contacts').insert({
+    user_id: user.id,
+    name: `PLACEHOLDER (${subAreaName.trim()})`,
+    phone: '233000000000',
+    group_name: `Constituency: ${subAreaName.trim()}`,
+    sub_area: subAreaName.trim(),
+    polling_station: pollingStationName ? pollingStationName.trim() : null,
+    polling_station_code: pollingStationCode ? pollingStationCode.trim() : null,
+    has_contact: false
+  })
+
+  if (error) {
+    console.error('Error creating new sub-area placeholder:', error)
+    return { error: 'Failed to set up new sub-area.' }
+  }
+
+  return { success: true }
+}
