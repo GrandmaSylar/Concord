@@ -151,6 +151,35 @@ export default function SendMessageForm({
  setLoadingContacts(false)
  }
 
+ // Select all matching contacts that possess a valid phone number
+ const handleSelectAllWithPhone = async () => {
+   setLoadingContacts(true)
+   const filters = {
+     sub_area: filterSubArea || undefined,
+     position: filterPosition || undefined,
+     group_name: filterGroup || undefined
+   }
+   const allContacts = await getAllFilteredContacts(search, filters)
+   const next = new Map(selectedContacts)
+   let selectedCount = 0
+   allContacts.forEach((c: any) => {
+     const cleanPhone = c.phone?.trim()
+     if (cleanPhone) {
+       next.set(cleanPhone, { 
+         name: c.name, 
+         phone: cleanPhone, 
+         position: c.position, 
+         sub_area: c.sub_area, 
+         polling_station: c.polling_station 
+       })
+       selectedCount++
+     }
+   })
+   setSelectedContacts(next)
+   setLoadingContacts(false)
+   toast.success(`Selected ${selectedCount} contacts with phone numbers.`)
+ }
+
  const handleClearSelection = () => {
  setSelectedContacts(new Map())
  }
@@ -357,6 +386,13 @@ export default function SendMessageForm({
  className="text-blue-600 font-medium hover:text-blue-700 hover:underline transition-all active:scale-95"
  >
  Select All Matching Contacts ({total})
+ </button>
+ <button 
+ type="button" 
+ onClick={handleSelectAllWithPhone}
+ className="text-indigo-600 font-medium hover:text-indigo-700 hover:underline transition-all active:scale-95"
+ >
+ Select All with Phone Numbers
  </button>
  {selectedContacts.size > 0 && (
  <button 
