@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { processBulkSMS, getFilteredContacts, getAllFilteredContacts } from './actions'
-import { Send, Search, ChevronLeft, ChevronRight, Filter, UserPlus, X, Sparkles } from 'lucide-react'
+import { Send, Search, ChevronLeft, ChevronRight, Filter, UserPlus, X, Sparkles, AlertCircle } from 'lucide-react'
 import { toast } from 'sonner'
 import SystemConfirmDialog from '@/components/ui/SystemConfirmDialog'
 import AIAssistantWidget from '@/components/ui/AIAssistantWidget'
@@ -201,6 +201,27 @@ export default function SendMessageForm({
  textarea.selectionStart = textarea.selectionEnd = start + tag.length
  }, 0)
  }
+
+  // Helper to calculate exact SMS part split count based on GSM-7 or Unicode character sets
+  const getSMSDetails = (text: string) => {
+    const gsm7Regex = /^[A-Za-z0-9@£$¥èéùìòÇ\n\rÅåΔ_ΦΓΛΩΠΨΣΘΞÆæßÉ !"¤%&'()*+,\-./:;<=>?¡ÄÖÑÜ§¿äöñüà\^{}\\[~\]|€]*$/;
+    const isGsm = gsm7Regex.test(text);
+    const length = text.length;
+
+    if (isGsm) {
+      if (length <= 160) {
+        return { parts: 1, limit: 160, isGsm, type: 'GSM-7' };
+      } else {
+        return { parts: Math.ceil(length / 153), limit: 153, isGsm, type: 'GSM-7' };
+      }
+    } else {
+      if (length <= 70) {
+        return { parts: 1, limit: 70, isGsm, type: 'Unicode' };
+      } else {
+        return { parts: Math.ceil(length / 67), limit: 67, isGsm, type: 'Unicode' };
+      }
+    }
+  }
 
  const totalPages = Math.ceil(total / 50) || 1
  const isPageAllSelected = contacts.length > 0 && contacts.every(c => selectedContacts.has(c.phone))
@@ -625,12 +646,30 @@ export default function SendMessageForm({
  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm py-2 px-3 border bg-white text-gray-900"
  placeholder={totalRecipientsCount === 0 ? "Please select contacts or enter temporary numbers first..." : "Type your message here... Use [Firstname] etc."}
  />
- <div className="mt-1 flex justify-between text-xs text-gray-500">
- <span>Standard SMS: 160 characters per part.</span>
- <span className={message.length > 160 ? "text-amber-600 font-medium" : ""}>
- {message.length} chars ({Math.ceil((message.length || 1) / 160)} SMS)
- </span>
- </div>
+ {(() => {
+   const sms = getSMSDetails(message)
+   const hasUnicode = !sms.isGsm
+   return (
+     <div className="mt-1.5 space-y-2">
+       <div className="flex justify-between text-xs text-gray-500">
+         <span>
+           {sms.type} encoding. Limit: {sms.limit} chars/part.
+         </span>
+         <span className={sms.parts > 1 || hasUnicode ? "text-amber-600 font-medium" : "text-gray-500"}>
+           {message.length} chars ({sms.parts} SMS {sms.parts > 1 ? 'parts' : 'part'})
+         </span>
+       </div>
+       {hasUnicode && (
+         <div className="rounded-lg bg-amber-50 p-2.5 text-[11px] text-amber-800 border border-amber-250 flex items-start gap-1.5 leading-normal">
+           <AlertCircle className="w-3.5 h-3.5 text-amber-600 shrink-0 mt-0.5" />
+           <div>
+             <span className="font-bold">Unicode Encoding Active:</span> Non-GSM character detected (such as smart quotes <code className="bg-amber-100 px-1 rounded">’</code>, emojis, or symbols). This restricts each SMS part to 70/67 characters instead of 160/153. Replacing them with standard text will reduce parts and campaign cost.
+           </div>
+         </div>
+       )}
+     </div>
+   )
+ })()}
  </div>
 
  <button
