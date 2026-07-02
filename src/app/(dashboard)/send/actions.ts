@@ -5,46 +5,57 @@ import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 
 export async function getFilteredContacts(
- page: number, 
- search: string, 
- sort: string, 
- filters?: { sub_area?: string; position?: string; group_name?: string }
+  page: number, 
+  search: string, 
+  sort: string, 
+  filters?: { sub_area?: string; position?: string; group_name?: string }
 ) {
- const supabase = await createClient()
- const { data: { user } } = await supabase.auth.getUser()
- if (!user) return { contacts: [], total: 0 }
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { contacts: [], total: 0 }
 
- let query = supabase.from('contacts')
- .select('*', { count: 'exact' })
- .eq('user_id', user.id)
- .eq('opt_out', false)
+  // Check if admin
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single()
+  const isAdmin = profile?.role === 'admin'
 
- if (search) {
- query = query.or(`name.ilike.%${search}%,phone.ilike.%${search}%,group_name.ilike.%${search}%`)
- }
+  let query = supabase.from('contacts')
+    .select('*', { count: 'exact' })
+    .eq('opt_out', false)
 
- if (filters?.sub_area) query = query.eq('sub_area', filters.sub_area)
- if (filters?.position) query = query.eq('position', filters.position)
- if (filters?.group_name) query = query.eq('group_name', filters.group_name)
+  if (!isAdmin) {
+    query = query.eq('user_id', user.id)
+  }
 
- if (sort === 'name_asc') query = query.order('name', { ascending: true })
- else if (sort === 'name_desc') query = query.order('name', { ascending: false })
- else if (sort === 'newest') query = query.order('created_at', { ascending: false })
- else if (sort === 'oldest') query = query.order('created_at', { ascending: true })
- else query = query.order('created_at', { ascending: false })
+  if (search) {
+    query = query.or(`name.ilike.%${search}%,phone.ilike.%${search}%,group_name.ilike.%${search}%`)
+  }
 
- const from = (page - 1) * 50
- const to = from + 49
- query = query.range(from, to)
+  if (filters?.sub_area) query = query.eq('sub_area', filters.sub_area)
+  if (filters?.position) query = query.eq('position', filters.position)
+  if (filters?.group_name) query = query.eq('group_name', filters.group_name)
 
- const { data, count, error } = await query
+  if (sort === 'name_asc') query = query.order('name', { ascending: true })
+  else if (sort === 'name_desc') query = query.order('name', { ascending: false })
+  else if (sort === 'newest') query = query.order('created_at', { ascending: false })
+  else if (sort === 'oldest') query = query.order('created_at', { ascending: true })
+  else query = query.order('created_at', { ascending: false })
 
- if (error) {
- console.error('Error fetching contacts:', error)
- return { contacts: [], total: 0 }
- }
+  const from = (page - 1) * 50
+  const to = from + 49
+  query = query.range(from, to)
 
- return { contacts: data, total: count || 0 }
+  const { data, count, error } = await query
+
+  if (error) {
+    console.error('Error fetching contacts:', error)
+    return { contacts: [], total: 0 }
+  }
+
+  return { contacts: data, total: count || 0 }
 }
 
 export async function getAllFilteredContacts(
@@ -55,6 +66,14 @@ export async function getAllFilteredContacts(
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return []
 
+  // Check if admin
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single()
+  const isAdmin = profile?.role === 'admin'
+
   const allContacts: any[] = []
   let from = 0
   const limit = 1000
@@ -62,8 +81,11 @@ export async function getAllFilteredContacts(
   while (true) {
     let query = supabase.from('contacts')
       .select('id, name, phone, position, sub_area, polling_station')
-      .eq('user_id', user.id)
       .eq('opt_out', false)
+
+    if (!isAdmin) {
+      query = query.eq('user_id', user.id)
+    }
 
     if (search) {
       query = query.or(`name.ilike.%${search}%,phone.ilike.%${search}%,group_name.ilike.%${search}%`)
