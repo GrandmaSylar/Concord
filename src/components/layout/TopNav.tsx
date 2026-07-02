@@ -1,10 +1,11 @@
 'use client'
 
-import { Menu, LogOut } from 'lucide-react'
+import { Menu, LogOut, RotateCw } from 'lucide-react'
 import SmsBalanceBadge from './SmsBalanceBadge'
 import { useState, useTransition } from 'react'
 import SystemConfirmDialog from '../ui/SystemConfirmDialog'
 import { logout } from '@/app/login/actions'
+import { useRouter } from 'next/navigation'
 
 interface TopNavProps {
  user: {
@@ -18,16 +19,24 @@ interface TopNavProps {
 export default function TopNav({ user, onMenuClick }: TopNavProps) {
  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
  const [isPending, startTransition] = useTransition()
+ const router = useRouter()
+ const [isRefreshing, setIsRefreshing] = useState(false)
+
+ const handleRefresh = () => {
+   setIsRefreshing(true)
+   router.refresh()
+   setTimeout(() => setIsRefreshing(false), 800)
+ }
 
  const handleLogout = () => {
  // Clear dev settings lockout session keys upon logout
  if (typeof window !== 'undefined') {
- sessionStorage.removeItem('dev_auth_attempts')
- sessionStorage.removeItem('dev_auth_lockouts')
- sessionStorage.removeItem('dev_auth_locked_at')
+   sessionStorage.removeItem('dev_auth_attempts')
+   sessionStorage.removeItem('dev_auth_lockouts')
+   sessionStorage.removeItem('dev_auth_locked_at')
  }
  startTransition(async () => {
- await logout()
+   await logout()
  })
  }
 
@@ -45,6 +54,15 @@ export default function TopNav({ user, onMenuClick }: TopNavProps) {
  </div>
  <div className="flex flex-1 justify-end items-center gap-2 sm:gap-4">
  <SmsBalanceBadge />
+
+ <button 
+   onClick={handleRefresh}
+   disabled={isRefreshing}
+   className="flex items-center justify-center p-2 rounded-lg bg-gray-50 border border-gray-200 text-gray-500 hover:text-blue-600 hover:bg-blue-50 hover:border-blue-200 transition-all duration-200 cursor-pointer disabled:opacity-50 shadow-sm"
+   title="Refresh page data"
+ >
+   <RotateCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+ </button>
 
  <div className="text-sm text-gray-700 hidden sm:block">
  <span className="font-medium">{user.fullName || user.email}</span>
