@@ -1,10 +1,22 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useTransition } from 'react'
 import { 
   Layers, ChevronDown, ChevronUp, CheckCircle2, XCircle, 
-  Clock, TrendingUp, FileText, Search, ArrowUpDown, Filter
+  Clock, TrendingUp, FileText, Search, ArrowUpDown, Filter,
+  RotateCcw, RefreshCw
 } from 'lucide-react'
+import { resendMessages } from './actions'
+import { toast } from 'sonner'
+import { useRouter } from 'next/navigation'
+
+interface FailedMessage {
+  id: string
+  recipient: string
+  content: string
+  status: string
+  sent_at: string
+}
 
 interface BatchData {
   id: string
@@ -15,6 +27,7 @@ interface BatchData {
   failed: number
   pending: number
   successRate: number
+  failedMessages?: FailedMessage[]
 }
 
 type SortKey = 'timestamp' | 'total' | 'sent' | 'failed' | 'successRate'
@@ -22,11 +35,17 @@ type SortDir = 'asc' | 'desc'
 type StatusFilter = 'all' | 'has_failures' | 'all_delivered' | 'has_pending'
 
 export default function BatchAnalysisCard({ batches }: { batches: BatchData[] }) {
+  const router = useRouter()
   const [expandedBatchId, setExpandedBatchId] = useState<string | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
   const [sortKey, setSortKey] = useState<SortKey>('timestamp')
   const [sortDir, setSortDir] = useState<SortDir>('desc')
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all')
+
+  // Selection states for failed messages per batch
+  const [selectedMessageIds, setSelectedMessageIds] = useState<Set<string>>(new Set())
+  const [customMessageText, setCustomMessageText] = useState('')
+  const [isResending, startResendTransition] = useTransition()
 
   const filteredAndSorted = useMemo(() => {
     let result = [...(batches || [])]
@@ -74,20 +93,53 @@ export default function BatchAnalysisCard({ batches }: { batches: BatchData[] })
     }
   }
 
-  if (!batches || batches.length === 0) {
-    return (
-      <div className="bg-white rounded-xl shadow-sm border border-slate-200/80 p-8 text-center">
-        <div className="p-3 bg-slate-50 rounded-full text-slate-400 inline-flex mb-3">
-          <Layers className="w-6 h-6" />
-        </div>
-        <p className="text-sm font-bold text-slate-700">No campaign batches detected</p>
-        <p className="text-xs text-slate-400 mt-1">Batches will appear here once messages are dispatched.</p>
-      </div>
-    )
+  const toggleBatch = (id: string) => {
+    if (expandedBatchId === id) {
+      setExpandedBatchId(null)
+    } else {
+      setExpandedBatchId(id)
+      // Reset inner resend selection states
+      setSelectedMessageIds(new Set())
+      const batchObj = batches.find(b => b.id === id)
+      setCustomMessageText(batchObj?.content || '')
+    }
   }
 
-  const toggleBatch = (id: string) => {
-    setExpandedBatchId(prev => prev === id ? null : id)
+  const handleToggleMessage = (msgId: string) => {
+    const next = new Set(selectedMessageIds)
+    if (next.has(msgId)) {
+      next.delete(msgId)
+    } else {
+      next.add(msgId)
+    }
+    setSelectedMessageIds(next)
+  }
+
+  const handleSelectAllFailed = (failedMsgs: FailedMessage[]) => {
+    const allSelected = failedMsgs.length > 0 && failedMsgs.every(m => selectedMessageIds.has(m.id))
+    const next = new Set(selectedMessageIds)
+    if (allSelected) {
+      failedMsgs.forEach(m => next.delete(m.id))
+    } else {
+      failedMsgs.forEach(m => next.add(m.id))
+    }
+    setSelectedMessageIds(next)
+  }
+
+  const handleResendBatchFailures = () => {
+    if (selectedMessageIds.size === 0) return
+
+    startResendTransition(async () => {
+      const idsArray = Array.from(selectedMessageIds)
+      const res = await resendMessages(idsArray, customMessageText || undefined)
+      if (res.error) {
+        toast.error(res.error)
+      } else {
+        toast.success(`Successfully queued retry for ${res.count} failures from this batch!`)
+        setSelectedMessageIds(new Set())
+        router.refresh()
+      }
+    })
   }
 
   const getSuccessColor = (rate: number) => {
@@ -117,6 +169,18 @@ export default function BatchAnalysisCard({ batches }: { batches: BatchData[] })
       )}
     </button>
   )
+
+  if (!batches || batches.length === 0) {
+    return (
+      <div className="bg-white rounded-xl shadow-sm border border-slate-200/80 p-8 text-center">
+        <div className="p-3 bg-slate-50 rounded-full text-slate-400 inline-flex mb-3">
+          <Layers className="w-6 h-6" />
+        </div>
+        <p className="text-sm font-bold text-slate-700">No campaign batches detected</p>
+        <p className="text-xs text-slate-400 mt-1">Batches will appear here once messages are dispatched.</p>
+      </div>
+    )
+  }
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-slate-200/80 overflow-hidden">
@@ -193,6 +257,9 @@ export default function BatchAnalysisCard({ batches }: { batches: BatchData[] })
               hour: '2-digit', minute: '2-digit'
             })
 
+            const hasFailures = batch.failedMessages && batch.failedMessages.length > 0
+            const isAllFailedSelected = hasFailures && batch.failedMessages!.every(m => selectedMessageIds.has(m.id))
+
             return (
               <div key={batch.id}>
                 {/* Batch Row */}
@@ -215,7 +282,9 @@ export default function BatchAnalysisCard({ batches }: { batches: BatchData[] })
                           <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-violet-100 text-violet-700 uppercase">Simulation</span>
                         )}
                         {batch.failed > 0 && (
-                          <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-red-50 text-red-600">{batch.failed} failed</span>
+                          <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-red-50 text-red-600">
+                            {batch.failedMessages?.length || batch.failed} unresolved failures
+                          </span>
                         )}
                       </div>
                       <p className="text-[11px] text-slate-500 truncate max-w-md font-medium">
@@ -253,9 +322,9 @@ export default function BatchAnalysisCard({ batches }: { batches: BatchData[] })
 
                 {/* Expanded Batch Details */}
                 {isExpanded && (
-                  <div className="px-6 pb-5 pt-1 bg-slate-50/40 border-t border-slate-100 animate-in slide-in-from-top-1 duration-200">
+                  <div className="px-6 pb-6 pt-1 bg-slate-50/40 border-t border-slate-100 animate-in slide-in-from-top-1 duration-200 flex flex-col gap-4">
                     {/* Stat Tiles */}
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                       <div className="bg-white rounded-lg border border-slate-200 p-3 flex items-center gap-3">
                         <div className="p-1.5 bg-indigo-50 rounded-md text-indigo-600">
                           <FileText className="w-4 h-4" />
@@ -318,12 +387,110 @@ export default function BatchAnalysisCard({ batches }: { batches: BatchData[] })
                     </div>
 
                     {/* Message Preview */}
-                    <div className="mt-3 bg-white rounded-lg border border-slate-200 p-4">
+                    <div className="bg-white rounded-lg border border-slate-200 p-4">
                       <p className="text-[10px] font-bold text-slate-400 uppercase mb-2">Message Content</p>
                       <p className="text-xs text-slate-700 whitespace-pre-wrap leading-relaxed font-medium bg-slate-50 rounded-lg p-3 border border-slate-100">
                         {batch.content}
                       </p>
                     </div>
+
+                    {/* Failed Messages Selection Console inside the batch */}
+                    {hasFailures ? (
+                      <div className="bg-white rounded-xl border border-red-100 overflow-hidden flex flex-col gap-3">
+                        <div className="px-4 py-3 bg-red-50/10 border-b border-red-50 flex items-center justify-between">
+                          <div className="flex items-center gap-2 text-red-900 font-bold text-xs">
+                            <XCircle className="w-4 h-4 text-red-600" />
+                            <span>Unresolved Batch Failures ({batch.failedMessages!.length})</span>
+                          </div>
+                          {selectedMessageIds.size > 0 && (
+                            <button
+                              onClick={handleResendBatchFailures}
+                              disabled={isResending}
+                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white text-[10px] font-bold transition-all shadow-sm active:scale-95 disabled:opacity-50 cursor-pointer"
+                            >
+                              {isResending ? (
+                                <RefreshCw className="w-3 h-3 animate-spin" />
+                              ) : (
+                                <RotateCcw className="w-3 h-3" />
+                              )}
+                              Resend Selected ({selectedMessageIds.size})
+                            </button>
+                          )}
+                        </div>
+
+                        {/* Text Editor Box for edit prior to retry */}
+                        {selectedMessageIds.size > 0 && (
+                          <div className="px-4 py-2 flex flex-col gap-2">
+                            <div className="flex justify-between items-center">
+                              <label className="text-[10px] font-bold text-slate-700">Edit message for retry (Optional)</label>
+                              <span className="text-[9px] font-bold text-slate-400">{customMessageText.length} chars</span>
+                            </div>
+                            <textarea
+                              value={customMessageText}
+                              onChange={e => setCustomMessageText(e.target.value)}
+                              rows={2}
+                              className="w-full rounded-lg border border-slate-200 p-2 text-xs text-slate-800 font-medium"
+                              placeholder="Modify the content if needed..."
+                            />
+                          </div>
+                        )}
+
+                        <div className="overflow-x-auto max-h-[220px]">
+                          <table className="min-w-full divide-y divide-slate-100">
+                            <thead className="bg-slate-50">
+                              <tr>
+                                <th scope="col" className="px-4 py-2 text-left w-10">
+                                  <input
+                                    type="checkbox"
+                                    checked={isAllFailedSelected}
+                                    onChange={() => handleSelectAllFailed(batch.failedMessages!)}
+                                    className="rounded border-slate-350 text-red-600 focus:ring-red-500"
+                                  />
+                                </th>
+                                <th scope="col" className="px-4 py-2 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Recipient</th>
+                                <th scope="col" className="px-4 py-2 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Status</th>
+                                <th scope="col" className="px-4 py-2 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Failed At</th>
+                              </tr>
+                            </thead>
+                            <tbody className="bg-white divide-y divide-slate-100">
+                              {batch.failedMessages!.map(msg => {
+                                const isSelected = selectedMessageIds.has(msg.id)
+                                return (
+                                  <tr 
+                                    key={msg.id}
+                                    onClick={() => handleToggleMessage(msg.id)}
+                                    className={`hover:bg-slate-50 cursor-pointer text-xs ${isSelected ? 'bg-red-50/20' : ''}`}
+                                  >
+                                    <td className="px-4 py-2" onClick={e => e.stopPropagation()}>
+                                      <input
+                                        type="checkbox"
+                                        checked={isSelected}
+                                        onChange={() => handleToggleMessage(msg.id)}
+                                        className="rounded border-slate-350 text-red-600 focus:ring-red-500"
+                                      />
+                                    </td>
+                                    <td className="px-4 py-2 font-mono font-bold text-slate-700">{msg.recipient}</td>
+                                    <td className="px-4 py-2 text-red-600 font-bold text-[10px] uppercase">{msg.status}</td>
+                                    <td className="px-4 py-2 text-slate-400">
+                                      {new Date(msg.sent_at).toLocaleString('en-GB', {
+                                        hour: '2-digit', minute: '2-digit', second: '2-digit'
+                                      })}
+                                    </td>
+                                  </tr>
+                                )
+                              })}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    ) : batch.failed > 0 ? (
+                      <div className="bg-emerald-50/40 border border-emerald-100 rounded-lg p-3 flex items-center gap-2">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                        <span className="text-xs text-emerald-800 font-semibold">
+                          All {batch.failed} failed messages in this batch were successfully resolved through retries!
+                        </span>
+                      </div>
+                    ) : null}
                   </div>
                 )}
               </div>

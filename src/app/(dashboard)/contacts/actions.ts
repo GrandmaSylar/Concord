@@ -110,23 +110,36 @@ export async function bulkImportContacts(contacts: {name: string, phone: string,
 }
 
 export async function toggleOptOut(contactId: string, currentStatus: boolean) {
- const supabase = await createClient()
- const { data: { user } } = await supabase.auth.getUser()
- if (!user) throw new Error('Unauthorized')
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error('Unauthorized')
 
- const { error } = await supabase
- .from('contacts')
- .update({ opt_out: !currentStatus })
- .eq('id', contactId)
- .eq('user_id', user.id)
+  // Get user profile to check role
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single()
+  const isAdmin = profile?.role === 'admin'
 
- if (error) {
- console.error('Toggle opt-out error:', error)
- return { error: 'Failed to update opt-out status.' }
- }
+  let query = supabase
+    .from('contacts')
+    .update({ opt_out: !currentStatus })
+    .eq('id', contactId)
 
- revalidatePath('/contacts')
- return { success: true }
+  if (!isAdmin) {
+    query = query.eq('user_id', user.id)
+  }
+
+  const { error } = await query
+
+  if (error) {
+    console.error('Toggle opt-out error:', error)
+    return { error: 'Failed to update opt-out status.' }
+  }
+
+  revalidatePath('/contacts')
+  return { success: true }
 }
 
 export async function getContactFilterOptions() {
@@ -134,16 +147,28 @@ export async function getContactFilterOptions() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { groups: [], sub_areas: [], positions: [] }
 
+  // Get user profile to check role
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single()
+  const isAdmin = profile?.role === 'admin'
+
   const allContacts: { group_name: string | null; sub_area: string | null; position: string | null }[] = []
   let from = 0
   const limit = 1000
 
   while (true) {
-    const { data, error } = await supabase
+    let query = supabase
       .from('contacts')
       .select('group_name, sub_area, position')
-      .eq('user_id', user.id)
-      .range(from, from + limit - 1)
+
+    if (!isAdmin) {
+      query = query.eq('user_id', user.id)
+    }
+
+    const { data, error } = await query.range(from, from + limit - 1)
 
     if (error) {
       console.error('Error fetching contacts filter options:', error)
@@ -172,67 +197,92 @@ export async function getContactFilterOptions() {
 }
 
 export async function updateContact(contactId: string, formData: FormData) {
- const supabase = await createClient()
- const { data: { user } } = await supabase.auth.getUser()
- if (!user) throw new Error('Unauthorized')
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error('Unauthorized')
 
- const parsed = contactSchema.safeParse({
- name: formData.get('name') || '',
- phone: formData.get('phone') || '',
- group_name: formData.get('group_name') || '',
- position: formData.get('position') || '',
- sub_area: formData.get('sub_area') || '',
- polling_station_code: formData.get('polling_station_code') || '',
- polling_station: formData.get('polling_station') || '',
- })
+  // Get user profile to check role
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single()
+  const isAdmin = profile?.role === 'admin'
 
- if (!parsed.success) {
- return { error: parsed.error.issues?.[0]?.message || 'Validation failed' }
- }
+  const parsed = contactSchema.safeParse({
+    name: formData.get('name') || '',
+    phone: formData.get('phone') || '',
+    group_name: formData.get('group_name') || '',
+    position: formData.get('position') || '',
+    sub_area: formData.get('sub_area') || '',
+    polling_station_code: formData.get('polling_station_code') || '',
+    polling_station: formData.get('polling_station') || '',
+  })
 
- let { name, phone, group_name, position, sub_area, polling_station_code, polling_station } = parsed.data
- phone = phone.replace(/[\s\-\(\)]/g, '')
+  if (!parsed.success) {
+    return { error: parsed.error.issues?.[0]?.message || 'Validation failed' }
+  }
 
- const { error } = await supabase
- .from('contacts')
- .update({
- name: name.trim(),
- phone,
- group_name: group_name ? group_name.trim() : null,
- position: position ? position.trim() : null,
- sub_area: sub_area ? sub_area.trim() : null,
- polling_station_code: polling_station_code ? polling_station_code.trim() : null,
- polling_station: polling_station ? polling_station.trim() : null,
- })
- .eq('id', contactId)
- .eq('user_id', user.id)
+  let { name, phone, group_name, position, sub_area, polling_station_code, polling_station } = parsed.data
+  phone = phone.replace(/[\s\-\(\)]/g, '')
 
- if (error) {
- console.error('Error updating contact:', error)
- return { error: 'Failed to update contact. Phone number might already exist.' }
- }
+  let query = supabase
+    .from('contacts')
+    .update({
+      name: name.trim(),
+      phone,
+      group_name: group_name ? group_name.trim() : null,
+      position: position ? position.trim() : null,
+      sub_area: sub_area ? sub_area.trim() : null,
+      polling_station_code: polling_station_code ? polling_station_code.trim() : null,
+      polling_station: polling_station ? polling_station.trim() : null,
+    })
+    .eq('id', contactId)
 
- revalidatePath('/contacts')
- return { success: true }
+  if (!isAdmin) {
+    query = query.eq('user_id', user.id)
+  }
+
+  const { error } = await query
+
+  if (error) {
+    console.error('Error updating contact:', error)
+    return { error: 'Failed to update contact. Phone number might already exist.' }
+  }
+
+  revalidatePath('/contacts')
+  return { success: true }
 }
 
 export async function deleteContact(contactId: string) {
- const supabase = await createClient()
- const { data: { user } } = await supabase.auth.getUser()
- if (!user) throw new Error('Unauthorized')
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error('Unauthorized')
 
- const { error } = await supabase
- .from('contacts')
- .delete()
- .eq('id', contactId)
- .eq('user_id', user.id)
+  // Get user profile to check role
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single()
+  const isAdmin = profile?.role === 'admin'
 
- if (error) {
- console.error('Error deleting contact:', error)
- return { error: 'Failed to delete contact.' }
- }
+  let query = supabase
+    .from('contacts')
+    .delete()
+    .eq('id', contactId)
 
- revalidatePath('/contacts')
- return { success: true }
+  if (!isAdmin) {
+    query = query.eq('user_id', user.id)
+  }
+
+  const { error } = await query
+
+  if (error) {
+    console.error('Error deleting contact:', error)
+    return { error: 'Failed to delete contact.' }
+  }
+
+  revalidatePath('/contacts')
+  return { success: true }
 }
-

@@ -316,6 +316,11 @@ export async function getSMSAnalytics(startDate?: string, endDate?: string) {
       .substring(0, 60)
   }
 
+  // Set of all recipients who have at least one successful delivery in the current logs
+  const successRecipients = new Set(
+    allMessages.filter(m => m.status === 'sent').map(m => m.recipient)
+  )
+
   sortedMessages.forEach(m => {
     if (!m.sent_at) return
     const time = new Date(m.sent_at).getTime()
@@ -349,6 +354,16 @@ export async function getSMSAnalytics(startDate?: string, endDate?: string) {
     const failedCount = b.messages.filter((m: any) => m.status === 'failed').length
     const pendingCount = b.messages.filter((m: any) => m.status === 'pending').length
     
+    const failedMessages = b.messages
+      .filter((m: any) => m.status === 'failed' && !m.retried && !successRecipients.has(m.recipient))
+      .map((m: any) => ({
+        id: m.id,
+        recipient: m.recipient,
+        content: m.content,
+        status: m.status,
+        sent_at: m.sent_at
+      }))
+
     return {
       id: b.id,
       timestamp: new Date(b.startTime).toISOString(),
@@ -357,7 +372,8 @@ export async function getSMSAnalytics(startDate?: string, endDate?: string) {
       sent: sentCount,
       failed: failedCount,
       pending: pendingCount,
-      successRate: totalCount > 0 ? Math.round((sentCount / totalCount) * 100) : 0
+      successRate: totalCount > 0 ? Math.round((sentCount / totalCount) * 100) : 0,
+      failedMessages
     }
   }).sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
 
@@ -455,14 +471,31 @@ export async function getFailedMessageLogs(startDate?: string, endDate?: string)
     query = query.lte('sent_at', `${endDate}T23:59:59.999Z`)
   }
 
-  const { data, error } = await query.limit(1000) // Fetch failures up to limit
+  const { data: failedLogs, error } = await query.limit(1000)
 
-  if (error) {
+  if (error || !failedLogs) {
     console.error('Error fetching failed message logs:', error)
     return []
   }
 
-  return data || []
+  // Fetch all successful messages to filter out resolved failures
+  let successQuery = supabase
+    .from('messages')
+    .select('recipient')
+    .eq('status', 'sent')
+
+  if (startDate) {
+    successQuery = successQuery.gte('sent_at', startDate)
+  }
+  if (endDate) {
+    successQuery = successQuery.lte('sent_at', `${endDate}T23:59:59.999Z`)
+  }
+
+  const { data: successData } = await successQuery.limit(5000)
+  const successRecipients = new Set((successData || []).map(m => m.recipient))
+
+  // Filter out any failed message whose recipient has since received a successful SMS
+  return failedLogs.filter(log => !successRecipients.has(log.recipient))
 }
 
 export async function getAnomalyContacts() {
