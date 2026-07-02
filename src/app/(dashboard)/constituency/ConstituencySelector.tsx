@@ -253,16 +253,21 @@ export default function ConstituencySelector({ initialContacts, initialTotal, gr
  </div>
  )}
  {activeTab === 'By Station' && (
- <select
- value={filters.polling_station_code || ''}
- onChange={e => e.target.value ? applyFilter('polling_station_code', e.target.value) : removeFilter('polling_station_code')}
- className="w-full max-w-md rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm py-2 px-3 border bg-white text-slate-900 "
- >
- <option value="">Select a polling station...</option>
- {groups.polling_stations.map(s => (
- <option key={s.code} value={s.code}>{s.name} ({s.code}) — {s.sub_area}</option>
- ))}
- </select>
+  <select
+    value={filters.polling_station_code || ''}
+    onChange={e => e.target.value ? applyFilter('polling_station_code', e.target.value) : removeFilter('polling_station_code')}
+    className="w-full max-w-md rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm py-2 px-3 border bg-white text-slate-900 "
+  >
+    <option value="">Select a polling station...</option>
+    {groups.polling_stations.map(s => {
+      const optionValue = s.code || s.name
+      return (
+        <option key={optionValue} value={optionValue}>
+          {s.name} {s.code ? `(${s.code})` : '[No Code]'} — {s.sub_area}
+        </option>
+      )
+    })}
+  </select>
  )}
  {activeTab === 'Smart Filters' && (
  <div className="flex flex-wrap gap-2">

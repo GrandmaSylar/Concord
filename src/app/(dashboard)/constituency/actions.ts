@@ -44,20 +44,22 @@ export interface ContactStats {
 
 // ── Base query helper: only constituency contacts (those with sub_area) ────
 function applyFilters(query: any, filters: FilterParams) {
- // Only constituency contacts
- query = query.not('sub_area', 'is', null)
+  // Only constituency contacts
+  query = query.not('sub_area', 'is', null)
 
- if (filters.sub_area) query = query.eq('sub_area', filters.sub_area)
- if (filters.position) query = query.eq('position', filters.position)
- if (filters.polling_station_code) query = query.eq('polling_station_code', filters.polling_station_code)
- if (filters.has_contact !== undefined) query = query.eq('has_contact', filters.has_contact)
- if (filters.has_voter_id !== undefined) query = query.eq('has_voter_id', filters.has_voter_id)
- if (filters.search) {
- query = query.or(
- `name.ilike.%${filters.search}%,polling_station.ilike.%${filters.search}%,sub_area.ilike.%${filters.search}%,phone.ilike.%${filters.search}%`
- )
- }
- return query
+  if (filters.sub_area) query = query.eq('sub_area', filters.sub_area)
+  if (filters.position) query = query.eq('position', filters.position)
+  if (filters.polling_station_code) {
+    query = query.or(`polling_station_code.eq."${filters.polling_station_code}",polling_station.eq."${filters.polling_station_code}"`)
+  }
+  if (filters.has_contact !== undefined) query = query.eq('has_contact', filters.has_contact)
+  if (filters.has_voter_id !== undefined) query = query.eq('has_voter_id', filters.has_voter_id)
+  if (filters.search) {
+    query = query.or(
+      `name.ilike.%${filters.search}%,polling_station.ilike.%${filters.search}%,sub_area.ilike.%${filters.search}%,phone.ilike.%${filters.search}%`
+    )
+  }
+  return query
 }
 
 // ── Get Filtered Contacts (paginated) ──────────────────────────────────────
@@ -151,11 +153,12 @@ export async function getConstituencyGroups(): Promise<GroupOptions> {
     if (c.position) {
       positionsSet.add(c.position)
     }
-    if (c.polling_station_code && c.sub_area) {
-      if (!stationMap.has(c.polling_station_code)) {
-        stationMap.set(c.polling_station_code, {
-          code: c.polling_station_code,
-          name: c.polling_station || c.polling_station_code,
+    if (c.polling_station && c.sub_area) {
+      const key = c.polling_station_code || c.polling_station
+      if (!stationMap.has(key)) {
+        stationMap.set(key, {
+          code: c.polling_station_code || '',
+          name: c.polling_station,
           sub_area: c.sub_area
         })
       }
