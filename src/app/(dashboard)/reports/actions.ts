@@ -345,7 +345,7 @@ export async function getFailedMessageLogs() {
     .select('*')
     .eq('status', 'failed')
     .order('sent_at', { ascending: false })
-    .limit(100)
+    .limit(1000) // Increased limit to fetch all failures
 
   if (error) {
     console.error('Error fetching failed message logs:', error)
@@ -353,4 +353,36 @@ export async function getFailedMessageLogs() {
   }
 
   return data
+}
+
+export async function getAnomalyContacts() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return []
+
+  const allContacts: any[] = []
+  let from = 0
+  const limit = 1000
+
+  while (true) {
+    const { data, error } = await supabase
+      .from('contacts')
+      .select('id, name, phone, sub_area, group_name, polling_station')
+      .eq('user_id', user.id)
+      .not('phone', 'is', null)
+      .range(from, from + limit - 1)
+
+    if (error) {
+      console.error('Error fetching contacts for anomalies:', error)
+      break
+    }
+    allContacts.push(...(data || []))
+    if (!data || data.length < limit) break
+    from += limit
+  }
+
+  return allContacts.filter(c => {
+    const cleanDigits = (c.phone || '').replace(/\D/g, '')
+    return cleanDigits.length > 10
+  })
 }
