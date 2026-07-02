@@ -48,28 +48,44 @@ export async function getFilteredContacts(
 }
 
 export async function getAllFilteredContacts(
- search: string,
- filters?: { sub_area?: string; position?: string; group_name?: string }
+  search: string,
+  filters?: { sub_area?: string; position?: string; group_name?: string }
 ) {
- const supabase = await createClient()
- const { data: { user } } = await supabase.auth.getUser()
- if (!user) return []
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return []
 
- let query = supabase.from('contacts')
- .select('id, name, phone, position, sub_area, polling_station')
- .eq('user_id', user.id)
- .eq('opt_out', false)
+  const allContacts: any[] = []
+  let from = 0
+  const limit = 1000
 
- if (search) {
- query = query.or(`name.ilike.%${search}%,phone.ilike.%${search}%,group_name.ilike.%${search}%`)
- }
+  while (true) {
+    let query = supabase.from('contacts')
+      .select('id, name, phone, position, sub_area, polling_station')
+      .eq('user_id', user.id)
+      .eq('opt_out', false)
 
- if (filters?.sub_area) query = query.eq('sub_area', filters.sub_area)
- if (filters?.position) query = query.eq('position', filters.position)
- if (filters?.group_name) query = query.eq('group_name', filters.group_name)
+    if (search) {
+      query = query.or(`name.ilike.%${search}%,phone.ilike.%${search}%,group_name.ilike.%${search}%`)
+    }
 
- const { data } = await query
- return data || []
+    if (filters?.sub_area) query = query.eq('sub_area', filters.sub_area)
+    if (filters?.position) query = query.eq('position', filters.position)
+    if (filters?.group_name) query = query.eq('group_name', filters.group_name)
+
+    query = query.range(from, from + limit - 1)
+
+    const { data, error } = await query
+    if (error) {
+      console.error('Error fetching all filtered contacts:', error)
+      break
+    }
+    allContacts.push(...(data || []))
+    if (!data || data.length < limit) break
+    from += limit
+  }
+
+  return allContacts
 }
 
 // Replace merge tags in a message template with actual contact data

@@ -3,6 +3,7 @@ import {
  CheckCircle2, XCircle, Clock, BarChart3, TrendingUp, 
  Zap, DollarSign, Wifi, AlertTriangle, Send 
 } from 'lucide-react'
+import MessageLogTable from './MessageLogTable'
 
 // Carrier brand colors
 const CARRIER_COLORS: Record<string, { bg: string; text: string; bar: string }> = {
@@ -173,73 +174,7 @@ export default async function ReportsPage() {
  </div>
 
  {/* ── Message Log Table ── */}
- <div className="bg-white rounded-xl shadow-sm border border-slate-200/80 overflow-hidden">
- <div className="px-6 py-4 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
- <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
- <Zap className="w-4 h-4 text-slate-400" />
- Recent Dispatch Audit Log
- </h2>
- <span className="text-xs text-slate-400 font-medium">Last 100 messages</span>
- </div>
- <div className="overflow-x-auto">
- <table className="min-w-full divide-y divide-gray-200">
- <thead className="bg-gray-50">
- <tr>
- <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Recipient</th>
- <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Message Content</th>
- <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
- <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sent At</th>
- </tr>
- </thead>
- <tbody className="bg-white divide-y divide-gray-200">
- {logs.length === 0 ? (
- <tr>
- <td colSpan={4} className="px-6 py-8 text-center text-sm text-gray-500">
- No messages have been sent yet.
- </td>
- </tr>
- ) : (
- logs.map((log) => (
- <tr key={log.id} className="hover:bg-gray-50 transition-colors">
- <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
- {log.recipient}
- </td>
- <td className="px-6 py-4 text-sm text-gray-500">
- <div className="line-clamp-2 max-w-md">{log.content}</div>
- </td>
- <td className="px-6 py-4 whitespace-nowrap text-sm">
- {log.status === 'sent' && (
- <span className="inline-flex items-center gap-1 text-green-700 bg-green-50 px-2 py-1 rounded-md font-medium">
- <CheckCircle2 className="w-4 h-4" /> Sent
- </span>
- )}
- {log.status === 'failed' && (
- <span className="inline-flex items-center gap-1 text-red-700 bg-red-50 px-2 py-1 rounded-md font-medium">
- <XCircle className="w-4 h-4" /> Failed
- </span>
- )}
- {log.status === 'pending' && (
- <span className="inline-flex items-center gap-1 text-amber-700 bg-amber-50 px-2 py-1 rounded-md font-medium">
- <Clock className="w-4 h-4" /> Pending
- </span>
- )}
- </td>
- <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500" suppressHydrationWarning>
- {new Date(log.sent_at).toLocaleString('en-GB', {
- day: '2-digit',
- month: 'short',
- year: 'numeric',
- hour: '2-digit',
- minute: '2-digit',
- })}
- </td>
- </tr>
- ))
- )}
- </tbody>
- </table>
- </div>
- </div>
+ <MessageLogTable initialLogs={logs} />
  </div>
  )
 }

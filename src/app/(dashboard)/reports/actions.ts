@@ -1,7 +1,7 @@
 'use server'
 
 import { createClient } from '@/utils/supabase/server'
-import { unstable_cache } from 'next/cache'
+import { unstable_cache, revalidatePath } from 'next/cache'
 
 export async function getMessageLogs() {
  const supabase = await createClient()
@@ -272,17 +272,67 @@ export async function getSMSAnalytics() {
  }, 0)
  const estimatedCost = totalSmsParts * SMS_UNIT_COST_GHS
 
- return {
- summary: {
- total,
- sent,
- failed,
- pending,
- successRate: total > 0 ? Math.round((sent / total) * 100) : 0,
- estimatedCost: estimatedCost.toFixed(2),
- totalSmsParts,
- },
- carrierData,
- timelineData,
- }
+  return {
+    summary: {
+      total,
+      sent,
+      failed,
+      pending,
+      successRate: total > 0 ? Math.round((sent / total) * 100) : 0,
+      estimatedCost: estimatedCost.toFixed(2),
+      totalSmsParts,
+    },
+    carrierData,
+    timelineData,
+  }
+}
+
+export async function resendMessages(messageIds: string[]) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Unauthorized' }
+
+  if (!messageIds || messageIds.length === 0) {
+    return { error: 'No messages selected' }
+  }
+
+  // 1. Fetch the source messages
+  const { data: sourceMessages, error: fetchError } = await supabase
+    .from('messages')
+    .select('*')
+    .in('id', messageIds)
+
+  if (fetchError || !sourceMessages || sourceMessages.length === 0) {
+    console.error('Error fetching source messages:', fetchError)
+    return { error: 'Failed to retrieve selected messages.' }
+  }
+
+  // 2. Clone them with pending status
+  const logs = sourceMessages.map(m => ({
+    user_id: user.id,
+    recipient: m.recipient,
+    content: m.content,
+    sender_id: m.sender_id || 'Rachael-RTK',
+    status: 'pending'
+  }))
+
+  const { error: insertError } = await supabase.from('messages').insert(logs)
+  if (insertError) {
+    console.error('Error re-inserting messages:', insertError)
+    return { error: 'Failed to re-queue messages.' }
+  }
+
+  // 3. Trigger edge function to process immediately
+  try {
+    const { error: invokeError } = await supabase.functions.invoke('process-messages')
+    if (invokeError) {
+      console.error('Error invoking process-messages on resend:', invokeError)
+    }
+  } catch (err) {
+    console.error('Failed to invoke process-messages on resend:', err)
+  }
+
+  revalidatePath('/reports')
+  revalidatePath('/')
+  return { success: true, count: logs.length }
 }
