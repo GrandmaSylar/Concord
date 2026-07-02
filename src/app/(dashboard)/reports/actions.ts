@@ -3,21 +3,29 @@
 import { createClient } from '@/utils/supabase/server'
 import { unstable_cache, revalidatePath } from 'next/cache'
 
-export async function getMessageLogs() {
- const supabase = await createClient()
+export async function getMessageLogs(startDate?: string, endDate?: string) {
+  const supabase = await createClient()
 
- const { data, error } = await supabase
- .from('messages')
- .select('*')
- .order('sent_at', { ascending: false })
- .limit(100)
+  let query = supabase
+    .from('messages')
+    .select('*')
+    .order('sent_at', { ascending: false })
 
- if (error) {
- console.error('Error fetching message logs:', error)
- return []
- }
+  if (startDate) {
+    query = query.gte('sent_at', startDate)
+  }
+  if (endDate) {
+    query = query.lte('sent_at', `${endDate}T23:59:59.999Z`)
+  }
 
- return data
+  const { data, error } = await query.limit(100)
+
+  if (error) {
+    console.error('Error fetching message logs:', error)
+    return []
+  }
+
+  return data
 }
 
 import { adminSupabase } from '@/utils/supabase/static'
@@ -207,33 +215,41 @@ function calculateMessageParts(content: string): number {
   }
 }
 
-export async function getSMSAnalytics() {
- const supabase = await createClient()
- const { data: { user } } = await supabase.auth.getUser()
- if (!user) throw new Error('Unauthorized')
+export async function getSMSAnalytics(startDate?: string, endDate?: string) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error('Unauthorized')
 
- // Fetch all non-simulation messages
- const limit = 1000
- let allMessages: any[] = []
- let from = 0
+  // Fetch all non-simulation messages
+  const limit = 1000
+  let allMessages: any[] = []
+  let from = 0
 
- while (true) {
- const { data, error } = await supabase
- .from('messages')
- .select('recipient, content, status, sent_at')
- .not('content', 'like', '[SIMULATION-DRYRUN]%')
- .order('sent_at', { ascending: false })
- .range(from, from + limit - 1)
+  while (true) {
+    let query = supabase
+      .from('messages')
+      .select('recipient, content, status, sent_at')
+      .not('content', 'like', '[SIMULATION-DRYRUN]%')
+      .order('sent_at', { ascending: false })
 
- if (error) {
- console.error('Error fetching analytics:', error)
- break
- }
- if (!data || data.length === 0) break
- allMessages = allMessages.concat(data)
- if (data.length < limit) break
- from += limit
- }
+    if (startDate) {
+      query = query.gte('sent_at', startDate)
+    }
+    if (endDate) {
+      query = query.lte('sent_at', `${endDate}T23:59:59.999Z`)
+    }
+
+    const { data, error } = await query.range(from, from + limit - 1)
+
+    if (error) {
+      console.error('Error fetching analytics:', error)
+      break
+    }
+    if (!data || data.length === 0) break
+    allMessages = allMessages.concat(data)
+    if (data.length < limit) break
+    from += limit
+  }
 
  const total = allMessages.length
  const sent = allMessages.filter(m => m.status === 'sent').length
@@ -300,7 +316,7 @@ export async function getSMSAnalytics() {
   }
 }
 
-export async function resendMessages(messageIds: string[]) {
+export async function resendMessages(messageIds: string[], customContent?: string) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'Unauthorized' }
@@ -335,7 +351,7 @@ export async function resendMessages(messageIds: string[]) {
   const logs = sourceMessages.map(m => ({
     user_id: user.id,
     recipient: m.recipient,
-    content: m.content,
+    content: customContent || m.content, // Use edited content if provided
     sender_id: m.sender_id || 'Rachael-RTK',
     status: 'pending'
   }))
@@ -361,16 +377,24 @@ export async function resendMessages(messageIds: string[]) {
   return { success: true, count: logs.length }
 }
 
-export async function getFailedMessageLogs() {
+export async function getFailedMessageLogs(startDate?: string, endDate?: string) {
   const supabase = await createClient()
 
-  const { data, error } = await supabase
+  let query = supabase
     .from('messages')
     .select('*')
     .eq('status', 'failed')
     .eq('retried', false) // Exclude previously retried dispatches
     .order('sent_at', { ascending: false })
-    .limit(1000) // Fetch all failures
+
+  if (startDate) {
+    query = query.gte('sent_at', startDate)
+  }
+  if (endDate) {
+    query = query.lte('sent_at', `${endDate}T23:59:59.999Z`)
+  }
+
+  const { data, error } = await query.limit(1000) // Fetch failures up to limit
 
   if (error) {
     console.error('Error fetching failed message logs:', error)

@@ -23,6 +23,7 @@ interface FailedMessageLog {
 export default function FailedMessagesCard({ failedLogs }: { failedLogs: FailedMessageLog[] }) {
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const [customMessage, setCustomMessage] = useState('')
   const [isPending, startTransition] = useTransition()
 
   // Filter based on search input
@@ -37,8 +38,12 @@ export default function FailedMessagesCard({ failedLogs }: { failedLogs: FailedM
     const next = new Set(selectedIds)
     if (isAllSelected) {
       filteredLogs.forEach(log => next.delete(log.id))
+      setCustomMessage('')
     } else {
       filteredLogs.forEach(log => next.add(log.id))
+      if (filteredLogs.length > 0) {
+        setCustomMessage(filteredLogs[0].content)
+      }
     }
     setSelectedIds(next)
   }
@@ -47,8 +52,15 @@ export default function FailedMessagesCard({ failedLogs }: { failedLogs: FailedM
     const next = new Set(selectedIds)
     if (next.has(id)) {
       next.delete(id)
+      if (next.size === 0) {
+        setCustomMessage('')
+      }
     } else {
       next.add(id)
+      if (next.size === 1) {
+        const log = failedLogs.find(l => l.id === id)
+        if (log) setCustomMessage(log.content)
+      }
     }
     setSelectedIds(next)
   }
@@ -57,12 +69,13 @@ export default function FailedMessagesCard({ failedLogs }: { failedLogs: FailedM
     if (selectedIds.size === 0) return
 
     startTransition(async () => {
-      const res = await resendMessages(Array.from(selectedIds))
+      const res = await resendMessages(Array.from(selectedIds), customMessage || undefined)
       if (res.error) {
         toast.error(res.error)
       } else {
         toast.success(`Successfully re-queued ${res.count} failed messages for delivery retry!`)
         setSelectedIds(new Set())
+        setCustomMessage('')
       }
     })
   }
@@ -101,17 +114,38 @@ export default function FailedMessagesCard({ failedLogs }: { failedLogs: FailedM
         )}
       </div>
 
-      {/* Search Input Filter */}
+      {/* Search Input Filter & Custom Message Input */}
       {failedLogs.length > 0 && (
-        <div className="px-6 relative w-full max-w-sm">
-          <Search className="absolute left-9 top-1/2 -translate-y-1/2 text-slate-455 w-4 h-4" />
-          <input
-            type="text"
-            placeholder="Search failed recipient or text..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-9 w-full rounded-lg border-slate-200 shadow-sm focus:border-red-500 focus:ring-red-500 text-xs py-2 px-3 border bg-white text-slate-900"
-          />
+        <div className="px-6 flex flex-col gap-4">
+          <div className="relative w-full max-w-sm">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
+            <input
+              type="text"
+              placeholder="Search failed recipient or text..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-9 w-full rounded-lg border-slate-200 shadow-sm focus:border-red-500 focus:ring-red-500 text-xs py-2 px-3 border bg-white text-slate-900"
+            />
+          </div>
+
+          {selectedIds.size > 0 && (
+            <div className="p-4 rounded-xl bg-red-50/30 border border-red-100 flex flex-col gap-2.5 animate-in slide-in-from-top-1 duration-200">
+              <div className="flex justify-between items-center">
+                <label className="text-xs font-bold text-red-950">Edit SMS Message for Selected Recipients (Optional)</label>
+                <span className="text-[10px] font-semibold text-slate-500">{customMessage.length} characters</span>
+              </div>
+              <textarea
+                value={customMessage}
+                onChange={(e) => setCustomMessage(e.target.value)}
+                rows={3}
+                className="w-full rounded-lg border border-slate-200 shadow-sm focus:border-red-500 focus:ring-red-500 text-xs py-2 px-3 bg-white text-slate-900 font-medium"
+                placeholder="Type the message content to send..."
+              />
+              <p className="text-[10px] text-red-700/80 leading-normal">
+                * Note: Modifying this text will apply the new message content to all selected recipients when resent. Leave as-is to retry the original content.
+              </p>
+            </div>
+          )}
         </div>
       )}
 

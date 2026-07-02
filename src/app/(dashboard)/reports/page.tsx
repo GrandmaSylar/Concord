@@ -6,6 +6,7 @@ import {
 import MessageLogTable from './MessageLogTable'
 import FailedMessagesCard from './FailedMessagesCard'
 import AnomalyContactsCard from './AnomalyContactsCard'
+import DateFilter from './DateFilter'
 
 // Carrier brand colors
 const CARRIER_COLORS: Record<string, { bg: string; text: string; bar: string }> = {
@@ -15,11 +16,19 @@ const CARRIER_COLORS: Record<string, { bg: string; text: string; bar: string }> 
  'Other': { bg: 'bg-slate-50', text: 'text-slate-600', bar: 'bg-slate-400' },
 }
 
-export default async function ReportsPage() {
+interface ReportsPageProps {
+  searchParams: Promise<{ startDate?: string; endDate?: string }>
+}
+
+export default async function ReportsPage({ searchParams }: ReportsPageProps) {
+ const params = await searchParams
+ const startDate = params.startDate
+ const endDate = params.endDate
+
  const [logs, analytics, failedLogs, anomalies] = await Promise.all([
- getMessageLogs(),
- getSMSAnalytics(),
- getFailedMessageLogs(),
+ getMessageLogs(startDate, endDate),
+ getSMSAnalytics(startDate, endDate),
+ getFailedMessageLogs(startDate, endDate),
  getAnomalyContacts(),
  ])
 
@@ -28,10 +37,15 @@ export default async function ReportsPage() {
 
  return (
  <div className="flex flex-col gap-8 pb-12">
+ <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
  <div>
  <h1 className="text-2xl font-bold tracking-tight text-gray-900">SMS Analytics & Delivery Reports</h1>
  <p className="text-sm text-gray-500 mt-1">Comprehensive gateway performance metrics, carrier distribution analysis, and delivery audit logs.</p>
  </div>
+ </div>
+
+ {/* Date Parameter Filter Tool */}
+ <DateFilter />
 
  {/* ── Summary Stat Cards ── */}
  <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
