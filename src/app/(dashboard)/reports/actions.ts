@@ -301,6 +301,54 @@ export async function getSMSAnalytics(startDate?: string, endDate?: string) {
   }, 0)
   const estimatedCost = totalSmsParts * SMS_UNIT_COST_GHS
 
+  // Group messages into campaign batches in memory
+  const batchesList: any[] = []
+  const sortedMessages = [...allMessages].sort((a, b) => new Date(a.sent_at).getTime() - new Date(b.sent_at).getTime())
+
+  sortedMessages.forEach(m => {
+    if (!m.sent_at) return
+    const time = new Date(m.sent_at).getTime()
+    const contentPrefix = (m.content || '').substring(0, 40)
+    
+    const matchingBatch = batchesList.find(b => {
+      const timeDiff = Math.abs(b.startTime - time)
+      const contentMatches = b.contentPrefix === contentPrefix
+      return timeDiff <= 180000 && contentMatches // Clustered within 3 minutes
+    })
+
+    if (matchingBatch) {
+      matchingBatch.messages.push(m)
+      matchingBatch.endTime = Math.max(matchingBatch.endTime, time)
+    } else {
+      batchesList.push({
+        id: `batch_${time}_${Math.random().toString(36).substring(2, 7)}`,
+        content: m.content,
+        contentPrefix,
+        startTime: time,
+        endTime: time,
+        messages: [m]
+      })
+    }
+  })
+
+  const batches = batchesList.map(b => {
+    const totalCount = b.messages.length
+    const sentCount = b.messages.filter((m: any) => m.status === 'sent').length
+    const failedCount = b.messages.filter((m: any) => m.status === 'failed').length
+    const pendingCount = b.messages.filter((m: any) => m.status === 'pending').length
+    
+    return {
+      id: b.id,
+      timestamp: new Date(b.startTime).toISOString(),
+      content: b.content,
+      total: totalCount,
+      sent: sentCount,
+      failed: failedCount,
+      pending: pendingCount,
+      successRate: totalCount > 0 ? Math.round((sentCount / totalCount) * 100) : 0
+    }
+  }).sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+
   return {
     summary: {
       total,
@@ -313,6 +361,7 @@ export async function getSMSAnalytics(startDate?: string, endDate?: string) {
     },
     carrierData,
     timelineData,
+    batches
   }
 }
 

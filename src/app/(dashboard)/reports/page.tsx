@@ -8,6 +8,7 @@ import FailedMessagesCard from './FailedMessagesCard'
 import AnomalyContactsCard from './AnomalyContactsCard'
 import DateFilter from './DateFilter'
 import ExportButtons from './ExportButtons'
+import BatchAnalysisCard from './BatchAnalysisCard'
 
 // Carrier brand colors
 const CARRIER_COLORS: Record<string, { bg: string; text: string; bar: string }> = {
@@ -33,7 +34,7 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
  getAnomalyContacts(),
  ])
 
- const { summary, carrierData, timelineData } = analytics
+ const { summary, carrierData, timelineData, batches } = analytics
  const maxDailyVolume = Math.max(...timelineData.map(d => d.sent + d.failed), 1)
 
  return (
@@ -194,6 +195,9 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
  </div>
  </div>
  </div>
+
+ {/* ── Campaign Batch Analysis ── */}
+ <BatchAnalysisCard batches={batches} />
 
  {/* ── Failed Messages Card ── */}
  <FailedMessagesCard failedLogs={failedLogs} />
