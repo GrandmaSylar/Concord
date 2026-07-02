@@ -336,3 +336,21 @@ export async function resendMessages(messageIds: string[]) {
   revalidatePath('/')
   return { success: true, count: logs.length }
 }
+
+export async function getFailedMessageLogs() {
+  const supabase = await createClient()
+
+  const { data, error } = await supabase
+    .from('messages')
+    .select('*')
+    .eq('status', 'failed')
+    .order('sent_at', { ascending: false })
+    .limit(100)
+
+  if (error) {
+    console.error('Error fetching failed message logs:', error)
+    return []
+  }
+
+  return data
+}

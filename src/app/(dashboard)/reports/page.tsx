@@ -1,9 +1,10 @@
-import { getMessageLogs, getSMSAnalytics } from './actions'
+import { getMessageLogs, getSMSAnalytics, getFailedMessageLogs } from './actions'
 import { 
  CheckCircle2, XCircle, Clock, BarChart3, TrendingUp, 
  Zap, DollarSign, Wifi, AlertTriangle, Send 
 } from 'lucide-react'
 import MessageLogTable from './MessageLogTable'
+import FailedMessagesCard from './FailedMessagesCard'
 
 // Carrier brand colors
 const CARRIER_COLORS: Record<string, { bg: string; text: string; bar: string }> = {
@@ -14,9 +15,10 @@ const CARRIER_COLORS: Record<string, { bg: string; text: string; bar: string }> 
 }
 
 export default async function ReportsPage() {
- const [logs, analytics] = await Promise.all([
+ const [logs, analytics, failedLogs] = await Promise.all([
  getMessageLogs(),
  getSMSAnalytics(),
+ getFailedMessageLogs(),
  ])
 
  const { summary, carrierData, timelineData } = analytics
@@ -172,6 +174,9 @@ export default async function ReportsPage() {
  </div>
  </div>
  </div>
+
+ {/* ── Failed Messages Card ── */}
+ <FailedMessagesCard failedLogs={failedLogs} />
 
  {/* ── Message Log Table ── */}
  <MessageLogTable initialLogs={logs} />
