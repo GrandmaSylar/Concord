@@ -15,7 +15,7 @@ serve(async (req?: Request) => {
   const startTime = Date.now();
   
   let dryRun = false;
-  let customTimeLimit = 12000;
+  let customTimeLimit = 120000; // Increased to 120 seconds to process larger batches in a single run
   let customLatency = 0;
 
   try {
@@ -51,6 +51,24 @@ serve(async (req?: Request) => {
   const results: Array<{ content: string; sender?: string; count: number; status: string }> = [];
 
   try {
+    // Auto-recover messages stuck in 'processing' status for more than 3 minutes
+    try {
+      const threeMinutesAgo = new Date(Date.now() - 3 * 60 * 1000).toISOString();
+      const { data: recoveredData, error: recoveryError } = await supabaseAdmin
+        .from("messages")
+        .update({ status: "pending" })
+        .eq("status", "processing")
+        .lt("sent_at", threeMinutesAgo)
+        .select("id");
+
+      if (recoveryError) {
+        console.error("Failed to auto-recover stuck messages:", recoveryError);
+      } else if (recoveredData && recoveredData.length > 0) {
+        console.info(`Successfully recovered ${recoveredData.length} stuck messages back to 'pending'.`);
+      }
+    } catch (recoveryErr) {
+      console.error("Error during stuck messages recovery:", recoveryErr);
+    }
     while (true) {
       // Keep-alive safety check
       if (Date.now() - startTime > TIME_LIMIT_MS) {
