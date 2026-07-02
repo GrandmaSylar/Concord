@@ -191,7 +191,21 @@ function detectCarrier(phone: string): string {
  return 'Other'
 }
 
-const SMS_UNIT_COST_GHS = 0.02
+const SMS_UNIT_COST_GHS = 0.039
+
+function calculateMessageParts(content: string): number {
+  const gsm7Regex = /^[A-Za-z0-9@£$¥èéùìòÇ\n\rÅåΔ_ΦΓΛΩΠΨΣΘΞÆæßÉ !"¤%&'()*+,\-./:;<=>?¡ÄÖÑÜ§¿äöñüà\^{}\\[~\]|€]*$/;
+  const isGsm = gsm7Regex.test(content);
+  const length = content.length;
+
+  if (isGsm) {
+    if (length <= 160) return 1;
+    return Math.ceil(length / 153);
+  } else {
+    if (length <= 70) return 1;
+    return Math.ceil(length / 67);
+  }
+}
 
 export async function getSMSAnalytics() {
  const supabase = await createClient()
@@ -265,12 +279,11 @@ export async function getSMSAnalytics() {
  ...counts
  }))
 
- // Cost estimation
- const totalSmsParts = allMessages.reduce((acc, m) => {
- const len = (m.content || '').length
- return acc + Math.ceil((len || 1) / 160)
- }, 0)
- const estimatedCost = totalSmsParts * SMS_UNIT_COST_GHS
+  // Cost estimation
+  const totalSmsParts = allMessages.reduce((acc, m) => {
+    return acc + calculateMessageParts(m.content || '')
+  }, 0)
+  const estimatedCost = totalSmsParts * SMS_UNIT_COST_GHS
 
   return {
     summary: {
