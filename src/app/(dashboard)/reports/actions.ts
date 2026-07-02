@@ -320,6 +320,17 @@ export async function resendMessages(messageIds: string[]) {
     return { error: 'Failed to retrieve selected messages.' }
   }
 
+  // Mark the original failed messages as retried so they disappear from the failed console
+  const { error: updateError } = await supabase
+    .from('messages')
+    .update({ retried: true })
+    .in('id', messageIds)
+
+  if (updateError) {
+    console.error('Error marking source messages as retried:', updateError)
+    // Non-blocking, continue execution
+  }
+
   // 2. Clone them with pending status
   const logs = sourceMessages.map(m => ({
     user_id: user.id,
@@ -357,8 +368,9 @@ export async function getFailedMessageLogs() {
     .from('messages')
     .select('*')
     .eq('status', 'failed')
+    .eq('retried', false) // Exclude previously retried dispatches
     .order('sent_at', { ascending: false })
-    .limit(1000) // Increased limit to fetch all failures
+    .limit(1000) // Fetch all failures
 
   if (error) {
     console.error('Error fetching failed message logs:', error)
