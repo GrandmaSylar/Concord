@@ -7,6 +7,7 @@ import MessageLogTable from './MessageLogTable'
 import FailedMessagesCard from './FailedMessagesCard'
 import AnomalyContactsCard from './AnomalyContactsCard'
 import DateFilter from './DateFilter'
+import ExportButtons from './ExportButtons'
 
 // Carrier brand colors
 const CARRIER_COLORS: Record<string, { bg: string; text: string; bar: string }> = {
@@ -46,6 +47,9 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
 
  {/* Date Parameter Filter Tool */}
  <DateFilter />
+
+ {/* Export Utility Toolbar */}
+ <ExportButtons logs={logs} summary={summary} />
 
  {/* ── Summary Stat Cards ── */}
  <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">

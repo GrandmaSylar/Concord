@@ -401,7 +401,7 @@ export async function getFailedMessageLogs(startDate?: string, endDate?: string)
     return []
   }
 
-  return data
+  return data || []
 }
 
 export async function getAnomalyContacts() {
