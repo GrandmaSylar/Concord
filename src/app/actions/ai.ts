@@ -3,8 +3,6 @@
 import { GoogleGenAI } from '@google/genai'
 import { createClient } from '@/utils/supabase/server'
 
-const apiKey = process.env.GEMINI_API_KEY
-
 // Fallback model chain — if the primary model is rate-limited or not supported, try alternatives
 const MODEL_CHAIN = [
  'gemini-2.5-flash',
@@ -17,6 +15,8 @@ export async function generateCampaignDrafts(
  prompt: string,
  context: { position?: string; subArea?: string }
 ) {
+ const apiKey = process.env.GEMINI_API_KEY
+ 
  if (!apiKey) {
  return {
  error: 'Gemini API key is not configured. Please add GEMINI_API_KEY to your environment variables.',
