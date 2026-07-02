@@ -1,4 +1,4 @@
-import { getMessageLogs, getSMSAnalytics, getAnomalyContacts } from '../actions'
+import { getMessageLogs, getAnomalyContacts } from '../actions'
 import ReportsHeader from '../ReportsHeader'
 import AnomalyContactsCard from '../AnomalyContactsCard'
 
@@ -11,21 +11,15 @@ export default async function AnomaliesPage({ searchParams }: Props) {
   const startDate = params.startDate
   const endDate = params.endDate
 
-  const [logs, analytics, anomalies] = await Promise.all([
+  const [logs, anomalies] = await Promise.all([
     getMessageLogs(startDate, endDate),
-    getSMSAnalytics(startDate, endDate),
     getAnomalyContacts(),
   ])
-
-  const { summary, carrierData, timelineData } = analytics
 
   return (
     <div className="flex flex-col gap-8 pb-12">
       <ReportsHeader
         activeTab="anomalies"
-        summary={summary}
-        carrierData={carrierData}
-        timelineData={timelineData}
         logs={logs}
       />
       <AnomalyContactsCard anomalies={anomalies} />
