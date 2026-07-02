@@ -302,18 +302,30 @@ export async function getSMSAnalytics(startDate?: string, endDate?: string) {
   const estimatedCost = totalSmsParts * SMS_UNIT_COST_GHS
 
   // Group messages into campaign batches in memory
+  // Uses a sliding window: compare new message time against the batch's LAST message (endTime)
+  // so that a campaign running for 30+ minutes still clusters as one batch.
+  // Content matching strips personalized merge fields (names, etc.) to match by template.
   const batchesList: any[] = []
   const sortedMessages = [...allMessages].sort((a, b) => new Date(a.sent_at).getTime() - new Date(b.sent_at).getTime())
+
+  // Normalize content to a template fingerprint (strip names and numbers that vary per recipient)
+  const getContentFingerprint = (content: string) => {
+    return (content || '')
+      .replace(/^(Hi|Dear|Hello)\s+[A-Z][A-Z\s'-]+,/i, 'GREETING,') // Strip personalized greeting
+      .replace(/\[SIMULATION-DRYRUN\]\s*Campaign recipient #\d+/g, '[SIM]') // Normalize simulation prefix
+      .substring(0, 60)
+  }
 
   sortedMessages.forEach(m => {
     if (!m.sent_at) return
     const time = new Date(m.sent_at).getTime()
-    const contentPrefix = (m.content || '').substring(0, 40)
+    const fingerprint = getContentFingerprint(m.content || '')
     
+    // Find a batch where this message's timestamp is within 5 minutes of the batch's LATEST message
     const matchingBatch = batchesList.find(b => {
-      const timeDiff = Math.abs(b.startTime - time)
-      const contentMatches = b.contentPrefix === contentPrefix
-      return timeDiff <= 180000 && contentMatches // Clustered within 3 minutes
+      const timeDiff = time - b.endTime // Only look forward from the last message
+      const contentMatches = b.fingerprint === fingerprint
+      return timeDiff >= 0 && timeDiff <= 300000 && contentMatches // 5-minute sliding window
     })
 
     if (matchingBatch) {
@@ -323,7 +335,7 @@ export async function getSMSAnalytics(startDate?: string, endDate?: string) {
       batchesList.push({
         id: `batch_${time}_${Math.random().toString(36).substring(2, 7)}`,
         content: m.content,
-        contentPrefix,
+        fingerprint,
         startTime: time,
         endTime: time,
         messages: [m]
