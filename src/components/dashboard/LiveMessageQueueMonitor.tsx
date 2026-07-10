@@ -54,52 +54,59 @@ function formatTimeAgo(dateString: string | null) {
 }
 
 export default function LiveMessageQueueMonitor() {
- const [stats, setStats] = useState<QueueStats | null>(null)
- const [loading, setLoading] = useState(true)
- const [lastRefresh, setLastRefresh] = useState<Date>(new Date())
- const [prevSentCount, setPrevSentCount] = useState(0)
- const [throughput, setThroughput] = useState(0)
- const [isPolling, setIsPolling] = useState(true)
- const [manualRefreshing, setManualRefreshing] = useState(false)
+  const [stats, setStats] = useState<QueueStats | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [lastRefresh, setLastRefresh] = useState<Date>(new Date())
+  const [prevSentCount, setPrevSentCount] = useState(0)
+  const [throughput, setThroughput] = useState(0)
+  const [isPolling, setIsPolling] = useState(true)
+  const [manualRefreshing, setManualRefreshing] = useState(false)
+  const [startDate, setStartDate] = useState('')
+  const [endDate, setEndDate] = useState('')
 
- const fetchStats = useCallback(async () => {
- try {
- const data = await getLiveMessageQueueStats()
- setStats((prev) => {
- // Calculate throughput based on difference in sent count
- if (prev) {
- const sentDiff = data.counts.sent - prev.counts.sent
- if (sentDiff > 0) {
- setThroughput(sentDiff)
- } else {
- setThroughput((t) => Math.max(0, t * 0.7)) // decay
- }
- }
- return data
- })
- setPrevSentCount(data.counts.sent)
- setLastRefresh(new Date())
- } catch (e) {
- console.error('Failed to fetch live queue stats:', e)
- } finally {
- setLoading(false)
- }
- }, [])
+  const fetchStats = useCallback(async (start?: string, end?: string) => {
+    try {
+      const data = await getLiveMessageQueueStats(start || undefined, end || undefined)
+      setStats((prev) => {
+        // Calculate throughput based on difference in sent count
+        if (prev) {
+          const sentDiff = data.counts.sent - prev.counts.sent
+          if (sentDiff > 0) {
+            setThroughput(sentDiff)
+          } else {
+            setThroughput((t) => Math.max(0, t * 0.7)) // decay
+          }
+        }
+        return data
+      })
+      setPrevSentCount(data.counts.sent)
+      setLastRefresh(new Date())
+    } catch (e) {
+      console.error('Failed to fetch live queue stats:', e)
+    } finally {
+      setLoading(false)
+    }
+  }, [])
 
- // Initial fetch + polling
- useEffect(() => {
- fetchStats()
- const interval = setInterval(() => {
- if (isPolling) fetchStats()
- }, 3000)
- return () => clearInterval(interval)
- }, [fetchStats, isPolling])
+  // Initial fetch + polling
+  useEffect(() => {
+    const shouldPoll = isPolling && !startDate && !endDate
+    
+    fetchStats(startDate, endDate)
+    
+    if (!shouldPoll) return
+    
+    const interval = setInterval(() => {
+      fetchStats(startDate, endDate)
+    }, 3000)
+    return () => clearInterval(interval)
+  }, [fetchStats, isPolling, startDate, endDate])
 
- const handleManualRefresh = async () => {
- setManualRefreshing(true)
- await fetchStats()
- setManualRefreshing(false)
- }
+  const handleManualRefresh = async () => {
+    setManualRefreshing(true)
+    await fetchStats(startDate, endDate)
+    setManualRefreshing(false)
+  }
 
  if (loading || !stats) {
  return (
@@ -167,7 +174,7 @@ export default function LiveMessageQueueMonitor() {
  return (
  <div className="bg-white rounded-xl shadow-sm border border-slate-200/80 p-6 space-y-5">
  {/* Header */}
- <div className="flex items-center justify-between">
+ <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
  <div className="flex items-center gap-3">
  <div className={`p-2.5 rounded-lg ${isActive ? 'bg-indigo-50 text-indigo-600' : 'bg-slate-50 text-slate-500'}`}>
  <Activity className={`w-5 h-5 ${isActive ? 'animate-pulse' : ''}`} />
@@ -182,10 +189,10 @@ export default function LiveMessageQueueMonitor() {
  </span>
  )}
  </h2>
- <p className="text-xs text-slate-500">
- Live dispatch pipeline status — auto-refreshes every 3s
- </p>
- </div>
+  <p className="text-xs text-slate-500">
+    {(startDate || endDate) ? 'Filtered queue status — auto-refresh paused' : 'Live dispatch pipeline status — auto-refreshes every 3s'}
+  </p>
+  </div>
  </div>
  <div className="flex items-center gap-2">
  <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold border ${status.color}`}>
@@ -202,6 +209,44 @@ export default function LiveMessageQueueMonitor() {
  </button>
  </div>
  </div>
+
+ {/* Date Filters Row */}
+ <div className="flex flex-wrap items-center gap-3 bg-slate-50 p-3 rounded-xl border border-slate-100/80">
+    <div className="flex items-center gap-2">
+      <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Date Filters:</span>
+      {(!startDate && !endDate) && (
+        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-bold bg-blue-100 text-blue-800 border border-blue-200">
+          Current Batch Only
+        </span>
+      )}
+    </div>
+    <div className="flex items-center gap-2 flex-1 min-w-[200px]">
+      <input
+        type="date"
+        value={startDate}
+        onChange={(e) => setStartDate(e.target.value)}
+        className="bg-white border border-slate-200 rounded-lg text-xs py-1 px-2.5 text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+      />
+      <span className="text-slate-400 text-xs">to</span>
+      <input
+        type="date"
+        value={endDate}
+        onChange={(e) => setEndDate(e.target.value)}
+        className="bg-white border border-slate-200 rounded-lg text-xs py-1 px-2.5 text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+      />
+      {(startDate || endDate) && (
+        <button
+          onClick={() => {
+            setStartDate('')
+            setEndDate('')
+          }}
+          className="text-xs text-red-600 hover:text-red-800 font-bold hover:underline transition-colors cursor-pointer"
+        >
+          Reset
+        </button>
+      )}
+    </div>
+  </div>
 
  {/* Status Cards Grid */}
  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">

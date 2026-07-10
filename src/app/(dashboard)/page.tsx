@@ -231,11 +231,11 @@ export default async function DashboardOverview() {
  Recent Outgoing Activity
  </h2>
  <Link 
- href="/reports" 
- className="text-xs font-semibold text-theme-primary hover:underline flex items-center gap-1.5"
- >
- See All Logs <ArrowUpRight className="w-3.5 h-3.5" />
- </Link>
+  href="/reports" 
+  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-50 text-slate-700 border border-slate-200 hover:bg-slate-100 hover:text-slate-800 transition-all hover:scale-[1.02] active:scale-95 shadow-xs cursor-pointer"
+  >
+  See All Logs <ArrowUpRight className="w-3.5 h-3.5" />
+  </Link>
  </div>
 
  <div className="flex-1 space-y-4">

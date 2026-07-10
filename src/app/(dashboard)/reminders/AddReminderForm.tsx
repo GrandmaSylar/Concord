@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { addReminder } from './actions'
 import { getFilteredContacts, getAllFilteredContacts } from '../send/actions'
-import { Clock, Search, ChevronLeft, ChevronRight, Filter, UserPlus, Sparkles } from 'lucide-react'
+import { Clock, Search, ChevronLeft, ChevronRight, Filter, UserPlus, Sparkles, Smartphone, CheckCircle2, X, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 import SystemConfirmDialog from '@/components/ui/SystemConfirmDialog'
 import AIAssistantWidget from '@/components/ui/AIAssistantWidget'
@@ -65,6 +65,9 @@ export default function AddReminderForm({
  // Store full contact info for merge tag personalization and scheduling
  const [selectedContacts, setSelectedContacts] = useState<Map<string, ContactInfo>>(new Map())
 
+ // Selection Loading State
+ const [selectingState, setSelectingState] = useState<'matching' | 'phone' | null>(null)
+
  useEffect(() => {
  async function loadContacts() {
  setLoadingContacts(true)
@@ -112,6 +115,7 @@ export default function AddReminderForm({
  // Select ALL contacts matching the current search (fetches from DB)
  const handleSelectAllMatching = async () => {
  setLoadingContacts(true)
+ setSelectingState('matching')
  const filters = {
  sub_area: filterSubArea || undefined,
  position: filterPosition || undefined,
@@ -122,6 +126,39 @@ export default function AddReminderForm({
  allContacts.forEach((c: ContactInfo) => next.set(c.id, c))
  setSelectedContacts(next)
  setLoadingContacts(false)
+ setSelectingState(null)
+ }
+
+ // Select all matching contacts that possess a valid phone number
+ const handleSelectAllWithPhone = async () => {
+ setLoadingContacts(true)
+ setSelectingState('phone')
+ const filters = {
+ sub_area: filterSubArea || undefined,
+ position: filterPosition || undefined,
+ group_name: filterGroup || undefined
+ }
+ const allContacts = await getAllFilteredContacts(search, filters)
+ const next = new Map(selectedContacts)
+ let selectedCount = 0
+ allContacts.forEach((c: any) => {
+ const cleanPhone = c.phone?.trim()
+ if (cleanPhone) {
+ next.set(c.id, { 
+ id: c.id,
+ name: c.name, 
+ phone: cleanPhone, 
+ position: c.position, 
+ sub_area: c.sub_area, 
+ polling_station: c.polling_station 
+ })
+ selectedCount++
+ }
+ })
+ setSelectedContacts(next)
+ setLoadingContacts(false)
+ setSelectingState(null)
+ toast.success(`Selected ${selectedCount} contacts with phone numbers.`)
  }
 
  const handleClearSelection = () => {
@@ -265,12 +302,13 @@ export default function AddReminderForm({
  )}
  
  {(filterSubArea || filterPosition || filterGroup) && (
- <button 
- onClick={() => { setFilterSubArea(''); setFilterPosition(''); setFilterGroup(''); setPage(1); }}
- className="text-xs text-red-600 hover:underline flex items-center px-2 font-medium"
- >
- Clear Filters
- </button>
+    <button 
+      onClick={() => { setFilterSubArea(''); setFilterPosition(''); setFilterGroup(''); setPage(1); }}
+      className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 hover:border-red-300 transition-all hover:scale-[1.02] active:scale-95 shadow-xs cursor-pointer"
+    >
+      <X className="w-3 h-3" />
+      Clear Filters
+    </button>
  )}
  </div>
 
@@ -301,24 +339,45 @@ export default function AddReminderForm({
  </div>
 
  {/* Selection Actions */}
- <div className="flex flex-wrap gap-3 mb-4 text-sm">
- <button 
- type="button" 
- onClick={handleSelectAllMatching}
- className="text-blue-600 font-medium hover:text-blue-700 hover:underline transition-all active:scale-95"
- >
- Select All Matching Contacts ({total})
- </button>
- {selectedContacts.size > 0 && (
- <button 
- type="button" 
- onClick={handleClearSelection}
- className="text-red-600 font-medium hover:text-red-700 hover:underline transition-all active:scale-95"
- >
- Clear Selection
- </button>
- )}
- </div>
+  <div className="flex flex-wrap items-center gap-2 mb-4">
+    <button 
+      type="button" 
+      onClick={handleSelectAllMatching}
+      disabled={selectingState !== null}
+      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100 hover:border-blue-300 transition-all hover:scale-[1.02] active:scale-95 shadow-xs cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+    >
+      {selectingState === 'matching' ? (
+        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+      ) : (
+        <CheckCircle2 className="w-3.5 h-3.5" />
+      )}
+      Select All Matching ({total})
+    </button>
+    <button 
+      type="button" 
+      onClick={handleSelectAllWithPhone}
+      disabled={selectingState !== null}
+      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200 hover:bg-indigo-100 hover:border-indigo-300 transition-all hover:scale-[1.02] active:scale-95 shadow-xs cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+    >
+      {selectingState === 'phone' ? (
+        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+      ) : (
+        <Smartphone className="w-3.5 h-3.5" />
+      )}
+      Select All with Phone Numbers
+    </button>
+    {selectedContacts.size > 0 && (
+      <button 
+        type="button" 
+        onClick={handleClearSelection}
+        disabled={selectingState !== null}
+        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-red-50 text-red-700 border border-red-200 hover:bg-red-100 hover:border-red-300 transition-all hover:scale-[1.02] active:scale-95 shadow-xs cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        <X className="w-3.5 h-3.5" />
+        Clear Selection
+      </button>
+    )}
+  </div>
 
  {/* Contacts Table */}
  <div className="border border-gray-200 rounded-lg overflow-hidden relative min-h-[300px]">

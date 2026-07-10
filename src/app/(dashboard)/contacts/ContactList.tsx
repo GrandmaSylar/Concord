@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { Search, Power, Pencil } from 'lucide-react'
+import { Search, Power, Pencil, X } from 'lucide-react'
 import { toggleOptOut } from './actions'
 import EditContactDialog from './EditContactDialog'
 
@@ -107,13 +107,14 @@ export default function ContactList({
  )}
  
  {(filterSubArea || filterPosition || filterGroup) && (
- <button 
- onClick={() => { setFilterSubArea(''); setFilterPosition(''); setFilterGroup(''); }}
- className="text-xs text-red-600 hover:underline flex items-center px-2 font-medium"
- >
- Clear Filters
- </button>
- )}
+    <button 
+      onClick={() => { setFilterSubArea(''); setFilterPosition(''); setFilterGroup(''); }}
+      className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 hover:border-red-300 transition-all hover:scale-[1.02] active:scale-95 shadow-xs cursor-pointer"
+    >
+      <X className="w-3 h-3" />
+      Clear Filters
+    </button>
+  )}
  </div>
 
  <div className="relative w-full">

@@ -93,85 +93,130 @@ export async function getDashboardStats() {
  )()
 }
 
+// Helper to fetch live queue stats, optionally filtering by date range
+async function fetchQueueStats(startDate?: string, endDate?: string) {
+  try {
+    const statuses = ['pending', 'processing', 'sent', 'failed'] as const
+
+    // 1. Determine date filter range
+    let effectiveStartDate: string | undefined = startDate
+    let effectiveEndDate: string | undefined = endDate
+
+    if (!startDate && !endDate) {
+      // By default, find the "current batch" based on the latest message timestamp
+      const { data: latestMsg, error: latestError } = await adminSupabase
+        .from('messages')
+        .select('sent_at')
+        .not('content', 'like', '[SIMULATION-DRYRUN]%')
+        .order('sent_at', { ascending: false })
+        .limit(1)
+
+      if (latestMsg && latestMsg.length > 0 && !latestError) {
+        const latestTime = new Date(latestMsg[0].sent_at)
+        // Set the batch start time to 10 minutes before the latest message was sent to capture the current campaign
+        effectiveStartDate = new Date(latestTime.getTime() - 10 * 60 * 1000).toISOString()
+      }
+    }
+
+    // 2. Count messages per status within the range
+    const countPromises = statuses.map(async (status) => {
+      let query = adminSupabase
+        .from('messages')
+        .select('*', { count: 'exact', head: true })
+        .not('content', 'like', '[SIMULATION-DRYRUN]%')
+        .eq('status', status)
+
+      if (effectiveStartDate) {
+        query = query.gte('sent_at', effectiveStartDate)
+      }
+      if (effectiveEndDate) {
+        query = query.lte('sent_at', `${effectiveEndDate}T23:59:59.999Z`)
+      }
+
+      const { count, error } = await query
+      if (error) throw error
+      return { status, count: count || 0 }
+    })
+
+    // 3. Get recent active messages within the range
+    let recentActiveQuery = adminSupabase
+      .from('messages')
+      .select('id, recipient, content, status, sent_at, sender_id')
+      .not('content', 'like', '[SIMULATION-DRYRUN]%')
+      .in('status', ['pending', 'processing'])
+      .order('sent_at', { ascending: false })
+
+    if (effectiveStartDate) {
+      recentActiveQuery = recentActiveQuery.gte('sent_at', effectiveStartDate)
+    }
+    if (effectiveEndDate) {
+      recentActiveQuery = recentActiveQuery.lte('sent_at', `${effectiveEndDate}T23:59:59.999Z`)
+    }
+
+    // 4. Get recent completed messages within the range
+    let recentCompletedQuery = adminSupabase
+      .from('messages')
+      .select('id, recipient, content, status, sent_at, sender_id')
+      .not('content', 'like', '[SIMULATION-DRYRUN]%')
+      .in('status', ['sent', 'failed'])
+      .order('sent_at', { ascending: false })
+
+    if (effectiveStartDate) {
+      recentCompletedQuery = recentCompletedQuery.gte('sent_at', effectiveStartDate)
+    }
+    if (effectiveEndDate) {
+      recentCompletedQuery = recentCompletedQuery.lte('sent_at', `${effectiveEndDate}T23:59:59.999Z`)
+    }
+
+    const [countResults, recentActivity, recentCompleted] = await Promise.all([
+      Promise.all(countPromises),
+      recentActiveQuery.limit(8),
+      recentCompletedQuery.limit(5)
+    ])
+
+    const counts = { pending: 0, processing: 0, sent: 0, failed: 0 }
+    countResults.forEach(({ status, count }) => {
+      counts[status] = count
+    })
+
+    return {
+      counts,
+      activeMessages: recentActivity.data || [],
+      recentCompleted: recentCompleted.data || []
+    }
+  } catch (err: any) {
+    console.error('Failed to get live message queue stats:', err)
+    return {
+      counts: { pending: 0, processing: 0, sent: 0, failed: 0 },
+      activeMessages: [],
+      recentCompleted: []
+    }
+  }
+}
+
 // Inner helper cached fetcher which runs statically and contains no cookie/auth calls
 const getCachedLiveQueueStats = unstable_cache(
- async () => {
- try {
- const statuses = ['pending', 'processing', 'sent', 'failed'] as const
-
- // Get counts per status, excluding simulation messages
- const countPromises = statuses.map(async (status) => {
- const { count, error } = await adminSupabase
- .from('messages')
- .select('*', { count: 'exact', head: true })
- .not('content', 'like', '[SIMULATION-DRYRUN]%')
- .eq('status', status)
-
- if (error) throw error
- return { status, count: count || 0 }
- })
-
- // Get the 8 most recent messages that are actively being processed or pending
- const recentActivityPromise = adminSupabase
- .from('messages')
- .select('id, recipient, content, status, sent_at, sender_id')
- .not('content', 'like', '[SIMULATION-DRYRUN]%')
- .in('status', ['pending', 'processing'])
- .order('sent_at', { ascending: false })
- .limit(8)
-
- // Get the most recently completed messages (sent or failed in the last hour)
- const recentCompletedPromise = adminSupabase
- .from('messages')
- .select('id, recipient, content, status, sent_at, sender_id')
- .not('content', 'like', '[SIMULATION-DRYRUN]%')
- .in('status', ['sent', 'failed'])
- .order('sent_at', { ascending: false })
- .limit(5)
-
- const [countResults, recentActivity, recentCompleted] = await Promise.all([
- Promise.all(countPromises),
- recentActivityPromise,
- recentCompletedPromise
- ])
-
- const counts = { pending: 0, processing: 0, sent: 0, failed: 0 }
- countResults.forEach(({ status, count }) => {
- counts[status] = count
- })
-
- return {
- counts,
- activeMessages: recentActivity.data || [],
- recentCompleted: recentCompleted.data || []
- }
- } catch (err: any) {
- console.error('Failed to get live message queue stats:', err)
- return {
- counts: { pending: 0, processing: 0, sent: 0, failed: 0 },
- activeMessages: [],
- recentCompleted: []
- }
- }
- },
- ['live-queue-stats'],
- { revalidate: 3 }
+  async () => {
+    return fetchQueueStats()
+  },
+  ['live-queue-stats'],
+  { revalidate: 3 }
 )
 
-/**
- * Fetches real-time message queue stats for the dashboard live monitor.
- * Excludes simulation dry-run messages to show only production traffic.
- */
-export async function getLiveMessageQueueStats() {
- // Check authorization dynamically using cookies OUTSIDE the cache helper
- const supabase = await createClient()
- const { data: { user } } = await supabase.auth.getUser()
- if (!user) {
- throw new Error('Unauthorized')
- }
+export async function getLiveMessageQueueStats(startDate?: string, endDate?: string) {
+  // Check authorization dynamically using cookies OUTSIDE the cache helper
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    throw new Error('Unauthorized')
+  }
 
- // Call the static caching helper
- return getCachedLiveQueueStats()
+  // If filtering by dates, run dynamically; otherwise use cache
+  if (startDate || endDate) {
+    return fetchQueueStats(startDate, endDate)
+  }
+
+  return getCachedLiveQueueStats()
 }
 
 /**

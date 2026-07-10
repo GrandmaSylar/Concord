@@ -97,10 +97,10 @@ export default function AnomalyContactsCard({ anomalies }: { anomalies: AnomalyC
                     <td className="px-6 py-4 whitespace-nowrap text-right text-xs">
                       <Link 
                         href={`/contacts?search=${encodeURIComponent(c.name)}`}
-                        className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-755 hover:underline font-bold transition-all"
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-100 hover:bg-blue-100 hover:text-blue-850 transition-all hover:scale-[1.02] active:scale-95 shadow-xs cursor-pointer"
                       >
                         Edit Contact
-                        <ExternalLink className="w-3.5 h-3.5" />
+                        <ExternalLink className="w-3 h-3" />
                       </Link>
                     </td>
                   </tr>
