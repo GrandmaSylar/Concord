@@ -6,26 +6,36 @@ import { unstable_cache, revalidatePath } from 'next/cache'
 export async function getMessageLogs(startDate?: string, endDate?: string) {
   const supabase = await createClient()
 
-  let query = supabase
-    .from('messages')
-    .select('*')
-    .order('sent_at', { ascending: false })
+  const limit = 1000
+  let allLogs: any[] = []
+  let from = 0
 
-  if (startDate) {
-    query = query.gte('sent_at', startDate)
+  while (true) {
+    let query = supabase
+      .from('messages')
+      .select('*')
+      .order('sent_at', { ascending: false })
+
+    if (startDate) {
+      query = query.gte('sent_at', startDate)
+    }
+    if (endDate) {
+      query = query.lte('sent_at', `${endDate}T23:59:59.999Z`)
+    }
+
+    const { data, error } = await query.range(from, from + limit - 1)
+
+    if (error) {
+      console.error('Error fetching message logs:', error)
+      break
+    }
+    if (!data || data.length === 0) break
+    allLogs = allLogs.concat(data)
+    if (data.length < limit) break
+    from += limit
   }
-  if (endDate) {
-    query = query.lte('sent_at', `${endDate}T23:59:59.999Z`)
-  }
 
-  const { data, error } = await query.limit(100)
-
-  if (error) {
-    console.error('Error fetching message logs:', error)
-    return []
-  }
-
-  return data
+  return allLogs
 }
 
 import { adminSupabase } from '@/utils/supabase/static'

@@ -96,9 +96,9 @@ export default function MessageLogTable({ initialLogs }: { initialLogs: MessageL
         <div>
           <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
             <Zap className="w-4 h-4 text-slate-400" />
-            Recent Dispatch Audit Log
+            Dispatch Audit Log
           </h2>
-          <p className="text-xs text-slate-400 font-medium mt-0.5">Last 100 dispatches. Select entries to resend.</p>
+          <p className="text-xs text-slate-400 font-medium mt-0.5">Dispatches matching date parameters. Select entries to resend.</p>
         </div>
 
         {/* Selection Tools & Resend Button */}
