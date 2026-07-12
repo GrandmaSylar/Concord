@@ -28,16 +28,27 @@ export default function MessageLogTable({ initialLogs }: { initialLogs: MessageL
   const [statusFilter, setStatusFilter] = useState<'all' | 'sent' | 'failed' | 'pending'>('all')
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const [isPending, startTransition] = useTransition()
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 50
 
-  // Filter logs based on search and status
-  const filteredLogs = initialLogs.filter(log => {
-    const matchesSearch = log.recipient.includes(searchTerm) || 
-      log.content.toLowerCase().includes(searchTerm.toLowerCase())
+  // Filter logs based on search and status safely
+  const filteredLogs = (initialLogs || []).filter(log => {
+    const recipient = log?.recipient || ''
+    const content = log?.content || ''
+    const matchesSearch = recipient.includes(searchTerm) || 
+      content.toLowerCase().includes(searchTerm.toLowerCase())
     
-    const matchesStatus = statusFilter === 'all' || log.status === statusFilter
+    const matchesStatus = statusFilter === 'all' || log?.status === statusFilter
 
     return matchesSearch && matchesStatus
   })
+
+  // Calculate pagination values
+  const totalPages = Math.ceil(filteredLogs.length / itemsPerPage)
+  const paginatedLogs = filteredLogs.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  )
 
   const isAllSelected = filteredLogs.length > 0 && filteredLogs.every(log => selectedIds.has(log.id))
 
@@ -138,7 +149,10 @@ export default function MessageLogTable({ initialLogs }: { initialLogs: MessageL
             type="text"
             placeholder="Search recipient or content..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => {
+              setSearchTerm(e.target.value)
+              setCurrentPage(1)
+            }}
             className="pl-9 w-full rounded-lg border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-xs py-2 px-3 border bg-white text-slate-900"
           />
         </div>
@@ -148,7 +162,10 @@ export default function MessageLogTable({ initialLogs }: { initialLogs: MessageL
           <Filter className="w-3.5 h-3.5 text-slate-500" />
           <select
             value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value as any)}
+            onChange={(e) => {
+              setStatusFilter(e.target.value as any)
+              setCurrentPage(1)
+            }}
             className="rounded-lg border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-xs py-2 px-3 border bg-white text-slate-900"
           >
             <option value="all">All Dispatches</option>
@@ -186,7 +203,7 @@ export default function MessageLogTable({ initialLogs }: { initialLogs: MessageL
                 </td>
               </tr>
             ) : (
-              filteredLogs.map((log) => {
+              paginatedLogs.map((log) => {
                 const isSelected = selectedIds.has(log.id)
                 return (
                   <tr 
@@ -241,6 +258,38 @@ export default function MessageLogTable({ initialLogs }: { initialLogs: MessageL
           </tbody>
         </table>
       </div>
+
+      {/* Pagination Controls */}
+      {totalPages > 1 && (
+        <div className="px-6 py-4 border-t border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="text-xs text-slate-500 font-medium">
+            Showing <span className="font-bold text-slate-700">{Math.min(filteredLogs.length, (currentPage - 1) * itemsPerPage + 1)}</span> to{' '}
+            <span className="font-bold text-slate-700">{Math.min(filteredLogs.length, currentPage * itemsPerPage)}</span> of{' '}
+            <span className="font-bold text-slate-700">{filteredLogs.length}</span> dispatches
+          </div>
+          <div className="flex items-center gap-1.5">
+            <button
+              type="button"
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+              className="px-3 py-1.5 rounded-lg border border-slate-200 hover:border-slate-300 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Previous
+            </button>
+            <span className="text-xs font-semibold text-slate-600 px-2">
+              Page {currentPage} of {totalPages}
+            </span>
+            <button
+              type="button"
+              disabled={currentPage === totalPages}
+              onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+              className="px-3 py-1.5 rounded-lg border border-slate-200 hover:border-slate-300 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
